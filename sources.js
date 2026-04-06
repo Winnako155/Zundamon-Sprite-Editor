@@ -28,7 +28,7 @@
 //var params = PluginManager.parameters('sources'); // 获取插件参数
 var defaultTime = 2000; // 获取默认文本显示时长
 var defaultColor = 'white'; // 获取默认文本颜色
-var defaultFont = 'simsun'; // 获取默认字体
+var defaultFont = 'title'; // 获取默认字体
 
 var nums = 0; // 文本序号
 var back = document.createElement('div');// 背景板
