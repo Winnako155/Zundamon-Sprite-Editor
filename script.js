@@ -313,7 +313,7 @@ function canvasDraw() {
         if (currentIndex >= imageQueue.length) { // 如果索引超出范围
             // 所有图片绘制完成后更新预览
             try {
-                document.getElementById("CanvasImg").src = "ankomonExample.png";
+                document.getElementById("CanvasImg").src = canvas.toDataURL();
                 //canvas.toDataURL()
             } catch (e) {
                 console.error("Error exporting canvas:", e);
