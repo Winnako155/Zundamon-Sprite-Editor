@@ -1,0 +1,39 @@
+/* tipList 容器：fixed 定位脱离文档流，不影响其他元素布局 */
+.tipList{
+    position: fixed;
+    right: 0;
+    z-index: 9999;
+    pointer-events: none;
+}
+.tipView{
+    position: absolute;
+    right: 0;
+    top: 30px;
+    background-color: rgba(255, 255, 255, 0.616);
+    backdrop-filter: blur(5px);
+    width: 200px;
+    height: 20px;
+    border-radius: 10px 0 0 10px;
+    border-left: 3px solid var(--color-primary);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px;
+    transform: translateX(100%);
+    transition: all 0.4s ease;
+    z-index: 10000;
+}
+.tipView p{
+    font-family: 'xs';
+    font-size: 14px;
+    color: #000;
+}
+.tipView div{
+    background-color: var(--color-primary);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 10px;
+}

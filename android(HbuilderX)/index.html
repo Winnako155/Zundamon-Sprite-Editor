@@ -1,0 +1,70 @@
+<!--
+俊达萌立绘编辑器
+代码写的很烂捏轻点喷
+·此项目采取小驼峰命名法
+
+
+
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="font.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="rowList.css">
+    <link rel="stylesheet" href="tip.css">
+    <link rel="stylesheet" href="decideView.css">
+    <link rel="stylesheet" href="aboutView.css">
+    <title>俊达萌立绘编辑器</title>
+</head>
+<body>
+    <div class="tipList"> <!--提示视图-->
+    </div>
+    <div id="topBar"><!-- 顶部栏 -->
+        <p style="color: var(--color-primary-dark); font-size: 18px;">俊达萌立绘编辑器</p>
+        <div>
+            <button id="button_nowActor" onclick="showDecideView()">当前立绘:???</button>
+            <button id="button_Download" onclick="downloadSprite()">导出</button>
+        </div>
+    </div>
+    <div id="mainView"><!-- 主视图 -->
+        
+        <div id="canvasView"><!--画布视图-->
+            <canvas id="canvas" style="display: none;"></canvas> <!--隐藏起来，后期用img显示，这样不用调整大小(-->
+            <img id="img_canvasResult" alt="展示区" style="height: 250px;" src="res/no-image.png">
+        </div>
+
+        <div id="setView"><!-- 设置视图 -->
+            <p style="font-size: 30px; font-weight: bold;">设置</p>
+        </div>
+    </div>
+
+    <div id="decideView_backGround" onclick="hideDecideView()">
+        
+    </div>
+    <div id="decideView" style="z-index: 10000;">
+            <p style="font-size: 30px;">立绘款式</p>
+            <div id="decideView_itemList"></div>
+            <div id="aboutView">
+                <div>
+                    <p style="font-size: 20px; vertical-align: top; margin-top: 0; color: rgba(34, 156, 83, 1);">俊达萌立绘编辑器<font style="font-size: 12px; vertical-align: top; color: rgba(67, 207, 124, 1);">v1.1</font></p>
+                    <p style="font-size: 11px; color: rgb(5, 41, 19);">使用和编辑立绘请遵循「官方规章」</p>
+                    <p style="font-size: 15px;width: 180px;color: rgba(18, 97, 50, 1);">该软件能够更方便直观的编辑坂本老师的立绘。</p>
+                    <img src="res/example.png" style="max-width: 150px; position: absolute; bottom: 0; right: 0;">
+                    <a href="https://ext.seiga.nicovideo.jp/user/illust/97452727">坂本アヒル ニコニコ静画</a>
+                    <a href="https://github.com/Winnako155/Zundamon-Sprite-Editor">项目 Github</a>
+                    <a href="https://space.bilibili.com/696501979">软件作者 BiliBili</a>
+                    <button onclick="checkUpdate()">检测更新</button>
+                </div>
+            </div>
+            
+    </div>
+</body>
+<script src="rowList.js"></script>
+<script src="scrpit.js"></script>
+<script src="tip.js"></script>
+<script src="decideView.js"></script>
+<script src="checkUpdate.js"></script>
+</html>
