@@ -1,0 +1,579 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{BE66CCB9-53A5-4FD9-BC4E-9B6210C9F35A}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>zunzunWebView2</RootNamespace>
+    <AssemblyName>zunzunWebView2</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>ico_256x256.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Web.WebView2.Core, Version=1.0.4129.50, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.WebView2.1.0.4129.50\lib\net462\Microsoft.Web.WebView2.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.WebView2.WinForms, Version=1.0.4129.50, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.WebView2.1.0.4129.50\lib\net462\Microsoft.Web.WebView2.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.WebView2.Wpf, Version=1.0.4129.50, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.WebView2.1.0.4129.50\lib\net462\Microsoft.Web.WebView2.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Resource Include="zunzun\font\xs.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="ico_256x256.ico" />
+    <Content Include="zunzun\aboutView.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="zunzun\ankomon.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="zunzun\checkUpdate.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="zunzun\decideView.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="zunzun\decideView.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="zunzun\font.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="zunzun\index.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Resource Include="zunzun\res\ankomon\Back Arm\Basic.png" />
+    <Resource Include="zunzun\res\ankomon\Back Arm\Hand raised.png" />
+    <Resource Include="zunzun\res\ankomon\Back Arm\Microphone.png" />
+    <Resource Include="zunzun\res\ankomon\Back Arm\Mouth area.png" />
+    <Resource Include="zunzun\res\ankomon\Back Arm\Pointing.png" />
+    <Resource Include="zunzun\res\ankomon\Back Arm\Side.png" />
+    <Resource Include="zunzun\res\ankomon\Back Arm\Waist.png" />
+    <Resource Include="zunzun\res\ankomon\Body.png" />
+    <Resource Include="zunzun\res\ankomon\Cheeks and Face Color\Blushing.png" />
+    <Resource Include="zunzun\res\ankomon\Cheeks and Face Color\Cheeks 2.png" />
+    <Resource Include="zunzun\res\ankomon\Cheeks and Face Color\Cheeks.png" />
+    <Resource Include="zunzun\res\ankomon\Cheeks and Face Color\Shadow.png" />
+    <Resource Include="zunzun\res\ankomon\Cheeks and Face Color\Vertical lines.png" />
+    <Resource Include="zunzun\res\ankomon\Eyebrows\Angry 1.png" />
+    <Resource Include="zunzun\res\ankomon\Eyebrows\Angry 2.png" />
+    <Resource Include="zunzun\res\ankomon\Eyebrows\Basic.png" />
+    <Resource Include="zunzun\res\ankomon\Eyebrows\Raised.png" />
+    <Resource Include="zunzun\res\ankomon\Eyebrows\Thick brows 1.png" />
+    <Resource Include="zunzun\res\ankomon\Eyebrows\Thick brows 2.png" />
+    <Resource Include="zunzun\res\ankomon\Eyebrows\Troubled.png" />
+    <Resource Include="zunzun\res\ankomon\Eyes\%29%28.png" />
+    <Resource Include="zunzun\res\ankomon\Eyes\Basic Eye Set\Basic whites.png" />
+    <Resource Include="zunzun\res\ankomon\Eyes\Basic Eye Set\Pupils\Averting eyes 1.png" />
+    <Resource Include="zunzun\res\ankomon\Eyes\Basic Eye Set\Pupils\Averting eyes 2.png" />
+    <Resource Include="zunzun\res\ankomon\Eyes\Basic Eye Set\Pupils\Camera gaze 1.png" />
+    <Resource Include="zunzun\res\ankomon\Eyes\Basic Eye Set\Pupils\Camera gaze 2.png" />
+    <Resource Include="zunzun\res\ankomon\Eyes\Basic Eye Set\Pupils\Front 1.png" />
+    <Resource Include="zunzun\res\ankomon\Eyes\Basic Eye Set\Pupils\Front 2.png" />
+    <Resource Include="zunzun\res\ankomon\Eyes\Basic Eye Set\Pupils\Shrunken.png" />
+    <Resource Include="zunzun\res\ankomon\Eyes\Basic Eye Set\Squinting whites.png" />
+    <Resource Include="zunzun\res\ankomon\Eyes\Basic Eye Set\Wide open whites.png" />
+    <Resource Include="zunzun\res\ankomon\Eyes\Cheerful.png" />
+    <Resource Include="zunzun\res\ankomon\Eyes\Closed.png" />
+    <Resource Include="zunzun\res\ankomon\Eyes\Gentle.png" />
+    <Resource Include="zunzun\res\ankomon\Eyes\Looking up 1.png" />
+    <Resource Include="zunzun\res\ankomon\Eyes\Looking up 2.png" />
+    <Resource Include="zunzun\res\ankomon\Eyes\OO.png" />
+    <Resource Include="zunzun\res\ankomon\Eyes\Swirl eyes.png" />
+    <Resource Include="zunzun\res\ankomon\Front Arm\Arms crossed %28hide back arm%29.png" />
+    <Resource Include="zunzun\res\ankomon\Front Arm\Basic.png" />
+    <Resource Include="zunzun\res\ankomon\Front Arm\Finger to mouth.png" />
+    <Resource Include="zunzun\res\ankomon\Front Arm\Hand raised.png" />
+    <Resource Include="zunzun\res\ankomon\Front Arm\Mouth area.png" />
+    <Resource Include="zunzun\res\ankomon\Front Arm\Side.png" />
+    <Resource Include="zunzun\res\ankomon\Front Arm\Thinking.png" />
+    <Resource Include="zunzun\res\ankomon\Front Arm\Waist.png" />
+    <Resource Include="zunzun\res\ankomon\Head Bean\Basic.png" />
+    <Resource Include="zunzun\res\ankomon\Head Bean\Drooping.png" />
+    <Resource Include="zunzun\res\ankomon\ico.png" />
+    <Resource Include="zunzun\res\ankomon\Mouth\Bite lip.png" />
+    <Resource Include="zunzun\res\ankomon\Mouth\E-.png" />
+    <Resource Include="zunzun\res\ankomon\Mouth\E.png" />
+    <Resource Include="zunzun\res\ankomon\Mouth\Ea-.png" />
+    <Resource Include="zunzun\res\ankomon\Mouth\Grin.png" />
+    <Resource Include="zunzun\res\ankomon\Mouth\Mufu.png" />
+    <Resource Include="zunzun\res\ankomon\Mouth\N.png" />
+    <Resource Include="zunzun\res\ankomon\Mouth\Nmu.png" />
+    <Resource Include="zunzun\res\ankomon\Mouth\Nn-.png" />
+    <Resource Include="zunzun\res\ankomon\Mouth\Nyu.png" />
+    <Resource Include="zunzun\res\ankomon\Mouth\O.png" />
+    <Resource Include="zunzun\res\ankomon\Mouth\Oo-.png" />
+    <Resource Include="zunzun\res\ankomon\Mouth\Smile.png" />
+    <Resource Include="zunzun\res\ankomon\Mouth\Smirk.png" />
+    <Resource Include="zunzun\res\ankomon\Mouth\Stick tongue out.png" />
+    <Resource Include="zunzun\res\ankomon\Mouth\Triangle.png" />
+    <Resource Include="zunzun\res\ankomon\Mouth\Uhe-.png" />
+    <Resource Include="zunzun\res\ankomon\Mouth\Uoa-.png" />
+    <Resource Include="zunzun\res\ankomon\Mouth\Waa-.png" />
+    <Resource Include="zunzun\res\ankomon\Mouth\Waa.png" />
+    <Resource Include="zunzun\res\ankomon\Sweat and Tears\Sweat 1.png" />
+    <Resource Include="zunzun\res\ankomon\Sweat and Tears\Sweat 2.png" />
+    <Resource Include="zunzun\res\ankomon\Sweat and Tears\Tears 1.png" />
+    <Resource Include="zunzun\res\ankomon\Sweat and Tears\Tears 2.png" />
+    <Resource Include="zunzun\res\ankomon\Tail-like thing.png" />
+    <Resource Include="zunzun\res\example.png" />
+    <Resource Include="zunzun\res\no-image.png" />
+    <Resource Include="zunzun\res\zun1.1\Body\Body leaning forward.png" />
+    <Resource Include="zunzun\res\zun1.1\Body\Body upright.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Edamame\Edamame normal.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Edamame\Edamame wilted.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Eyebrows\Angry brows 2.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Eyebrows\Angry brows.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Eyebrows\Basic brows.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Eyebrows\Raised brows.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Eyebrows\Troubled brows.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Eyes\Basic eyes left.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Eyes\Basic eyes right.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Eyes\Basic eyes.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Eyes\Cheerful.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Eyes\Closed eyes.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Eyes\Gentle eyes.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Eyes\Half-closed left.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Eyes\Half-closed right.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Eyes\Half-closed.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Eyes\OO.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Eyes\Sanpaku eyes left.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Eyes\Sanpaku eyes right.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Eyes\Sanpaku eyes.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Eyes\Wide open.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Eyes\X-X.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Face Color\Basic cheeks.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Face Color\Blushing.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Face Color\Cheeks reddish.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Face Color\Pale.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Head.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Mouth\Hoa-.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Mouth\Hoa.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Mouth\Hou.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Mouth\Mufu.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Mouth\N%27e-.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Mouth\N.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Mouth\Nn-.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Mouth\O.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Mouth\Smirk.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Mouth\Sullen.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Mouth\Triangle.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Mouth\Uhee.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Mouth\Uwa-.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Sweat.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Front\Tears.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Edamame\Edamame normal.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Edamame\Edamame raised.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Edamame\Edamame wilted.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Eyebrows\Angry brows 2.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Eyebrows\Angry brows.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Eyebrows\Basic brows.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Eyebrows\Raised brows.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Eyebrows\Troubled brows.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Eyes\Cheerful.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Eyes\Closed eyes.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Eyes\Gentle eyes.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Eyes\Half-closed.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Eyes\Normal eyes up.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Eyes\Normal eyes.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Eyes\OO.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Eyes\Sanpaku eyes up.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Eyes\Wide open.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Eyes\X-X.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Face Color\Basic cheeks.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Face Color\Blushing.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Face Color\Cheeks reddish.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Face Color\Pale.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Head.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Mouth\Hoa-.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Mouth\Hoa.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Mouth\Hou.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Mouth\Mufu.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Mouth\N%27e-.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Mouth\N.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Mouth\Nn-.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Mouth\O.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Mouth\Smirk.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Mouth\Sullen.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Mouth\Triangle.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Mouth\Uhe-.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Mouth\Uwa-.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Sweat.png" />
+    <Resource Include="zunzun\res\zun1.1\Head Up\Tears.png" />
+    <Resource Include="zunzun\res\zun1.1\ico.png" />
+    <Resource Include="zunzun\res\zun1.1\Left Arm\Arms crossed %28hide right arm%29.png" />
+    <Resource Include="zunzun\res\zun1.1\Left Arm\Basic.png" />
+    <Resource Include="zunzun\res\zun1.1\Left Arm\Diagonal down.png" />
+    <Resource Include="zunzun\res\zun1.1\Left Arm\Down.png" />
+    <Resource Include="zunzun\res\zun1.1\Left Arm\Finger on chin.png" />
+    <Resource Include="zunzun\res\zun1.1\Left Arm\Hand raised.png" />
+    <Resource Include="zunzun\res\zun1.1\Left Arm\Mouth area.png" />
+    <Resource Include="zunzun\res\zun1.1\Left Arm\Pocket.png" />
+    <Resource Include="zunzun\res\zun1.1\Left Arm\Push.png" />
+    <Resource Include="zunzun\res\zun1.1\Left Arm\Side.png" />
+    <Resource Include="zunzun\res\zun1.1\Right Arm\Basic for upright.png" />
+    <Resource Include="zunzun\res\zun1.1\Right Arm\Chop.png" />
+    <Resource Include="zunzun\res\zun1.1\Right Arm\Diagonal down.png" />
+    <Resource Include="zunzun\res\zun1.1\Right Arm\Down.png" />
+    <Resource Include="zunzun\res\zun1.1\Right Arm\Hand raised.png" />
+    <Resource Include="zunzun\res\zun1.1\Right Arm\Mouth area.png" />
+    <Resource Include="zunzun\res\zun1.1\Right Arm\Pocket for leaning.png" />
+    <Resource Include="zunzun\res\zun1.1\Right Arm\Pocket for upright.png" />
+    <Resource Include="zunzun\res\zun1.1\Right Arm\Pointing side.png" />
+    <Resource Include="zunzun\res\zun1.1\Right Arm\Pointing up.png" />
+    <Resource Include="zunzun\res\zun1.1\Right Arm\Side.png" />
+    <Resource Include="zunzun\res\zun2.3\Edamame\Edamame normal.png" />
+    <Resource Include="zunzun\res\zun2.3\Edamame\Edamame wilted.png" />
+    <Resource Include="zunzun\res\zun2.3\Edamame\Hoodie %28use with lining%29.png" />
+    <Resource Include="zunzun\res\zun2.3\Eyebrows\Angry brows.png" />
+    <Resource Include="zunzun\res\zun2.3\Eyebrows\Normal brows.png" />
+    <Resource Include="zunzun\res\zun2.3\Eyebrows\Raised brows.png" />
+    <Resource Include="zunzun\res\zun2.3\Eyebrows\Troubled brows 1.png" />
+    <Resource Include="zunzun\res\zun2.3\Eyebrows\Troubled brows 2.png" />
+    <Resource Include="zunzun\res\zun2.3\Eyes\Eye set\Half-closed whites.png" />
+    <Resource Include="zunzun\res\zun2.3\Eyes\Eye set\Normal whites.png" />
+    <Resource Include="zunzun\res\zun2.3\Eyes\Eye set\Pupils\Averting eyes 2.png" />
+    <Resource Include="zunzun\res\zun2.3\Eyes\Eye set\Pupils\Averting eyes 3.png" />
+    <Resource Include="zunzun\res\zun2.3\Eyes\Eye set\Pupils\Averting eyes.png" />
+    <Resource Include="zunzun\res\zun2.3\Eyes\Eye set\Pupils\Camera gaze 2.png" />
+    <Resource Include="zunzun\res\zun2.3\Eyes\Eye set\Pupils\Camera gaze 3.png" />
+    <Resource Include="zunzun\res\zun2.3\Eyes\Eye set\Pupils\Camera gaze.png" />
+    <Resource Include="zunzun\res\zun2.3\Eyes\Eye set\Pupils\Normal eyes 2.png" />
+    <Resource Include="zunzun\res\zun2.3\Eyes\Eye set\Pupils\Normal eyes 3.png" />
+    <Resource Include="zunzun\res\zun2.3\Eyes\Eye set\Pupils\Normal eyes.png" />
+    <Resource Include="zunzun\res\zun2.3\Eyes\Eye set\Wide open whites.png" />
+    <Resource Include="zunzun\res\zun2.3\Eyes\Gentle eyes.png" />
+    <Resource Include="zunzun\res\zun2.3\Eyes\Half-closed eyes.png" />
+    <Resource Include="zunzun\res\zun2.3\Eyes\Looking up 2.png" />
+    <Resource Include="zunzun\res\zun2.3\Eyes\Looking up 3.png" />
+    <Resource Include="zunzun\res\zun2.3\Eyes\Looking up.png" />
+    <Resource Include="zunzun\res\zun2.3\Eyes\OO.png" />
+    <Resource Include="zunzun\res\zun2.3\Eyes\Smile 2.png" />
+    <Resource Include="zunzun\res\zun2.3\Eyes\Smile.png" />
+    <Resource Include="zunzun\res\zun2.3\Eyes\Squinting eyes.png" />
+    <Resource Include="zunzun\res\zun2.3\Eyes\Squinting heart eyes.png" />
+    <Resource Include="zunzun\res\zun2.3\Eyes\Swirl eyes.png" />
+    <Resource Include="zunzun\res\zun2.3\Eyes\UU.png" />
+    <Resource Include="zunzun\res\zun2.3\Eyes\X-X.png" />
+    <Resource Include="zunzun\res\zun2.3\Face Color\%28Hidden%29.png" />
+    <Resource Include="zunzun\res\zun2.3\Face Color\Cheeks 2.png" />
+    <Resource Include="zunzun\res\zun2.3\Face Color\Cheeks reddish.png" />
+    <Resource Include="zunzun\res\zun2.3\Face Color\Cheeks.png" />
+    <Resource Include="zunzun\res\zun2.3\Face Color\Pale.png" />
+    <Resource Include="zunzun\res\zun2.3\Face Color\Shadow.png" />
+    <Resource Include="zunzun\res\zun2.3\Hoodie lining.png" />
+    <Resource Include="zunzun\res\zun2.3\ico.png" />
+    <Resource Include="zunzun\res\zun2.3\Mouth\Hahee.png" />
+    <Resource Include="zunzun\res\zun2.3\Mouth\Ho-.png" />
+    <Resource Include="zunzun\res\zun2.3\Mouth\Hoa.png" />
+    <Resource Include="zunzun\res\zun2.3\Mouth\Hoah.png" />
+    <Resource Include="zunzun\res\zun2.3\Mouth\Mu-.png" />
+    <Resource Include="zunzun\res\zun2.3\Mouth\Mufu.png" />
+    <Resource Include="zunzun\res\zun2.3\Mouth\Nah-.png" />
+    <Resource Include="zunzun\res\zun2.3\Mouth\Nheh-.png" />
+    <Resource Include="zunzun\res\zun2.3\Mouth\Nn-.png" />
+    <Resource Include="zunzun\res\zun2.3\Mouth\O.png" />
+    <Resource Include="zunzun\res\zun2.3\Mouth\Ohoo.png" />
+    <Resource Include="zunzun\res\zun2.3\Mouth\Triangle.png" />
+    <Resource Include="zunzun\res\zun2.3\Mouth\Yu.png" />
+    <Resource Include="zunzun\res\zun2.3\name_mapping.txt" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 1\Left arm\%28Hidden%29.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 1\Left arm\Basic.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 1\Left arm\Hand raised.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 1\Left arm\Mouth area.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 1\Left arm\Suffering.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 1\Left arm\Thinking.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 1\Left arm\Waist.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 1\Left arm\Whispering.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 1\Right arm\%28Hidden%29.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 1\Right arm\Basic.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 1\Right arm\Hand raised.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 1\Right arm\Microphone.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 1\Right arm\Mouth area.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 1\Right arm\Pointing.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 1\Right arm\Suffering.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 1\Right arm\Waist.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 1\Uniform.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 1\Usual clothes.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 2\Base body.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 2\Bath towel.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 2\Left arm\%28Hidden%29.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 2\Left arm\Basic.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 2\Left arm\Chest area.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 2\Left arm\Hand raised.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 2\Left arm\Mouth area.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 2\Left arm\Suffering.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 2\Left arm\Thinking.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 2\Left arm\Waist.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 2\Left arm\Whispering.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 2\Panties.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 2\Right arm\%28Hidden%29.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 2\Right arm\Basic.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 2\Right arm\Chest area.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 2\Right arm\Hand raised.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 2\Right arm\Microphone.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 2\Right arm\Mouth area.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 2\Right arm\Pointing.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 2\Right arm\Suffering.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 2\Right arm\Waist.png" />
+    <Resource Include="zunzun\res\zun2.3\Outfit 2\School swimsuit.png" />
+    <Content Include="zunzun\res\zun2.3\rowList_data.js" />
+    <Resource Include="zunzun\res\zun2.3\Symbols etc\Duckling.png" />
+    <Resource Include="zunzun\res\zun2.3\Symbols etc\Sweat 1.png" />
+    <Resource Include="zunzun\res\zun2.3\Symbols etc\Sweat 2.png" />
+    <Resource Include="zunzun\res\zun2.3\Symbols etc\Sweat 3.png" />
+    <Resource Include="zunzun\res\zun2.3\Symbols etc\Tears.png" />
+    <Resource Include="zunzun\res\zun2.3\Tail-like thing.png" />
+    <Resource Include="zunzun\res\zun3.2\Body.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Edamame\Edamame normal.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Edamame\Edamame standing half-broken.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Edamame\Edamame standing.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Edamame\Edamame wilted.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Eyebrows\Angry brows 2.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Eyebrows\Angry brows.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Eyebrows\Basic brows 2.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Eyebrows\Basic brows.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Eyebrows\Raised brows.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Eyebrows\Troubled brows.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Eyes\Basic eyes 2 left.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Eyes\Basic eyes 2 right.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Eyes\Basic eyes 2 up.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Eyes\Basic eyes 2.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Eyes\Basic eyes left.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Eyes\Basic eyes right.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Eyes\Basic eyes up.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Eyes\Basic eyes.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Eyes\Cheerful.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Eyes\Closed eyes.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Eyes\Gentle eyes.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Eyes\Half-closed 2 left.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Eyes\Half-closed 2 right.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Eyes\Half-closed 2.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Eyes\Half-closed left.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Eyes\Half-closed right.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Eyes\Half-closed.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Eyes\Happy.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Eyes\OO.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Eyes\Squinting eyes.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Eyes\Squinting heart eyes.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Eyes\UU.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Eyes\X-X.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Face Color\Basic cheeks.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Face Color\Blushing.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Face Color\Cheeks reddish.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Face Color\Pale.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Face Color\Shadow.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Head.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Heavy sweat.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Lower eyelid.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Mouth\Aha.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Mouth\Ehe.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Mouth\Hoa-.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Mouth\Hoa.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Mouth\Hou.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Mouth\Mufu.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Mouth\N%27e-.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Mouth\N.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Mouth\Nn-.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Mouth\O.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Mouth\Smile.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Mouth\Smirk.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Mouth\Sullen.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Mouth\Triangle.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Mouth\Uhee.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Mouth\Uwa-.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Sweat.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Front\Tears.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Edamame\Edamame normal.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Edamame\Edamame standing.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Edamame\Edamame wilted.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Eyebrows\Angry brows 2.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Eyebrows\Angry brows.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Eyebrows\Basic brows.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Eyebrows\Raised brows.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Eyebrows\Troubled brows.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Eyes\Cheerful.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Eyes\Closed eyes.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Eyes\Gentle eyes.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Eyes\Half-closed 2.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Eyes\Half-closed heart.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Eyes\Half-closed.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Eyes\Happy.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Eyes\Normal eyes 2 up.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Eyes\Normal eyes 2.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Eyes\Normal eyes up.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Eyes\Normal eyes.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Eyes\OO.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Eyes\UU.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Eyes\X-X.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Face Color\Basic cheeks.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Face Color\Blushing.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Face Color\Cheeks reddish.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Face Color\Pale.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Face Color\Shadow.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Head.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Heavy sweat.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Mouth\Aha.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Mouth\Ehe.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Mouth\Hoa-.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Mouth\Hoa.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Mouth\Hou.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Mouth\Mufu.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Mouth\N%27e-.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Mouth\N.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Mouth\Nn-.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Mouth\O.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Mouth\Smile.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Mouth\Smirk.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Mouth\Sullen.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Mouth\Triangle.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Mouth\Uhe-.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Mouth\Uwa-.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Sweat.png" />
+    <Resource Include="zunzun\res\zun3.2\Head Up\Tears.png" />
+    <Resource Include="zunzun\res\zun3.2\ico.png" />
+    <Resource Include="zunzun\res\zun3.2\Left Arm\Arms crossed %28hide right arm%29.png" />
+    <Resource Include="zunzun\res\zun3.2\Left Arm\Basic.png" />
+    <Resource Include="zunzun\res\zun3.2\Left Arm\Finger on chin.png" />
+    <Resource Include="zunzun\res\zun3.2\Left Arm\Hand raised.png" />
+    <Resource Include="zunzun\res\zun3.2\Left Arm\Mouth area.png" />
+    <Resource Include="zunzun\res\zun3.2\Left Arm\Side.png" />
+    <Resource Include="zunzun\res\zun3.2\Left Arm\Waist.png" />
+    <Resource Include="zunzun\res\zun3.2\Right Arm\Basic.png" />
+    <Resource Include="zunzun\res\zun3.2\Right Arm\Chop.png" />
+    <Resource Include="zunzun\res\zun3.2\Right Arm\Hand raised.png" />
+    <Resource Include="zunzun\res\zun3.2\Right Arm\Mouth area.png" />
+    <Resource Include="zunzun\res\zun3.2\Right Arm\Pointing side.png" />
+    <Resource Include="zunzun\res\zun3.2\Right Arm\Pointing up.png" />
+    <Resource Include="zunzun\res\zun3.2\Right Arm\Side.png" />
+    <Resource Include="zunzun\res\zun3.2\Right Arm\Waist.png" />
+    <Content Include="zunzun\res\zun3.2\rowList_data.js" />
+    <Resource Include="zunzun\res\zun3.2\Tail-like thing.png" />
+    <Content Include="zunzun\rowList.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="zunzun\rowList.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="zunzun\scrpit.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="zunzun\style.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="zunzun\tip.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="zunzun\tip.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="zunzun\zun1.1.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="zunzun\zun2.3.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="zunzun\zun3.2.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\Microsoft.Web.WebView2.1.0.4129.50\build\Microsoft.Web.WebView2.targets" Condition="Exists('..\packages\Microsoft.Web.WebView2.1.0.4129.50\build\Microsoft.Web.WebView2.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>这台计算机上缺少此项目引用的 NuGet 程序包。使用“NuGet 程序包还原”可下载这些程序包。有关更多信息，请参见 http://go.microsoft.com/fwlink/?LinkID=322105。缺少的文件是 {0}。</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.Web.WebView2.1.0.4129.50\build\Microsoft.Web.WebView2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Web.WebView2.1.0.4129.50\build\Microsoft.Web.WebView2.targets'))" />
+  </Target>
+</Project>
