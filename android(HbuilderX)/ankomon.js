@@ -4,6 +4,29 @@ canvas.width = 1500;
 canvas.height = 3300;
 nowActor = "安可萌";
 document.body.dataset.actor = nowActor;
+var readMe = `あんこもん立ち絵素材
+========================================
+
+あんこもんのフリー立ち絵素材です。
+SSS合同会社様のご依頼により制作しました。
+
+良識の範囲内で、動画やアイコン等、自由にご利用ください。
+公式の規約に準じての商用利用や、改変・加工しての利用も可能です。
+クレジット表記や、ニコニコでのコンテンツツリー登録は任意です。
+
+↓公式ガイドラインも読んでね。（ず・ω・きょ）
+https://zunko.jp/guideline.html
+
+PSDToolに対応しています。
+ブラウザ上で使えるツールでレイヤー切り替えなどが簡単にできるのでおすすめです。
+https://oov.github.io/psdtool
+
+2026/01/06 公開
+
+========================================
+製作：坂本アヒル
+https://twitter.com/sakamoto_ahr`;
+showDialog("提示", readMe);
 rowList_init("面部", true, [
     {
         img: "res/ankomon/Sweat and Tears/Tears 1.png",
@@ -704,6 +727,4 @@ selectItemByID("Basic");
 selectItemByID("FBasic");
 selectItemByID("BBasic");
 selectItemByID("Cheeks");
-setTimeout(function(){
-    document.getElementById("Tail-like thing").click();
-}, 500);
+selectItemByID("Tail-like thing");

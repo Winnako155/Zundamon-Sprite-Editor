@@ -28,6 +28,24 @@ body[data-actor="安可萌"]{
     --color-item-selected: #e53935;
     --color-item-hover: #ffcdd273;
 }
+body[data-actor="春日部紬"]{
+    --color-primary: #FFC107;
+    --color-primary-light: #FFC10721;
+    --color-primary-dark: #FF8F00;
+    --color-primary-border: #FF8F001C;
+    --color-bg-gradient-top: rgba(255, 248, 225, 1);
+    --color-item-selected: #FFC107;
+    --color-item-hover: #FFECB373;
+}
+body[data-actor="东北切蒲英"]{
+    --color-primary: #802a08;
+    --color-primary-light: #ff070721;
+    --color-primary-dark: #ff3c00;
+    --color-primary-border: #ff33001c;
+    --color-bg-gradient-top: rgba(255, 248, 225, 1);
+    --color-item-selected: #ff3907;
+    --color-item-hover: #FFECB373;
+}
 
 * {
     margin: 0;
@@ -48,11 +66,15 @@ body{
     padding: 10px;
 
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 10px;
     height: calc(100vh - 50px);
 }
-
+@media screen and (max-width: 768px) {
+    #mainView{
+        flex-direction: column;
+    }
+}
 /* 顶部栏 */
 #topBar{
     background-color: rgba(0, 0, 0, 0.021);
@@ -72,6 +94,14 @@ body{
     border-bottom: 1px solid rgba(0, 0, 0, 0.048);
     backdrop-filter: blur(10px);
 }
+#topBar div{
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	max-height: 1.5625rem;
+	gap: 0.3125rem;
+}
 #topBar button{
     box-sizing: border-box;
     padding: 5px 10px;
@@ -79,10 +109,16 @@ body{
     border: 0;
     cursor: pointer;
     transition: transform 0.1s ease;
+	max-width: 7.5rem;
+	max-height: 1.875rem;
+	white-space: nowrap; /* 禁止换行 */
 }
 #button_nowActor{
     background-color: var(--color-primary-light);
     color: var(--color-primary-dark);
+	text-overflow: ellipsis; /* 显示省略号 */
+	overflow: hidden;
+	padding: 0;
 }
 
 #button_Download{
@@ -98,7 +134,7 @@ body{
 
 /* 画布视图 */
 #canvasView{
-    height: 250px;
+    height: 100%;
     background-color: white;
     box-sizing: border-box;
     padding: 10px;
@@ -109,6 +145,18 @@ body{
     align-items: center;
     justify-content: center;
     overflow: hidden;
+}
+#canvasView img{
+    max-width: 300px;
+}
+@media screen and (max-width: 768px) {
+    #canvasView{
+        height: 250px;
+    }
+    #canvasView img {
+       max-height: 250px;
+       max-width: auto;
+    }
 }
 
 /* 设置视图 */

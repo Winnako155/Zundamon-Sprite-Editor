@@ -28,47 +28,9 @@ function compareVersions(v1, v2) {
  * @returns {Promise<object>} 包含检测结果的对象
  */
 async function checkGitHubVersion(owner, repo, currentVersion, options = {}) {
-    function requestJSON(url) {
-        return new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', url, true);
-            xhr.setRequestHeader('Accept', 'application/vnd.github.v3+json');
-            if (options.token) {
-                xhr.setRequestHeader('Authorization', `token ${options.token}`);
-            }
-
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState !== 4) {
-                    return;
-                }
-
-                if (xhr.status >= 200 && xhr.status < 300) {
-                    try {
-                        resolve({
-                            ok: true,
-                            status: xhr.status,
-                            data: JSON.parse(xhr.responseText)
-                        });
-                    } catch (error) {
-                        reject(new Error(`解析响应失败: ${error.message}`));
-                    }
-                    return;
-                }
-
-                if (xhr.status === 404) {
-                    resolve({ ok: false, status: xhr.status, data: null });
-                    return;
-                }
-
-                reject(new Error(`GitHub API 请求失败: ${xhr.status}`));
-            };
-
-            xhr.onerror = function () {
-                reject(new Error('网络请求失败'));
-            };
-
-            xhr.send();
-        });
+    const headers = new Headers({ 'Accept': 'application/vnd.github.v3+json' });
+    if (options.token) {
+        headers.append('Authorization', `token ${options.token}`);
     }
 
     try {
@@ -76,18 +38,18 @@ async function checkGitHubVersion(owner, repo, currentVersion, options = {}) {
         let latestVersion = null;
         let releaseUrl = null;
 
-        const releaseRes = await requestJSON(`https://api.github.com/repos/${owner}/${repo}/releases/latest`);
+        const releaseRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/releases/latest`, { headers });
         
         if (releaseRes.ok) {
-            const releaseData = releaseRes.data;
+            const releaseData = await releaseRes.json();
             latestVersion = releaseData.tag_name;
             releaseUrl = releaseData.html_url;
         } else if (releaseRes.status === 404) {
             // 如果没有 Release，则退而求其次获取最新的 Tag
-            const tagRes = await requestJSON(`https://api.github.com/repos/${owner}/${repo}/tags?per_page=1`);
+            const tagRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/tags?per_page=1`, { headers });
             if (!tagRes.ok) throw new Error(`获取 Tags 失败: ${tagRes.status}`);
             
-            const tags = tagRes.data;
+            const tags = await tagRes.json();
             if (tags.length > 0) {
                 latestVersion = tags[0].name;
                 releaseUrl = `https://github.com/${owner}/${repo}/tree/${latestVersion}`;

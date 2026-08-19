@@ -4,7 +4,45 @@ canvas.width = 1082;
 canvas.height = 1594;
 nowActor = "俊达萌新";
 document.body.dataset.actor = nowActor;
+var readMe = `ずんだもん立ち絵素材V3.2
+========================================
 
+ずんだもん（美少女）のフリー立ち絵素材です。
+
+良識の範囲内で、動画やアイコン等、自由にご利用ください。
+公式の規約に準じての商用利用や、改変・加工しての利用も可能です。
+クレジット表記や、ニコニコでのコンテンツツリー登録は任意です。
+
+↓公式ガイドラインも読んでね。（ず・ω・きょ）
+https://zunko.jp/guideline.html
+
+【使い方】
+基本版：レイヤー構造をシンプルにしたものです。頭は正面向きのみです。
+上向き版：レイヤー構造をシンプルにしたものです。頭は上向きのみです。
+全部詰め版：レイヤーがやや細かく分かれています。頭の向き2種類をまとめたものです。なお、レイヤーの干渉の都合で腕差分「口元」がやや下寄りです。
+
+PSDToolに対応しています。
+ブラウザ上で使えるツールでレイヤー切り替えなどが簡単にできるのでおすすめです。
+https://oov.github.io/psdtool
+
+【更新履歴】
+2023/09/03 V3.2
+・レイヤー構造のシンプルなpsdファイル「通常版」「上向き版」を追加しました。
+・顔のバランスなどを大幅に調整しました。
+・口「えへ」「ほほえみ」「あは」を追加しました。
+・正面向きの眉「基本眉2」を追加しました。
+
+2023/06/30 V3.1
+・顔のバランスを調整しました。
+・上向きの目「○○」が半透明になっていた問題を修正しました。
+
+2023/06/06 V3
+公開
+
+========================================
+製作：坂本アヒル
+https://twitter.com/sakamoto_ahr`;
+showDialog("提示", readMe);
 rowList_init("脸部", true, [
     {
         img: "res/zun3.2/Head Front/Tears.png",
@@ -1160,6 +1198,7 @@ selectItemByID("FAngry brows");
 selectItemByID("FBasic eyes");
 selectItemByID("FHou");
 selectItemByID("FEdamame normal");
+selectItemByID("FBasic cheeks");
 selectItemByID("FHead");
 selectItemByID("LBasic");
 selectItemByID("RBasic");

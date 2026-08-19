@@ -1,4 +1,4 @@
-const nowBuild = "v1.1";
+const nowBuild = "v1.3";
 const OWNER = 'Winnako155';
 const REPO = 'Zundamon-Sprite-Editor';
 var nowActor = "";
@@ -9,9 +9,11 @@ canvas.width = 1082;
 canvas.height = 1650;
 let ctx = canvas.getContext("2d");
 var allRowLists = [];
+hideDialogView();
 
-
+var renderGeneration = 0;
 async function render(){
+    const myGen = ++renderGeneration;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     let targets = [];
     for(let i of [...allRowLists].reverse()){
@@ -22,6 +24,8 @@ async function render(){
         }
     }
     let imgs = await Promise.all(targets.map(preloadItem));
+    // 期间若有更新的 render 启动，本次为过期调用，丢弃绘制，避免用旧 targets 覆盖最新画面
+    if(myGen !== renderGeneration) return;
     for(let k = 0; k < targets.length; k++){
         let t = targets[k];
         ctx.drawImage(imgs[k], t.x, t.y, t.width, t.height);
@@ -36,6 +40,7 @@ function preloadItem(target){
         img.onload = function() { resolve(img); };
     });
 }
+//获取项状态 返回的是这个项的选中状态
 function getItemStateByID(id){
     for(let i of allRowLists){
         for(let j of i.items){
@@ -46,6 +51,7 @@ function getItemStateByID(id){
     }
     return false;
 }
+//获取列表选中项 返回的是这个列表的选中项
 function getListSelectStateByID(title){
     for(let i of allRowLists){
         if(i.id == title){
@@ -70,10 +76,18 @@ function selectItemByID(id,isSelect=true){
         }
     }
 }
+//切换列表状态 可以显示/隐藏列表
+//注意::::::::::::::::夜路塞牙我要吃了你 这个tempState 是为了在隐藏列表时，保存当前选中的项，避免重复 hide 把之前存的冲掉
 function changeTheRowListState(title,causeTarget,isShow=true){
     for(let i of allRowLists){
         if(i.id == title){
-            i.theTitle.innerText = isShow ? i.theTitle.innerText.replace("（"+causeTarget+"后使用）","") : i.theTitle.innerText.replace("（"+causeTarget+"后使用）","")+"（"+causeTarget+"后使用）";
+            if(causeTarget){
+                i.theTitle.innerText = isShow ? i.theTitle.innerText.replace("（"+causeTarget+"后使用）","") : i.theTitle.innerText.replace("（"+causeTarget+"后使用）","")+"（"+causeTarget+"后使用）";
+            }
+            else{
+                // causeTarget 留空时，标题跟随 isShow 显隐
+                i.theTitle.style.display = isShow ? "" : "none";
+            }
             if(!isShow){
                 // 隐藏：只在当前可见时才存缓存，避免重复 hide 把之前存的冲掉
                 if(i.style.display !== "none"){
@@ -100,6 +114,7 @@ function changeTheRowListState(title,causeTarget,isShow=true){
         }
     }
 }
+//清空列表状态 可以清空列表的所有项
 function clearTheRowListState(title){
     for(let i of allRowLists){
         if(i.id == title){
@@ -111,6 +126,7 @@ function clearTheRowListState(title){
         }
     }
 }
+//判断是否可以使用
 function isAbleToUse(clickItem){
     if(nowActor == "俊达萌"){
         if(clickItem.id == "Hoodie lining"){
@@ -236,6 +252,24 @@ function isAbleToUse(clickItem){
             changeTheRowListState("毛豆","选择正常",false);
         }
     }
+    else if(nowActor == "春日部紬"){
+        if(getListSelectStateByID("眼睛")!=null && clickItem.addTarget.theTitle.innerText == "眼睛"){
+            clearTheRowListState("瞳孔");
+            clearTheRowListState("眼眶");
+        }
+        if(getListSelectStateByID("眼眶")!=null && clickItem.addTarget.theTitle.innerText == "眼眶"){
+            clearTheRowListState("眼睛");
+        }
+        if(getListSelectStateByID("眼眶")!=null){
+            changeTheRowListState("瞳孔","选中眼眶",true);
+        }
+        else{
+            changeTheRowListState("瞳孔","选中眼眶",false);
+        }
+    }
+    else if(nowActor == "(平鱼)俊达萌"){
+        flatFish(clickItem);
+    }
 }
 function checkUpdate(){
     tip("检测更新中...");
@@ -261,14 +295,14 @@ function downloadSprite(){
 
     // === 普通浏览器环境 ===
     if(!hasPlus){
-        tip("走浏览器 a 标签下载", 2000);
         var a = document.createElement("a");
         a.href = canvas.toDataURL("image/png");
         a.download = nowActor + ".png";
         a.click();
-        setTimeout(function(){ tip("浏览器下载已触发"); }, 500);
+        setTimeout(function(){ tip("下载已触发"); }, 500);
         return;
     }
+
 
     // === HTML5+ 环境 ===
     var dataUrl = canvas.toDataURL("image/png");
@@ -330,10 +364,141 @@ function downloadSprite(){
             tip("已保存到相册");
         }, function(err){
             tip("[ERR] gallery.save 失败：" + (err.message || err.code || "?"), 3000);
-			tip("请检查软件的储存访问权限是否开启",3000,"yellow");
             console.error("gallery.save err", err);
         });
     }
 
     doSave();
+}
+
+//平鱼、的、立绘、太、复杂、了、我、不写、注释、就炸、了、、
+function flatFish(clickItem){
+    //↓衣服类型的判断 来决定什么服装 用什么手
+    if(getItemStateByID("Hoodie")|| getItemStateByID("Overall") || getItemStateByID("Yukata") || getItemStateByID("Maid") || getItemStateByID("Staff uniform")){ //如果选中外套，那么将禁用左右手
+        changeTheRowListState("左手(常服)","",false);
+        changeTheRowListState("右手(常服)","",false);
+        changeTheRowListState("左手(裙子)","",false);
+        changeTheRowListState("右手(裙子)","",false);
+        changeTheRowListState("左手","",false);
+        changeTheRowListState("右手","",false);
+    }
+    else{ //如果没有选中外套，那么才看你要选哪个手的样式
+        if(getItemStateByID("Usual")){ //如果当前服装是常款，那么将使用制服左右手
+            changeTheRowListState("左手(常服)","",true);
+            changeTheRowListState("右手(常服)","",true);
+            changeTheRowListState("左手(裙子)","",false);
+            changeTheRowListState("右手(裙子)","",false);
+            changeTheRowListState("左手","",false);
+            changeTheRowListState("右手","",false);
+        }
+        else if(getItemStateByID("Dress")){ //如果当前服装是裙子，那么将使用裙子左右手
+            changeTheRowListState("左手","",true);
+            changeTheRowListState("右手(裙子)","",true);
+            changeTheRowListState("左手(常服)","",false);
+            changeTheRowListState("右手(常服)","",false);
+            changeTheRowListState("右手","",false);
+        }
+        else if(getItemStateByID("Uniform") || getItemStateByID("Body Shirt")|| getItemStateByID("Plain shirt")){ //如果是其他三个需要左右手的服装
+            changeTheRowListState("左手(常服)","",false);
+            changeTheRowListState("右手(常服)","",false);
+            changeTheRowListState("左手(裙子)","",false);
+            changeTheRowListState("右手(裙子)","",false);
+            changeTheRowListState("左手","",true);
+            changeTheRowListState("右手","",true);
+        }
+        else{
+            changeTheRowListState("左手","",false);
+            changeTheRowListState("右手","",false);
+        }
+    }
+    //↑衣服类型的判断 来决定什么服装 用什么手
+
+    //↓这个是判断是否要使用手在臀部
+    if(getItemStateByID("Usual clothes Right hand Hand on hip") || getItemStateByID("Right hand Hand on hip")  || getItemStateByID("Right hand Hand on hip")){
+        selectItemByID("Hand on hip");
+    }
+    else{
+        selectItemByID("Hand on hip",false);
+    }
+    //↑这个是判断是否要使用手在臀部
+
+    
+    
+
+    //↓大型眼部判断 先全打开在根据情况关闭
+    if(getListSelectStateByID("其它眼") != null && clickItem.addTarget.theTitle.innerText == "其它眼"){ //如果是其它眼
+        clearTheRowListState("惊讶眼");
+        clearTheRowListState("凶恶眼");
+        clearTheRowListState("眼眶");
+        clearTheRowListState("瞳孔");
+        clearTheRowListState("眼部效果");
+    }
+    else if(getListSelectStateByID("凶恶眼") != null && clickItem.addTarget.theTitle.innerText == "凶恶眼"){ //如果是凶恶眼
+        clearTheRowListState("惊讶眼");
+        clearTheRowListState("其它眼");
+        clearTheRowListState("眼眶");
+        clearTheRowListState("瞳孔");
+        clearTheRowListState("眼部效果");
+    }
+    else if(getListSelectStateByID("惊讶眼") != null && clickItem.addTarget.theTitle.innerText == "惊讶眼"){ //如果是惊讶眼
+        clearTheRowListState("凶恶眼");
+        clearTheRowListState("其它眼");
+        clearTheRowListState("眼眶");
+        clearTheRowListState("瞳孔");
+        clearTheRowListState("眼部效果");
+    }
+    else if(getListSelectStateByID("眼眶") != null && clickItem.addTarget.theTitle.innerText == "眼眶"){ //如果是眼眶
+        clearTheRowListState("惊讶眼");
+        clearTheRowListState("凶恶眼");
+        clearTheRowListState("其它眼");
+        clearTheRowListState("眼部效果");
+    }
+    if(getListSelectStateByID("眼眶") != null){
+        changeTheRowListState("瞳孔","",true);
+    }
+    else{
+        changeTheRowListState("瞳孔","",false);
+    }
+    //↑大型眼部判断 先全打开在根据情况关闭
+    
+    //↓这个是判断是否要使用眼白
+    if(getListSelectStateByID("眼眶")!=null){
+        selectItemByID("Open White eyes",true);
+    }
+    else{
+        selectItemByID("Open White eyes",false);
+    }
+    //↑这个是判断是否要使用眼白
+
+
+    //↓手部判断
+    if(getItemStateByID("Grip Grip") || getItemStateByID("Grip")){ //如果是右手握柄
+        changeTheRowListState("配件(搭配右手-握柄姿势使用)","",true);
+    }
+    else{ //如果不是右手握柄
+        changeTheRowListState("配件(搭配右手-握柄姿势使用)","",false);
+    }
+    if(getItemStateByID("Upward grip Upward grip") || getItemStateByID("Upward grip")){ //如果是向上握柄
+        changeTheRowListState("向上配件(搭配右手-向上握柄姿势使用)","",true);
+    }
+    else{ //如果不是向上握柄
+        changeTheRowListState("向上配件(搭配右手-向上握柄姿势使用)","",false);
+    }
+    if(getItemStateByID("Pick")){ //如果用到了拨片
+        changeTheRowListState("拨片上插的东西(?) (搭配配件-拨片物件使用)","",true);
+    }
+    else{ //如果没有用到拨片
+        changeTheRowListState("拨片上插的东西(?) (搭配配件-拨片物件使用)","",false);
+    }
+    //↑手部判断
+
+    //↓书包判断
+    changeTheRowListState("搭配背包","",false);
+    if(getListSelectStateByID("后部配件")!=null){
+        selectItemByID("Backpack strap",true);
+    }
+    else{
+        selectItemByID("Backpack strap",false);
+    }
+    //↑书包判断
 }

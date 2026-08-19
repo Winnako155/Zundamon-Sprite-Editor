@@ -9,8 +9,7 @@
     position: absolute;
     right: 0;
     top: 30px;
-    background-color: rgba(255, 255, 255, 0.616);
-    backdrop-filter: blur(5px);
+    background-color: rgb(255, 255, 255);
     width: 200px;
     height: 20px;
     border-radius: 10px 0 0 10px;
@@ -29,6 +28,7 @@
     font-family: 'xs';
     font-size: 14px;
     color: #000;
+    width: 100%;
 }
 .tipView div{
     background-color: var(--color-primary);

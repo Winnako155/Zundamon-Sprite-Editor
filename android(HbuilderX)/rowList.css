@@ -27,6 +27,9 @@
     cursor: pointer;
     flex-shrink: 0;
 }
+.rowList_Item:hover{
+    transform: scale(1.05);
+}
 .rowList_Item:active{
     transform: scale(0.95);
 }
