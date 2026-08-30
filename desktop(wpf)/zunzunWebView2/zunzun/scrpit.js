@@ -1,18 +1,54 @@
-const nowBuild = "v1.3";
+const nowBuild = "v1.4";
+document.getElementById("nowBuildText").innerHTML = nowBuild;
 const OWNER = 'Winnako155';
 const REPO = 'Zundamon-Sprite-Editor';
 var nowActor = "";
+var nowMode = "sprite";
+document.getElementById("bqbView").style.display ="none";
 let canvas = document.getElementById("canvas");
+let bqbCanvas = document.getElementById("bqbCanvas");
 let img_canvasResult = document.getElementById("img_canvasResult");
+let dragOverlay = document.getElementById("dragOverlay");
 let button_nowActor = document.getElementById("button_nowActor");
-canvas.width = 1082;
-canvas.height = 1650;
+var actorPositionX = 0;
+var actorPositionY = 0;
+var actorSize = 100;
+var actorRotation = 0;
+var actorFlipX = false;
+var subtitleText = "";
+var subtitleColor = "#FFFFFF";
+var subtitleStrokeColor = "#000000";
+var subtitleStrokeSize = 8;
+var subtitleFontSize = 46;
+var subtitleBottomMargin = 26;
+var canvasSizeX = 1082;
+var canvasSizeY = 1650;
 let ctx = canvas.getContext("2d");
+let ctx_bqb = bqbCanvas.getContext("2d");
 var allRowLists = [];
 hideDialogView();
 
+function resetActorSize(){
+    document.getElementById("input_actorSize").value = 100;
+    document.getElementById("input_actorSizeText").innerHTML = "100%";
+    document.getElementById("input_actorSize").oninput();
+}
+function resetActorPosition(){
+    document.getElementById("input_actorPositionX").value = canvasSizeX / 2;
+    document.getElementById("input_actorPositionY").value = canvasSizeY / 2;
+    document.getElementById("input_actorPositionX").oninput();
+    document.getElementById("input_actorPositionY").oninput();
+}
+
+
+
+
+
+
 var renderGeneration = 0;
 async function render(){
+    canvas.width = canvasSizeX;
+    canvas.height = canvasSizeY;
     const myGen = ++renderGeneration;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     let targets = [];
@@ -30,7 +66,48 @@ async function render(){
         let t = targets[k];
         ctx.drawImage(imgs[k], t.x, t.y, t.width, t.height);
     }
-    img_canvasResult.src = canvas.toDataURL("image/png");
+    if(nowMode == "sprite"){
+        img_canvasResult.src = canvas.toDataURL("image/png");
+    }
+    else if(nowMode == "bqb"){
+        drawBqbResult();
+    }
+}
+//把主画布内容合成到 bqb 画板并刷新预览（同步执行，拖拽时直接调用避免延迟）
+function drawBqbResult(){
+    bqbCanvas.width = 512;
+    bqbCanvas.height = 512;
+    ctx_bqb.clearRect(0, 0, 512, 512);
+    ctx_bqb.fillStyle = document.getElementById("backgroundColorWell").value;
+    ctx_bqb.fillRect(0, 0, 512, 512);
+    // 把主画布内容按 人物大小 缩放后，以 人物位置 为锚点在 bqb 画板内位移（50% = 居中）
+    const baseScale = Math.min(bqbCanvas.width / canvasSizeX, bqbCanvas.height / canvasSizeY);
+    const scale = baseScale * (actorSize / 100);
+    const drawW = canvasSizeX * scale;
+    const drawH = canvasSizeY * scale;
+    const offsetX = (actorPositionX / canvasSizeX) * bqbCanvas.width - drawW / 2;
+    const offsetY = bqbCanvas.height - (actorPositionY / canvasSizeY) * bqbCanvas.height - drawH / 2; //翻转y轴
+    //绕人物中心旋转，翻转作用于人物自身（先镜像再整体旋转）
+    ctx_bqb.save();
+    ctx_bqb.translate(offsetX + drawW / 2, offsetY + drawH / 2);
+    ctx_bqb.scale(actorFlipX ? -1 : 1, 1);
+    ctx_bqb.rotate(actorRotation * Math.PI / 180);
+    ctx_bqb.drawImage(canvas, -drawW / 2, -drawH / 2, drawW, drawH);
+    ctx_bqb.restore();
+    // 底部居中绘制字幕，描边为圆角
+    if(subtitleText){
+        ctx_bqb.font = "bold " + subtitleFontSize + "px sans-serif";
+        ctx_bqb.textAlign = "center";
+        ctx_bqb.textBaseline = "bottom";
+        ctx_bqb.lineJoin = "round";
+        ctx_bqb.lineCap = "round";
+        ctx_bqb.strokeStyle = subtitleStrokeColor;
+        ctx_bqb.lineWidth = subtitleStrokeSize;
+        ctx_bqb.strokeText(subtitleText, bqbCanvas.width / 2, bqbCanvas.height - subtitleBottomMargin);
+        ctx_bqb.fillStyle = subtitleColor;
+        ctx_bqb.fillText(subtitleText, bqbCanvas.width / 2, bqbCanvas.height - subtitleBottomMargin);
+    }
+    img_canvasResult.src = bqbCanvas.toDataURL("image/png");
 }
 function preloadItem(target){
     return new Promise(resolve => {
@@ -293,10 +370,13 @@ function downloadSprite(){
     var diag = "环境检测: plus=" + hasPlus + " plus.io=" + !!hasPlusIO + " gallery=" + !!hasGallery;
     console.log(diag);
 
+    //表情包模式导出 bqb 画板，立绘模式导出主画布(也是用、上三元，运算符了、口牙)
+    var exportCanvas = (nowMode == "bqb") ? bqbCanvas : canvas;
+
     // === 普通浏览器环境 ===
     if(!hasPlus){
         var a = document.createElement("a");
-        a.href = canvas.toDataURL("image/png");
+        a.href = exportCanvas.toDataURL("image/png");
         a.download = nowActor + ".png";
         a.click();
         setTimeout(function(){ tip("下载已触发"); }, 500);
@@ -305,7 +385,7 @@ function downloadSprite(){
 
 
     // === HTML5+ 环境 ===
-    var dataUrl = canvas.toDataURL("image/png");
+    var dataUrl = exportCanvas.toDataURL("image/png");
     var base64 = dataUrl.replace(/^data:image\/\w+;base64,/, "");
     var baseName = nowActor;
     var ext = ".png";
@@ -501,4 +581,189 @@ function flatFish(clickItem){
         selectItemByID("Backpack strap",false);
     }
     //↑书包判断
+}
+
+function switchMode(mode){
+    if(mode == "sprite"){
+        nowMode = "sprite";
+        tip("完整立绘模式");
+    }
+    else if(mode == "bqb"){
+        nowMode = "bqb";
+        tip("表情包模式");
+        initBqbPosition();
+    }
+    //表情包模式显示设置面板，立绘模式隐藏
+    document.getElementById("bqbView").style.display = (mode == "bqb") ? "" : "none";
+    //拖拽手势层只在表情包模式启用
+    dragOverlay.style.display = (mode == "bqb") ? "" : "none";
+    dragOverlay.style.cursor = (mode == "bqb") ? "grab" : "";
+    hideDialogViewMode();
+    render();
+}
+
+//↓一堆、表情包模式的设置项
+//bqb 模式的位置/大小初始化：位置滑条范围为主画布尺寸，默认居中；大小默认 100%
+function initBqbPosition(){
+    document.getElementById("input_actorPositionX").max = canvasSizeX;
+    document.getElementById("input_actorPositionY").max = canvasSizeY;
+    document.getElementById("input_actorPositionX").min = -canvasSizeX;
+    document.getElementById("input_actorPositionY").min = -canvasSizeY;
+
+    document.getElementById("input_actorPositionX").value = canvasSizeX / 2;
+    document.getElementById("input_actorPositionY").value = canvasSizeY / 2;
+    actorPositionX = canvasSizeX / 2;
+    actorPositionY = canvasSizeY / 2;
+    document.getElementById("input_actorPositionXText").innerHTML = actorPositionX + "px";
+    document.getElementById("input_actorPositionYText").innerHTML = actorPositionY + "px";
+    document.getElementById("input_actorRotation").value = 0;
+    actorRotation = 0;
+    document.getElementById("input_actorRotationText").innerHTML = "0°";
+    actorFlipX = false;
+    document.getElementById("button_actorFlip").innerHTML = "左右翻转：关";
+}
+initBqbPosition();
+dragOverlay.style.display = "none"; //默认是 sprite 模式，手势层隐藏（切到 bqb 时由 switchMode 打开）
+document.getElementById("input_actorSize").oninput = function(){
+    actorSize = Number(this.value);
+    document.getElementById("input_actorSizeText").innerHTML = this.value + "%";
+    document.getElementById("input_actorPositionX").max = canvasSizeX;
+    document.getElementById("input_actorPositionY").max = canvasSizeY;
+    render();
+}
+document.getElementById("input_actorRotation").oninput = function(){
+    actorRotation = Number(this.value);
+    document.getElementById("input_actorRotationText").innerHTML = this.value + "°";
+    drawBqbResult(); //同步重绘，拖动更跟手
+}
+function resetActorRotation(){
+    document.getElementById("input_actorRotation").value = 0;
+    actorRotation = 0;
+    document.getElementById("input_actorRotationText").innerHTML = "0°";
+    drawBqbResult();
+}
+function toggleActorFlip(){
+    actorFlipX = !actorFlipX;
+    document.getElementById("button_actorFlip").innerHTML = "左右翻转：" + (actorFlipX ? "开" : "关");
+    drawBqbResult();
+}
+
+
+document.getElementById("input_actorPositionX").oninput = function(){
+    actorPositionX = Number(this.value);
+    document.getElementById("input_actorPositionXText").innerHTML = this.value + "px";
+    render();
+}
+document.getElementById("input_actorPositionY").oninput = function(){
+    actorPositionY = Number(this.value);
+    document.getElementById("input_actorPositionYText").innerHTML = this.value + "px";
+    render();
+}
+document.getElementById("backgroundColorWell").oninput = function(){
+    render();
+}
+document.getElementById("input_subtitleText").oninput = function(){
+    subtitleText = this.value;
+    render();
+}
+document.getElementById("subtitleColorWell").oninput = function(){
+    subtitleColor = this.value;
+    render();
+}
+document.getElementById("subtitleStrokeColorWell").oninput = function(){
+    subtitleStrokeColor = this.value;
+    render();
+}
+document.getElementById("input_subtitleStrokeSize").oninput = function(){
+    subtitleStrokeSize = Number(this.value);
+    document.getElementById("input_subtitleStrokeSizeText").innerHTML = this.value + "px";
+    render();
+}
+document.getElementById("input_subtitleFontSize").oninput = function(){
+    subtitleFontSize = Number(this.value);
+    document.getElementById("input_subtitleFontSizeText").innerHTML = this.value + "px";
+    render();
+}
+document.getElementById("input_subtitleBottomMargin").oninput = function(){
+    subtitleBottomMargin = Number(this.value);
+    document.getElementById("input_subtitleBottomMarginText").innerHTML = this.value + "px";
+    render();
+}
+//↑一堆、表情包模式的设置项
+
+// ===== 表情包模式：拖拽预览图移动人物（鼠标/触屏通用） =====
+var isDraggingBqb = false;
+var dragStartClientX = 0;
+var dragStartClientY = 0;
+var dragStartPosX = 0;
+var dragStartPosY = 0;
+
+//把拖拽后的位置同步回滑条和文字
+function syncBqbSliders(){
+    document.getElementById("input_actorPositionX").value = actorPositionX;
+    document.getElementById("input_actorPositionY").value = actorPositionY;
+    document.getElementById("input_actorPositionXText").innerHTML = Math.round(actorPositionX) + "px";
+    document.getElementById("input_actorPositionYText").innerHTML = Math.round(actorPositionY) + "px";
+}
+
+//移动端/桌面端通用拖拽：手势绑在透明手势层 dragOverlay 上
+//触摸目标是普通 div 而不是 <img>，webview 就不会把长按当成原生图片拖拽
+function getDragClient(e){
+    if(e.touches && e.touches.length > 0){
+        return {x: e.touches[0].clientX, y: e.touches[0].clientY};
+    }
+    return {x: e.clientX, y: e.clientY};
+}
+function dragBqbStart(e){
+    if(nowMode != "bqb") return;
+    e.preventDefault(); //阻止触摸默认行为
+    const p = getDragClient(e);
+    isDraggingBqb = true;
+    dragStartClientX = p.x;
+    dragStartClientY = p.y;
+    dragStartPosX = actorPositionX;
+    dragStartPosY = actorPositionY;
+    dragOverlay.style.cursor = "grabbing";
+}
+function dragBqbMove(e){
+    if(!isDraggingBqb || nowMode != "bqb") return;
+    if(e.cancelable) e.preventDefault(); //注意!@#$%夜路塞牙我要吃了你社会很单、纯，、不阻止的话移、。动端拖一下就会被页面滚动接管
+    const p = getDragClient(e);
+    //屏幕位移 → bqb画布位移（因为、预览图，被CSS缩放过，所以、要按显，示尺寸换算口牙，）
+    const rect = img_canvasResult.getBoundingClientRect();
+    const dx = (p.x - dragStartClientX) * (bqbCanvas.width / rect.width);
+    const dy = (p.y - dragStartClientY) * (bqbCanvas.height / rect.height);
+    //与渲染映射严格互逆：offsetX 随位置变量正向变化，offsetY 反向（翻转轴）
+    //反正就是、不依赖缩，放余量，任何大小下都是 1:1 跟手；范围与滑条一、致口牙 [-canvasSize, +canvasSize]，人物也是可完全拖出画面，口牙
+    actorPositionX = Math.min(canvasSizeX, Math.max(-canvasSizeX, dragStartPosX + dx / bqbCanvas.width * canvasSizeX));
+    actorPositionY = Math.min(canvasSizeY, Math.max(-canvasSizeY, dragStartPosY - dy / bqbCanvas.height * canvasSizeY));
+    syncBqbSliders();
+    drawBqbResult(); //同步重绘，不走异步 render，避免拖拽延迟
+}
+function dragBqbEnd(){
+    if(!isDraggingBqb) return;
+    isDraggingBqb = false;
+    dragOverlay.style.cursor = "grab";
+}
+//触屏：touchmove 直接、挂，在 window 上，手指滑出、画布也能继，续跟口牙、
+dragOverlay.addEventListener("touchstart", dragBqbStart, {passive: false});
+window.addEventListener("touchmove", dragBqbMove, {passive: false});
+window.addEventListener("touchend", dragBqbEnd);
+window.addEventListener("touchcancel", dragBqbEnd);
+//鼠标：mousemove 挂在 window 上，拖出画布范围也持续跟踪口牙，，
+dragOverlay.addEventListener("mousedown", dragBqbStart);
+window.addEventListener("mousemove", dragBqbMove);
+window.addEventListener("mouseup", dragBqbEnd);
+//兜底：拦截原生图片拖拽和长按菜单
+window.addEventListener("dragstart", function(e){ e.preventDefault(); });
+dragOverlay.addEventListener("contextmenu", function(e){ e.preventDefault(); });
+img_canvasResult.addEventListener("contextmenu", function(e){ e.preventDefault(); });
+
+
+
+function toggleBqbView(){
+    var bqbView = document.getElementById("bqbView");
+    var isCollapsed = bqbView.style.flex.charAt(0) === "0";
+    bqbView.style.flex = isCollapsed ? "1" : "0";
+    bqbView.style.minHeight = isCollapsed ? "auto" : "50px";
 }

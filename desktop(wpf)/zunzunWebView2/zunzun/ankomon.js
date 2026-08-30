@@ -1,7 +1,7 @@
 // Auto-generated from あんこもん立ち絵素材.psd
 // Canvas: 1500 x 3300 px
-canvas.width = 1500;
-canvas.height = 3300;
+canvasSizeX = 1500;
+canvasSizeY = 3300;
 nowActor = "安可萌";
 document.body.dataset.actor = nowActor;
 var readMe = `あんこもん立ち絵素材

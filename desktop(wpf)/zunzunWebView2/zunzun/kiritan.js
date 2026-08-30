@@ -1,7 +1,7 @@
 // Auto-generated from kiritan PSD
 // Canvas: 1082 x 1368 px
-canvas.width = 1082;
-canvas.height = 1368;
+canvasSizeX = 1082;
+canvasSizeY = 1368;
 nowActor = "东北切蒲英";
 document.body.dataset.actor = nowActor;
 var readMe = `東北きりたん立ち絵素材

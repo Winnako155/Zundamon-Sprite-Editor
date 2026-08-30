@@ -1,7 +1,7 @@
 // Auto-generated from 春日部紬3.0.psd
 // Canvas: 1082 x 1820 px
-canvas.width = 1082;
-canvas.height = 1820;
+canvasSizeX = 1082;
+canvasSizeY = 1820;
 nowActor = "春日部紬";
 document.body.dataset.actor = nowActor;
 var readMe = `春日部つむぎ立ち絵素材

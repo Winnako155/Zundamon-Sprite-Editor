@@ -1,3 +1,39 @@
+@keyframes showDialog {
+    0% {
+        transform: translate(-50%,-50%) scale(0.5); 
+        opacity: 0;
+    }
+    100% {
+        transform: translate(-50%,-50%) scale(1);
+        opacity: 1;
+    }
+}
+@keyframes hideDialog {
+    0% {
+        transform: translate(-50%,-50%) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%,-50%) scale(0.5);
+        opacity: 0;
+    }
+}
+@keyframes showDialog_BackGround {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+@keyframes hideDialog_BackGround {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
 #dialogView_backGround{
     position: absolute;
     top: 0;
@@ -35,13 +71,15 @@
     padding: 10px 20px;
     border-radius: 5px;
     border: 0;
-    background-color: #00000017;
-    color: #000000;
+    background-color: #E8F5E9;
+    color: #388E3C;
     cursor: pointer;
     margin-top: 20px;
+    transition: all 0.1s ease;
 }
 #dialogView button:hover{
-    background-color: #00000033;
+    background-color: #388E3C;
+    color: white;
 }
 #dialogView button:active{
     transform: scale(0.95);

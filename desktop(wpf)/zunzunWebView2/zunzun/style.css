@@ -125,6 +125,10 @@ body{
     background-color: var(--color-primary);
     color: white;
 }
+#button_Mode{
+    background-color: var(--color-primary);
+    color: white;
+}
 #topBar button:hover{
     transform: scale(1.05);
 }
@@ -139,6 +143,7 @@ body{
     box-sizing: border-box;
     padding: 10px;
     border-radius: 8px;
+    position: relative; /*给拖拽手势层做定位基准*/
 
     display: flex;
     flex-direction: column;
@@ -148,6 +153,23 @@ body{
 }
 #canvasView img{
     max-width: 300px;
+    height: auto;
+    pointer-events: none; /*触摸一律落在手势层上，webview 不会把长按当成拖图片*/
+    -webkit-user-drag: none;
+    -webkit-touch-callout: none;
+    user-select: none;
+}
+/*透明手势层：盖住整个画布视图，接管拖拽*/
+#dragOverlay{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
+    touch-action: none;
+    -webkit-touch-callout: none;
+    user-select: none;
 }
 @media screen and (max-width: 768px) {
     #canvasView{
@@ -172,4 +194,141 @@ body{
     flex-direction: column;
 
     overflow-y: auto;
+}
+
+#bqbView{
+    flex: 1;
+    flex-shrink: 0;
+    background-color: white;
+    box-sizing: border-box;
+    padding: 10px;
+    border-radius: 8px;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow-y: auto;
+    transition: all 0.4s ease;
+}
+#bqbView button{
+    background-color: var(--color-primary);
+    border: 0;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+    flex-shrink: 0;
+    color: white;
+}
+#bqbView button:hover{
+    transform: scale(1.05);
+}
+#bqbView button:active{
+    transform: scale(0.95);
+}
+[type="number"]{
+    border: 1px solid var(--color-primary-border);
+    border-radius: 5px;
+    background-color: var(--color-bg-gradient-top);
+    color: var(--color-primary-dark);
+}
+[type="number"]:focus{
+    outline: none;
+}
+[type="number"]{
+    font-size: 14px;
+    border-color: var(--color-primary-dark);
+}
+[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+    outline: 0;
+    background-color: transparent;
+    width: 100%;
+    min-width: 0; /*允许在 flex 行内收缩，避免溢出屏幕*/
+}
+[type="range"]::-webkit-slider-runnable-track {
+    height: 4px;
+    background: var(--color-bg-gradient-top);
+    transition: all 0.4s ease;
+}
+[type="range" i]::-webkit-slider-container {
+    height: 20px;
+    overflow: hidden;
+    transition: all 0.4s ease;
+}
+[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: var(--color-primary-dark);
+    border: 1px solid transparent;
+    margin-top: -8px;
+    border-image: linear-gradient(var(--color-primary),var(--color-primary)) 0 fill / 8 20 8 0 / 0px 0px 0 2000px;
+    transition: all 0.4s ease;
+}
+
+
+[type="text"]{
+    box-sizing: border-box;
+    padding: 6px 12px;
+    border: 1.5px solid var(--color-primary-border);
+    border-radius: 8px;
+    background-color: var(--color-primary-light);
+    color: var(--color-primary-dark);
+    font-size: 14px;
+    outline: none;
+    min-width: 0;
+    user-select: text;
+    -webkit-user-select: text;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+[type="text"]::placeholder{
+    color: var(--color-primary-dark);
+    opacity: 0.45;
+}
+[type="text"]:hover{
+    border-color: var(--color-primary);
+}
+[type="text"]:focus{
+    border-color: var(--color-primary);
+    background-color: white;
+}
+[type="color"]{
+    flex-shrink: 0;
+    border: 0;
+    transition: transform 0.1s ease;
+}
+[type="color"]:hover{
+    scale: 1.05;
+}
+[type="color"]:active{
+    scale: 0.95;
+}
+
+
+
+/*自适应、*/
+#bqbView > div{
+    min-width: 0;
+}
+#bqbView div p{
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+/*数值文本固定占位，防止拖动滑条时宽度变化引起抖动*/
+#bqbView div p[id$="Text"]{
+    min-width: 4em;
+    text-align: right;
+}
+#button_toggleBqbView{
+    display: none;
+}
+@media screen and (max-width: 768px) {
+    #button_toggleBqbView{
+        display: block;
+    }
 }

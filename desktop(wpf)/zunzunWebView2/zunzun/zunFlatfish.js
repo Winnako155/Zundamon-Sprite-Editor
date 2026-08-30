@@ -1,7 +1,7 @@
 // Auto-generated from zunda_s.psd
 // Canvas: 750 x 1000 px
-canvas.width = 750;
-canvas.height = 1000;
+canvasSizeX = 750;
+canvasSizeY = 1000;
 nowActor = "(平鱼)俊达萌";
 document.body.dataset.actor = nowActor;
 var readMe = `当前立绘为测试版内容，可能会有图层显示BUG，请见谅。

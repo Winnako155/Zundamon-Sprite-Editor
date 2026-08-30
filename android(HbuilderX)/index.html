@@ -7,7 +7,7 @@
 
 -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,15 +18,17 @@
     <link rel="stylesheet" href="decideView.css">
     <link rel="stylesheet" href="aboutView.css">
     <link rel="stylesheet" href="dialog.css">
+    <link rel="stylesheet" href="dialog_mode.css">
     <title>俊达萌立绘编辑器</title>
 </head>
 <body>
     <div class="tipList"> <!--提示视图-->
     </div>
     <div id="topBar"><!-- 顶部栏 -->
-        <p style="color: var(--color-primary-dark); font-size: 18px;">俊达萌立绘编辑器</p>
+        <p style="color: var(--color-primary-dark); font-size: 15px;">俊达萌立绘编辑器</p>
         <div>
             <button id="button_nowActor" onclick="showDecideView()">当前立绘:???</button>
+            <button id="button_Mode" onclick="showDialogMode('编辑器模式')">模式</button>
             <button id="button_Download" onclick="downloadSprite()">导出</button>
         </div>
     </div>
@@ -34,9 +36,75 @@
         
         <div id="canvasView"><!--画布视图-->
             <canvas id="canvas" style="display: none;"></canvas> <!--隐藏起来，后期用img显示，这样不用调整大小(-->
+            <canvas id="bqbCanvas" style="display: none;"></canvas>
             <img id="img_canvasResult" alt="展示区"  src="res/no-image.png">
         </div>
 
+        <div id="bqbView"><!--表情包设置视图-->
+            <p style="font-size: 30px; font-weight: bold;">表情包设置</p>
+            <p style="margin-top: 10px;">人物大小</p>
+            <div style="display: flex; flex-direction: row; align-items: center; gap: 5px;">
+                <input type="range" min="0" max="500" step="1" value="100" style="flex: 1;" id="input_actorSize" />
+                <p id="input_actorSizeText">100%</p>
+                <button onclick="resetActorSize()">重置</button>
+            </div>
+
+            <p style="margin-top: 10px; display: flex; flex-direction: row; align-items: center; justify-content: space-between;">
+                人物位置(也可直接拖拽)
+                <button onclick="resetActorPosition()" style="margin-left: 5px;">重置</button>
+            </p>
+            <div style="display: flex; flex-direction: row; align-items: center; gap: 5px;">
+                <p>X:</p>
+                <input type="range" min="-1000" max="var(--canvasSizeX)" step="1" value="100" style="flex: 1;" id="input_actorPositionX" />
+                <p id="input_actorPositionXText">px</p>
+            </div>
+            <div style="display: flex; flex-direction: row; align-items: center; gap: 5px; margin-top: 5px;">
+                <p>Y:</p>
+                <input type="range" min="-2000" max="var(--canvasSizeY)" step="1" value="100" style="flex: 1;" id="input_actorPositionY" />
+                <p id="input_actorPositionYText">px</p>
+            </div>
+
+            <p style="margin-top: 10px;">人物旋转</p>
+            <div style="display: flex; flex-direction: row; align-items: center; gap: 5px;">
+                <input type="range" min="-180" max="180" step="1" value="0" style="flex: 1;" id="input_actorRotation" />
+                <p id="input_actorRotationText">0°</p>
+                <button onclick="resetActorRotation()">重置</button>
+            </div>
+
+            <p style="margin-top: 10px;">翻转</p>
+            <div style="display: flex; flex-direction: row; align-items: center; gap: 5px;">
+                <button onclick="toggleActorFlip()" id="button_actorFlip">左右翻转：关</button>
+            </div>
+            <p style="margin-top: 10px;">背景颜色</p>
+            <input type="color" id="backgroundColorWell" value="#388E3C">
+
+            <p style="margin-top: 10px;">字幕</p>
+            <div style="display: flex; flex-direction: row; align-items: center; gap: 5px;">
+                <p>文字:</p>
+                <input type="text" id="input_subtitleText" placeholder="输入字幕..." style="flex: 1;" />
+            </div>
+            <div style="display: flex; flex-direction: row; align-items: center; gap: 5px; margin-top: 5px;">
+                <p>字体:</p>
+                <input type="color" id="subtitleColorWell" value="#FFFFFF">
+                <p>描边:</p>
+                <input type="color" id="subtitleStrokeColorWell" value="#000000">
+            </div>
+            <div style="display: flex; flex-direction: row; align-items: center; gap: 5px; margin-top: 5px;">
+                <p>字体大小:</p>
+                <input type="range" min="10" max="120" step="1" value="46" style="flex: 1;" id="input_subtitleFontSize" />
+                <p id="input_subtitleFontSizeText">46px</p>
+            </div>
+            <div style="display: flex; flex-direction: row; align-items: center; gap: 5px; margin-top: 5px;">
+                <p>距底部:</p>
+                <input type="range" min="0" max="500" step="1" value="26" style="flex: 1;" id="input_subtitleBottomMargin" />
+                <p id="input_subtitleBottomMarginText">26px</p>
+            </div>
+            <div style="display: flex; flex-direction: row; align-items: center; gap: 5px; margin-top: 5px;">
+                <p>描边大小:</p>
+                <input type="range" min="0" max="30" step="1" value="8" style="flex: 1;" id="input_subtitleStrokeSize" />
+                <p id="input_subtitleStrokeSizeText">8px</p>
+            </div>
+        </div>
         <div id="setView"><!-- 设置视图 -->
             <p style="font-size: 30px; font-weight: bold;">设置</p>
         </div>
@@ -45,7 +113,7 @@
     <div id="decideView_backGround" onclick="hideDecideView()">
         <div id="aboutView">
             <div>
-                <p style="font-size: 18px; vertical-align: top; margin-top: 0; color: rgb(255, 255, 255);">俊达萌立绘编辑器<font style="font-size: 12px; vertical-align: top; color: rgba(255, 255, 255, 0.575);">v1.3</font></p>
+                <p style="font-size: 18px; vertical-align: top; margin-top: 0; color: rgb(255, 255, 255);">俊达萌立绘编辑器<font id="nowBuildText" style="font-size: 12px; vertical-align: top; color: rgba(255, 255, 255, 0.575);">NaN</font></p>
                 <p style="font-size: 10px; color: rgba(255, 255, 255, 0.651);">使用和编辑立绘请遵循「官方规章」</p>
                 <p style="font-size: 13px;width: 180px;color: rgba(255, 255, 255, 0.842);">能够更直观的编辑俊达萌立绘的小工具。</p>
                 <a href="https://github.com/Winnako155/Zundamon-Sprite-Editor">项目 Github</a>
@@ -64,7 +132,12 @@
     <div id="dialogView">
         <h2 id="dialogView_title"></h2>
         <p id="dialogView_content"></p>
-        <button onclick="hideDialogView()">okay</button>
+        <button onclick="hideDialogView()">确定</button>
+    </div>
+    <div id="dialogView_mode">
+        <h1 style="margin-bottom: 20px;" id="dialogView_mode_title">编辑器模式</h1>
+        <img src="res/img/mode_sprite.png" alt="完整立绘模式" id="dialogView_mode_sprite">
+        <img src="res/img/mode_bqb.png" alt="表情包模式" id="dialogView_mode_bqb">
     </div>
 </body>
 <script src="rowList.js"></script>
@@ -73,7 +146,9 @@
 <script src="tip.js"></script>
 <script src="decideView.js"></script>
 <script src="checkUpdate.js"></script>
+<script src="dialog_mode.js"></script>
 <script>
     checkUpdate();
+    hideDialogViewMode();
 </script>
 </html>
