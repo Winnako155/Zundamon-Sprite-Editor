@@ -727,7 +727,7 @@ function dragBqbStart(e){
 }
 function dragBqbMove(e){
     if(!isDraggingBqb || nowMode != "bqb") return;
-    if(e.cancelable) e.preventDefault(); //！！！！！！！！社会很单、纯，、不阻止的话移、。动端拖一下就会被页面滚动接管
+    if(e.cancelable) e.preventDefault(); //注意!@#$%夜路塞牙我要吃了你社会很单、纯，、不阻止的话移、。动端拖一下就会被页面滚动接管
     const p = getDragClient(e);
     //屏幕位移 → bqb画布位移（因为、预览图，被CSS缩放过，所以、要按显，示尺寸换算口牙，）
     const rect = img_canvasResult.getBoundingClientRect();
@@ -761,3 +761,11 @@ img_canvasResult.addEventListener("contextmenu", function(e){ e.preventDefault()
 
 
 
+function toggleBqbView(){
+	var button_bqbView = document.getElementById("button_toggleBqbView");
+    var bqbView = document.getElementById("bqbView");
+    var isCollapsed = bqbView.style.flex.charAt(0) === "0";
+	button_bqbView.innerText = isCollapsed ? "折叠" : "展开";
+    bqbView.style.flex = isCollapsed ? "1" : "0";
+    bqbView.style.minHeight = isCollapsed ? "auto" : "60px";
+}

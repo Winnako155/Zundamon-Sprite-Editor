@@ -143,6 +143,7 @@ body{
     box-sizing: border-box;
     padding: 10px;
     border-radius: 8px;
+    position: relative; /*给拖拽手势层做定位基准*/
 
     display: flex;
     flex-direction: column;
@@ -153,6 +154,22 @@ body{
 #canvasView img{
     max-width: 300px;
     height: auto;
+    pointer-events: none; /*触摸一律落在手势层上，webview 不会把长按当成拖图片*/
+    -webkit-user-drag: none;
+    -webkit-touch-callout: none;
+    user-select: none;
+}
+/*透明手势层：盖住整个画布视图，接管拖拽*/
+#dragOverlay{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
+    touch-action: none;
+    -webkit-touch-callout: none;
+    user-select: none;
 }
 @media screen and (max-width: 768px) {
     #canvasView{
@@ -191,7 +208,7 @@ body{
     flex-direction: column;
 
     overflow-y: auto;
-
+    transition: all 0.4s ease;
 }
 #bqbView button{
     background-color: var(--color-primary);
@@ -306,4 +323,12 @@ body{
 #bqbView div p[id$="Text"]{
     min-width: 4em;
     text-align: right;
+}
+#button_toggleBqbView{
+    display: none;
+}
+@media screen and (max-width: 768px) {
+    #button_toggleBqbView{
+        display: block;
+    }
 }

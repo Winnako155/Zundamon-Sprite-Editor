@@ -37,11 +37,15 @@
         <div id="canvasView"><!--画布视图-->
             <canvas id="canvas" style="display: none;"></canvas> <!--隐藏起来，后期用img显示，这样不用调整大小(-->
             <canvas id="bqbCanvas" style="display: none;"></canvas>
-            <img id="img_canvasResult" alt="展示区"  src="res/no-image.png">
+            <img id="img_canvasResult" alt="展示区"  src="res/no-image.png" style="border-radius: 10px;">
+            <div id="dragOverlay"></div> <!--透明手势层：接管触摸，避免 webview 长按图片触发原生拖拽-->
         </div>
 
         <div id="bqbView"><!--表情包设置视图-->
-            <p style="font-size: 30px; font-weight: bold;">表情包设置</p>
+            <div style="display: flex; flex-direction: row; align-items: center; gap: 5px;">
+                <p style="font-size: 30px; font-weight: bold;">表情包设置</p>
+                <button id="button_toggleBqbView" onclick="toggleBqbView()">折叠</button>
+            </div>
             <p style="margin-top: 10px;">人物大小</p>
             <div style="display: flex; flex-direction: row; align-items: center; gap: 5px;">
                 <input type="range" min="0" max="500" step="1" value="100" style="flex: 1;" id="input_actorSize" />
@@ -92,17 +96,17 @@
             <div style="display: flex; flex-direction: row; align-items: center; gap: 5px; margin-top: 5px;">
                 <p>字体大小:</p>
                 <input type="range" min="10" max="120" step="1" value="46" style="flex: 1;" id="input_subtitleFontSize" />
-                <p id="input_subtitleFontSizeText">46px</p>
+                <p id="input_subtitleFontSizeText">NaNpx</p>
             </div>
             <div style="display: flex; flex-direction: row; align-items: center; gap: 5px; margin-top: 5px;">
                 <p>距底部:</p>
                 <input type="range" min="0" max="500" step="1" value="26" style="flex: 1;" id="input_subtitleBottomMargin" />
-                <p id="input_subtitleBottomMarginText">26px</p>
+                <p id="input_subtitleBottomMarginText">NaNpx</p>
             </div>
             <div style="display: flex; flex-direction: row; align-items: center; gap: 5px; margin-top: 5px;">
                 <p>描边大小:</p>
                 <input type="range" min="0" max="30" step="1" value="8" style="flex: 1;" id="input_subtitleStrokeSize" />
-                <p id="input_subtitleStrokeSizeText">8px</p>
+                <p id="input_subtitleStrokeSizeText">NaNpx</p>
             </div>
         </div>
         <div id="setView"><!-- 设置视图 -->

@@ -765,5 +765,5 @@ function toggleBqbView(){
     var bqbView = document.getElementById("bqbView");
     var isCollapsed = bqbView.style.flex.charAt(0) === "0";
     bqbView.style.flex = isCollapsed ? "1" : "0";
-    bqbView.style.minHeight = isCollapsed ? "auto" : "50px";
+    bqbView.style.minHeight = isCollapsed ? "auto" : "60px";
 }
