@@ -46,6 +46,33 @@ body[data-actor="东北切蒲英"]{
     --color-item-selected: #ff3907;
     --color-item-hover: #FFECB373;
 }
+body[data-actor="结月缘"]{
+    --color-primary: #8C63C2;
+    --color-primary-light: #8c63c22f;
+    --color-primary-dark: #8c63c2e3;
+    --color-primary-border: #8c63c239;
+    --color-bg-gradient-top: #8c63c239;
+    --color-item-selected: #8C63C2;
+    --color-item-hover: #8c63c23d;
+}
+body[data-actor="结月缘B"]{
+    --color-primary: #8C63C2;
+    --color-primary-light: #8c63c22f;
+    --color-primary-dark: #8c63c2e3;
+    --color-primary-border: #8c63c239;
+    --color-bg-gradient-top: #8c63c239;
+    --color-item-selected: #8C63C2;
+    --color-item-hover: #8c63c23d;
+}
+body[data-actor="中国兔子"]{
+    --color-primary: #e53935;
+    --color-primary-light: #e5393521;
+    --color-primary-dark: #b71c1c;
+    --color-primary-border: #b71c1c1c;
+    --color-bg-gradient-top: rgba(230, 200, 200, 1);
+    --color-item-selected: #e53935;
+    --color-item-hover: #ffcdd273;
+}
 
 * {
     margin: 0;

@@ -1,5 +1,5 @@
-canvas.width = 1082;
-canvas.height = 1650;
+canvasSizeX = 1082;
+canvasSizeY = 1650;
 nowActor = "俊达萌";
 document.body.dataset.actor = nowActor;
 var readMe = `ずんだもん立ち絵素材

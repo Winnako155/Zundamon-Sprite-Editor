@@ -29,7 +29,9 @@ addItem("res/ankomon/ico.png","安可萌","ankomon.js");
 addItem("res/Kasukabe3.0/ico.png","春日部紬","kasukabe3.0.js");
 addItem("res/kiritan/ico.png","东北切蒲英","kiritan.js");
 addItem("res/zunko/ico.png","东北俊子","zunko.js");
-
+addItem("res/KetsugatsuYukari/ico.png","结月缘","KetsugatsuYukari.js");
+addItem("res/KetsugatsuYukariB/ico.png","结月缘B","KetsugatsuYukariB.js");
+addItem("res/ChuugokuUsagi/ico.png","中国兔子","ChuugokuUsagi.js");
 
 function addItem(img,name,jsPath){
     let item = document.createElement("div");
@@ -41,6 +43,9 @@ function addItem(img,name,jsPath){
         clearAllLists();
         setTimeout(() => {
             tip(name + "切换成功");
+            resetActorPosition();
+            resetActorSize();
+            console.log("重置人物位置");
         }, 500);
         // 创建script元素并设置js路径
         let script = document.createElement("script");
@@ -48,6 +53,8 @@ function addItem(img,name,jsPath){
         // 将script元素添加到body中以加载js文件
         document.body.appendChild(script);
         button_nowActor.innerHTML = "当前立绘:" + name;
+        
     });
     decideView_itemList.appendChild(item);
+    
 }

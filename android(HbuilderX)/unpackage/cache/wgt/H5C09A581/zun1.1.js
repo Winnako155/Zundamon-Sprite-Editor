@@ -1,7 +1,8 @@
 // Auto-generated from 俊达萌(披风)1.1.1.psd
 // Canvas: 1082 x 1552 px
-canvas.width = 1082;
-canvas.height = 1552;
+canvasSizeX = 1082;
+canvasSizeY = 1552;
+
 nowActor = "俊达萌披风";
 document.body.dataset.actor = nowActor;
 var readMe = `ずんだもん立ち絵素材改

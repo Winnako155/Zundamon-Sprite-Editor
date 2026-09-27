@@ -1,7 +1,7 @@
 // Auto-generated from zunko PSD
 // Canvas: 1082 x 1873 px
-canvas.width = 1082;
-canvas.height = 1873;
+canvasSizeX = 1082;
+canvasSizeY = 1873;
 nowActor = "东北俊子";
 document.body.dataset.actor = nowActor;
 var readMe = `東北ずん子立ち絵素材

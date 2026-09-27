@@ -29,7 +29,9 @@ addItem("res/ankomon/ico.png","安可萌","ankomon.js");
 addItem("res/Kasukabe3.0/ico.png","春日部紬","kasukabe3.0.js");
 addItem("res/kiritan/ico.png","东北切蒲英","kiritan.js");
 addItem("res/zunko/ico.png","东北俊子","zunko.js");
-
+addItem("res/KetsugatsuYukari/ico.png","结月缘","KetsugatsuYukari.js");
+addItem("res/KetsugatsuYukariB/ico.png","结月缘B","KetsugatsuYukariB.js");
+addItem("res/ChuugokuUsagi/ico.png","中国兔子","ChuugokuUsagi.js");
 
 function addItem(img,name,jsPath){
     let item = document.createElement("div");

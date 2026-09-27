@@ -1,7 +1,7 @@
 // Auto-generated from zundamonA.psd
 // Canvas: 2400 x 3200 px
-canvas.width = 2400;
-canvas.height = 3200;
+canvasSizeX = 2400;
+canvasSizeY = 3200;
 nowActor = "向日葵俊达萌侧";
 document.body.dataset.actor = nowActor;
 var readMe = `立绘原作者为Akihiyo

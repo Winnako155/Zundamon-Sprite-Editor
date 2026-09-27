@@ -1,7 +1,7 @@
 // Auto-generated from 俊达萌3.2.psd
 // Canvas: 1082 x 1594 px
-canvas.width = 1082;
-canvas.height = 1594;
+canvasSizeX = 1082;
+canvasSizeY = 1594;
 nowActor = "俊达萌新";
 document.body.dataset.actor = nowActor;
 var readMe = `ずんだもん立ち絵素材V3.2

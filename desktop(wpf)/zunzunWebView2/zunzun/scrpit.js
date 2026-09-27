@@ -90,6 +90,15 @@ function drawBqbResult(){
     bqbCanvas.height = 512;
     ctx_bqb.clearRect(0, 0, 512, 512);
     ctx_bqb.fillStyle = document.getElementById("backgroundColorWell").value;
+    // 色板 input[type=color] 返回的是 hex 格式(如 #ffffff)，而非 rgb，所以需要用兼容判断
+    var bgColor = document.getElementById("backgroundColorWell").value;
+    var isWhite = (bgColor === "#ffffff" || bgColor === "#FFFFFF" || bgColor === "rgb(255, 255, 255)" || bgColor === "white");
+    if(isWhite){
+        img_canvasResult.style.border = "1px solid #949494ff";
+    }
+    else{
+        img_canvasResult.style.border = "none";
+    }
     ctx_bqb.fillRect(0, 0, 512, 512);
     // 把主画布内容按 人物大小 缩放后，以 人物位置 为锚点在 bqb 画板内位移
     const baseScale = Math.min(bqbCanvas.width / canvasSizeX, bqbCanvas.height / canvasSizeY);
@@ -358,6 +367,31 @@ function isAbleToUse(clickItem){
     }
     else if(nowActor == "(平鱼)俊达萌"){
         flatFishZun(clickItem);
+    }
+    else if(nowActor == "中国兔子"){
+        if(getListSelectStateByID("眼睛")!=null && clickItem.addTarget.theTitle.innerText == "眼睛"){
+            clearTheRowListState("眼珠");
+            clearTheRowListState("眼白");
+            changeTheRowListState("眼珠","",false);
+        }
+        if(getListSelectStateByID("眼白")!=null && clickItem.addTarget.theTitle.innerText == "眼白"){
+            clearTheRowListState("眼睛");
+            changeTheRowListState("眼珠","",true);
+        }
+        if(getListSelectStateByID("服装差分")!=null && clickItem.addTarget.theTitle.innerText == "服装差分"){
+            clearTheRowListState("巫女服");
+            changeTheRowListState("服装左臂","",true);
+            changeTheRowListState("服装右臂","",true);
+            changeTheRowListState("巫女服左臂","",false);
+            changeTheRowListState("巫女服右臂","",false);
+        }
+        if(getListSelectStateByID("巫女服")!=null && clickItem.addTarget.theTitle.innerText == "巫女服"){
+            clearTheRowListState("服装差分");
+            changeTheRowListState("巫女服左臂","",true);
+            changeTheRowListState("巫女服右臂","",true);
+            changeTheRowListState("服装左臂","",false);
+            changeTheRowListState("服装右臂","",false);
+        }
     }
 }
 
