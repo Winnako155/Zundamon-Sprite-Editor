@@ -109,11 +109,14 @@
                 <p id="input_subtitleStrokeSizeText">NaNpx</p>
             </div>
         </div>
+
         <div id="setView"><!-- 设置视图 -->
             <p style="font-size: 30px; font-weight: bold;">设置</p>
         </div>
+
     </div>
 
+    <!-- 选择框背景 -->
     <div id="decideView_backGround" onclick="hideDecideView()">
         <div id="aboutView">
             <div>
@@ -128,22 +131,43 @@
             <p style="font-size: 10px; color: rgba(255, 255, 255, 0.651); position: absolute; top: 10px; right: 10px;">点击点击空白处退出</p>
         </div>    
     </div>
+
+    <!-- 选择框 -->
     <div id="decideView" style="z-index: 10000;">
         <p style="font-size: 30px;">立绘款式</p>
         <div id="decideView_itemList"></div>
     </div>
+    
+    <!-- 对话框背景 -->
     <div id="dialogView_backGround"></div>
     <div id="dialogView">
         <h2 id="dialogView_title"></h2>
         <p id="dialogView_content"></p>
         <button onclick="hideDialogView()">确定</button>
     </div>
+    
+    <!-- 对话框_更新下载 -->
+    <div id="dialogView_update_backGround"></div>
+    <div id="dialogView_update">
+        <h2 id="dialogView_update_title">发现新版本</h2>
+        <div id="dialogView_update_content"></div>
+        <p id="dialogView_update_tip">蓝奏云提取码：<b>zunzun</b></p>
+        <div class="dialogView_update_buttons">
+            <button onclick="openDownload('123pan')">123云盘</button>
+            <button onclick="openDownload('lanzou')">蓝奏云</button>
+            <button onclick="openDownload('github')">GitHub</button>
+        </div>
+        <button class="dialogView_update_close" onclick="hideDialogViewUpdate()">稍后再说</button>
+    </div>
+    
+    <!-- 对话框_编辑器模式 -->
     <div id="dialogView_mode">
         <h1 style="margin-bottom: 20px;" id="dialogView_mode_title">编辑器模式</h1>
         <img src="res/img/mode_sprite.png" alt="完整立绘模式" id="dialogView_mode_sprite">
         <img src="res/img/mode_bqb.png" alt="表情包模式" id="dialogView_mode_bqb">
     </div>
 </body>
+
 <script src="rowList.js"></script>
 <script src="dialog.js"></script>
 <script src="scrpit.js"></script>

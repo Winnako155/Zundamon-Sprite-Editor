@@ -52,6 +52,38 @@ https://oov.github.io/psdtool
 製作：坂本アヒル
 https://twitter.com/sakamoto_ahr`;
 showDialog("提示", readMe);
+
+//俊达萌的选中判断逻辑
+actorHooks[nowActor] = function(clickItem){
+    if(clickItem.id == "Hoodie lining"){
+        tip("选中连帽衫后自动启用的说",2000,"#d6d323ff");
+    }
+    if(getListSelectStateByID("眼睛")!=null && clickItem.addTarget.theTitle.innerText == "眼睛"){
+        clearTheRowListState("瞳孔");
+        clearTheRowListState("眼眶");
+    }
+    if(getListSelectStateByID("眼眶")!=null && clickItem.addTarget.theTitle.innerText == "眼眶"){
+        clearTheRowListState("眼睛");
+    }
+
+    if(getItemStateByID("Hoodie (use with lining)") == true){
+        changeTheRowListState("左臂","取消连帽衫",false);
+        changeTheRowListState("右臂","取消连帽衫",false);
+        selectItemByID("Hoodie lining",true);
+    }
+    else{
+        changeTheRowListState("左臂","取消连帽衫",true);
+        changeTheRowListState("右臂","取消连帽衫",true);
+        selectItemByID("Hoodie lining",false);
+    }
+    if(getListSelectStateByID("眼眶")!=null){
+        changeTheRowListState("瞳孔","选中眼眶",true);
+    }
+    else{
+        changeTheRowListState("瞳孔","选中眼眶",false);
+    }
+};
+
 rowList_init("装饰", true, [
     {
         img: "res/zun2.3/Symbols etc/Duckling.png",

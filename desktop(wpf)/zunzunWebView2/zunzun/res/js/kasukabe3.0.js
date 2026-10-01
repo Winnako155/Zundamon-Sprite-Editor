@@ -35,6 +35,24 @@ https://oov.github.io/psdtool
 製作：坂本アヒル
 https://twitter.com/sakamoto_ahr`;
 showDialog("提示", readMe);
+
+//春日部紬的选中判断逻辑
+actorHooks[nowActor] = function(clickItem){
+    if(getListSelectStateByID("眼睛")!=null && clickItem.addTarget.theTitle.innerText == "眼睛"){
+        clearTheRowListState("瞳孔");
+        clearTheRowListState("眼眶");
+    }
+    if(getListSelectStateByID("眼眶")!=null && clickItem.addTarget.theTitle.innerText == "眼眶"){
+        clearTheRowListState("眼睛");
+    }
+    if(getListSelectStateByID("眼眶")!=null){
+        changeTheRowListState("瞳孔","选中眼眶",true);
+    }
+    else{
+        changeTheRowListState("瞳孔","选中眼眶",false);
+    }
+};
+
 rowList_init("装饰", true, [
     {
         img: "res/Kasukabe3.0/Expression symbols/Nose.png",

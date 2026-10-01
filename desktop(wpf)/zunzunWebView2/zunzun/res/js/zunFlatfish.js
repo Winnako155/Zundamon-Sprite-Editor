@@ -31,6 +31,142 @@ https://flatfish.fanbox.cc/
 かれい
 @flat_fish_`;
 showDialog("提示", readMe);
+
+//(平鱼)俊达萌的选中判断逻辑
+actorHooks[nowActor] = flatFishZun;
+
+//平鱼、的、立绘、太、复杂、了、我、不写、注释、就炸、了、、
+function flatFishZun(clickItem){
+    //↓衣服类型的判断 来决定什么服装 用什么手
+    if(getItemStateByID("Hoodie")|| getItemStateByID("Overall") || getItemStateByID("Yukata") || getItemStateByID("Maid") || getItemStateByID("Staff uniform")){ //如果选中外套，那么将禁用左右手
+        changeTheRowListState("左手(常服)","",false);
+        changeTheRowListState("右手(常服)","",false);
+        changeTheRowListState("左手(裙子)","",false);
+        changeTheRowListState("右手(裙子)","",false);
+        changeTheRowListState("左手","",false);
+        changeTheRowListState("右手","",false);
+    }
+    else{ //如果没有选中外套，那么才看你要选哪个手的样式
+        if(getItemStateByID("Usual")){ //如果当前服装是常款，那么将使用制服左右手
+            changeTheRowListState("左手(常服)","",true);
+            changeTheRowListState("右手(常服)","",true);
+            changeTheRowListState("左手(裙子)","",false);
+            changeTheRowListState("右手(裙子)","",false);
+            changeTheRowListState("左手","",false);
+            changeTheRowListState("右手","",false);
+        }
+        else if(getItemStateByID("Dress")){ //如果当前服装是裙子，那么将使用裙子左右手
+            changeTheRowListState("左手","",true);
+            changeTheRowListState("右手(裙子)","",true);
+            changeTheRowListState("左手(常服)","",false);
+            changeTheRowListState("右手(常服)","",false);
+            changeTheRowListState("右手","",false);
+        }
+        else if(getItemStateByID("Uniform") || getItemStateByID("Body Shirt")|| getItemStateByID("Plain shirt")){ //如果是其他三个需要左右手的服装
+            changeTheRowListState("左手(常服)","",false);
+            changeTheRowListState("右手(常服)","",false);
+            changeTheRowListState("左手(裙子)","",false);
+            changeTheRowListState("右手(裙子)","",false);
+            changeTheRowListState("左手","",true);
+            changeTheRowListState("右手","",true);
+        }
+        else{
+            changeTheRowListState("左手","",false);
+            changeTheRowListState("右手","",false);
+        }
+    }
+    //↑衣服类型的判断 来决定什么服装 用什么手
+
+    //↓这个是判断是否要使用手在臀部
+    if(getItemStateByID("Usual clothes Right hand Hand on hip") || getItemStateByID("Right hand Hand on hip")  || getItemStateByID("Right hand Hand on hip")){
+        selectItemByID("Hand on hip");
+    }
+    else{
+        selectItemByID("Hand on hip",false);
+    }
+    //↑这个是判断是否要使用手在臀部
+
+    
+    
+
+    //↓大型眼部判断 先全打开在根据情况关闭
+    if(getListSelectStateByID("其它眼") != null && clickItem.addTarget.theTitle.innerText == "其它眼"){ //如果是其它眼
+        clearTheRowListState("惊讶眼");
+        clearTheRowListState("凶恶眼");
+        clearTheRowListState("眼眶");
+        clearTheRowListState("瞳孔");
+        clearTheRowListState("眼部效果");
+    }
+    else if(getListSelectStateByID("凶恶眼") != null && clickItem.addTarget.theTitle.innerText == "凶恶眼"){ //如果是凶恶眼
+        clearTheRowListState("惊讶眼");
+        clearTheRowListState("其它眼");
+        clearTheRowListState("眼眶");
+        clearTheRowListState("瞳孔");
+        clearTheRowListState("眼部效果");
+    }
+    else if(getListSelectStateByID("惊讶眼") != null && clickItem.addTarget.theTitle.innerText == "惊讶眼"){ //如果是惊讶眼
+        clearTheRowListState("凶恶眼");
+        clearTheRowListState("其它眼");
+        clearTheRowListState("眼眶");
+        clearTheRowListState("瞳孔");
+        clearTheRowListState("眼部效果");
+    }
+    else if(getListSelectStateByID("眼眶") != null && clickItem.addTarget.theTitle.innerText == "眼眶"){ //如果是眼眶
+        clearTheRowListState("惊讶眼");
+        clearTheRowListState("凶恶眼");
+        clearTheRowListState("其它眼");
+        clearTheRowListState("眼部效果");
+    }
+    if(getListSelectStateByID("眼眶") != null){
+        changeTheRowListState("瞳孔","",true);
+    }
+    else{
+        changeTheRowListState("瞳孔","",false);
+    }
+    //↑大型眼部判断 先全打开在根据情况关闭
+    
+    //↓这个是判断是否要使用眼白
+    if(getListSelectStateByID("眼眶")!=null){
+        selectItemByID("Open White eyes",true);
+    }
+    else{
+        selectItemByID("Open White eyes",false);
+    }
+    //↑这个是判断是否要使用眼白
+
+
+    //↓手部判断
+    if(getItemStateByID("Grip Grip") || getItemStateByID("Grip")){ //如果是右手握柄
+        changeTheRowListState("配件(搭配右手-握柄姿势使用)","",true);
+    }
+    else{ //如果不是右手握柄
+        changeTheRowListState("配件(搭配右手-握柄姿势使用)","",false);
+    }
+    if(getItemStateByID("Upward grip Upward grip") || getItemStateByID("Upward grip")){ //如果是向上握柄
+        changeTheRowListState("向上配件(搭配右手-向上握柄姿势使用)","",true);
+    }
+    else{ //如果不是向上握柄
+        changeTheRowListState("向上配件(搭配右手-向上握柄姿势使用)","",false);
+    }
+    if(getItemStateByID("Pick")){ //如果用到了拨片
+        changeTheRowListState("拨片上插的东西(?) (搭配配件-拨片物件使用)","",true);
+    }
+    else{ //如果没有用到拨片
+        changeTheRowListState("拨片上插的东西(?) (搭配配件-拨片物件使用)","",false);
+    }
+    //↑手部判断
+
+    //↓书包判断
+    changeTheRowListState("搭配背包","",false);
+    if(getListSelectStateByID("后部配件")!=null){
+        selectItemByID("Backpack strap",true);
+    }
+    else{
+        selectItemByID("Backpack strap",false);
+    }
+    //↑书包判断
+}
+
 rowList_init("漫画效果", true, [
     {
         img: "res/zunFlatfish/Manga effects/Sweating.png",

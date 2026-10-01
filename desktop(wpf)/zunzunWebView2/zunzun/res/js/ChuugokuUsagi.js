@@ -34,6 +34,34 @@ https://oov.github.io/psdtool
 製作：坂本アヒル
 https://twitter.com/sakamoto_ahr`;
 showDialog("提示", readMe);
+
+//中国兔子的选中判断逻辑
+actorHooks[nowActor] = function(clickItem){
+    if(getListSelectStateByID("眼睛")!=null && clickItem.addTarget.theTitle.innerText == "眼睛"){
+        clearTheRowListState("眼珠");
+        clearTheRowListState("眼白");
+        changeTheRowListState("眼珠","",false);
+    }
+    if(getListSelectStateByID("眼白")!=null && clickItem.addTarget.theTitle.innerText == "眼白"){
+        clearTheRowListState("眼睛");
+        changeTheRowListState("眼珠","",true);
+    }
+    if(getListSelectStateByID("服装差分")!=null && clickItem.addTarget.theTitle.innerText == "服装差分"){
+        clearTheRowListState("巫女服");
+        changeTheRowListState("服装左臂","",true);
+        changeTheRowListState("服装右臂","",true);
+        changeTheRowListState("巫女服左臂","",false);
+        changeTheRowListState("巫女服右臂","",false);
+    }
+    if(getListSelectStateByID("巫女服")!=null && clickItem.addTarget.theTitle.innerText == "巫女服"){
+        clearTheRowListState("服装差分");
+        changeTheRowListState("巫女服左臂","",true);
+        changeTheRowListState("巫女服右臂","",true);
+        changeTheRowListState("服装左臂","",false);
+        changeTheRowListState("服装右臂","",false);
+    }
+};
+
 rowList_init("记号等", true, [
     {
         img: "res/ChuugokuUsagi/Symbols/RabbitEars.png",

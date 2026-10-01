@@ -34,6 +34,46 @@ https://oov.github.io/psdtool
 製作：坂本アヒル
 https://twitter.com/sakamoto_ahr`;
 showDialog("提示", readMe);
+
+//俊达萌披风的选中判断逻辑
+actorHooks[nowActor] = function(clickItem){
+    if(getItemStateByID("LArms crossed")){
+        changeTheRowListState("右臂","取消抱臂",false);
+    }
+    else{
+        changeTheRowListState("右臂","取消抱臂",true);
+    }
+    if(getItemStateByID("FHead")){ //正常
+        changeTheRowListState("脸部(抬头)","选择抬头",false);
+        changeTheRowListState("眉毛(抬头)","选择抬头",false);
+        changeTheRowListState("眼睛(抬头)","选择抬头",false);
+        changeTheRowListState("嘴巴(抬头)","选择抬头",false);
+        changeTheRowListState("面部(抬头)","选择抬头",false);
+        changeTheRowListState("毛豆(抬头)","选择抬头",false);
+        changeTheRowListState("脸部","选择正常",true);
+        changeTheRowListState("眉毛","选择正常",true);
+        changeTheRowListState("眼睛","选择正常",true);
+        changeTheRowListState("嘴巴","选择正常",true);
+        changeTheRowListState("面部","选择正常",true);
+        changeTheRowListState("毛豆","选择正常",true);
+    }
+    else if (getItemStateByID("UHead")){
+        changeTheRowListState("脸部(抬头)","选择抬头",true);
+        changeTheRowListState("眉毛(抬头)","选择抬头",true);
+        changeTheRowListState("眼睛(抬头)","选择抬头",true);
+        changeTheRowListState("嘴巴(抬头)","选择抬头",true);
+        changeTheRowListState("面部(抬头)","选择抬头",true);
+        changeTheRowListState("毛豆(抬头)","选择抬头",true);
+
+        changeTheRowListState("脸部","选择正常",false);
+        changeTheRowListState("眉毛","选择正常",false);
+        changeTheRowListState("眼睛","选择正常",false);
+        changeTheRowListState("嘴巴","选择正常",false);
+        changeTheRowListState("面部","选择正常",false);
+        changeTheRowListState("毛豆","选择正常",false);
+    }
+};
+
 rowList_init("脸部", true, [
     {
         img: "res/zun1.1/Head Front/Tears.png",
