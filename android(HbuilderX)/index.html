@@ -136,8 +136,26 @@
                 <p style="font-size: 18px; vertical-align: top; margin-top: 0; color: rgb(255, 255, 255);">俊达萌立绘编辑器<font id="nowBuildText" style="font-size: 12px; vertical-align: top; color: rgba(255, 255, 255, 0.575);">NaN</font></p>
                 <p style="font-size: 10px; color: rgba(255, 255, 255, 0.651);">使用和编辑立绘请遵循「官方规章」</p>
                 <p style="font-size: 13px;width: 180px;color: rgba(255, 255, 255, 0.842);">能够更直观的编辑俊达萌立绘的小工具。</p>
-                <a href="https://github.com/Winnako155/Zundamon-Sprite-Editor">项目 Github</a>
-                <a href="https://space.bilibili.com/696501979">软件作者 BiliBili</a>
+                <a href="javascript:void(0);" onclick="openZundamonLink('https://github.com/Winnako155/Zundamon-Sprite-Editor')">项目 Github</a>
+                <a href="javascript:void(0);" onclick="openZundamonLink('https://space.bilibili.com/696501979')">软件作者 BiliBili</a>
+                <a href="javascript:void(0);" onclick="openZundamonLink('https://wj.qq.com/s2/28078491/ruwi/')">立绘请愿</a>
+                <!-- 适配HBuilder环境的链接打开逻辑 -->
+                <script>
+                    // 统一处理外部链接打开：HBuilder打包的手机APP用系统浏览器，电脑端默认新标签打开
+                    function openZundamonLink(targetUrl) {
+                        try {
+                            // 判断是否为HBuilder H5+运行环境（仅打包后的APP存在plus对象）
+                            if (typeof plus !== 'undefined' && plus.runtime) {
+                                plus.runtime.openURL(targetUrl); // 调用手机系统默认浏览器打开
+                                return;
+                            }
+                        } catch (e) {
+                            // 捕获非H5+环境下的异常，避免影响后续逻辑
+                        }
+                        // 电脑端或普通浏览器环境：新标签页打开
+                        window.open(targetUrl, '_blank');
+                    }
+                </script>
                 <button onclick="checkUpdate()">检测更新</button>
             </div>
             <img src="res/example.png" style="max-width: 150px; position: absolute; bottom: 0; right: 0;">
