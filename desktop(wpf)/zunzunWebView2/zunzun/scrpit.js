@@ -1,4 +1,4 @@
-const nowBuild = "v1.4"; //当前版本
+const nowBuild = "v1.5"; //当前版本
 const OWNER = 'Winnako155'; //仓库所有者
 const REPO = 'Zundamon-Sprite-Editor'; //仓库名称
 
@@ -7,17 +7,13 @@ var nowMode = "sprite"; //当前模式：sprite/actor
 
 
 document.getElementById("nowBuildText").innerHTML = nowBuild;
+console.log(nowBuild);
 document.getElementById("bqbView").style.display ="none";
 let canvas = document.getElementById("canvas");
 let bqbCanvas = document.getElementById("bqbCanvas");
 let img_canvasResult = document.getElementById("img_canvasResult");
 let dragOverlay = document.getElementById("dragOverlay");
 let button_nowActor = document.getElementById("button_nowActor");
-var actorPositionX = 0;
-var actorPositionY = 0;
-var actorSize = 100;
-var actorRotation = 0;
-var actorFlipX = false;
 var subtitleText = "";
 var subtitleColor = "#FFFFFF";
 var subtitleStrokeColor = "#000000";
@@ -26,22 +22,16 @@ var subtitleFontSize = 46;
 var subtitleBottomMargin = 26;
 var canvasSizeX = 1082;
 var canvasSizeY = 1650;
+//表情包模式：多图层（数组按“从下到上”的绘制顺序存放，图层1固定为人物立绘，不可删除）
+var bqbLayers = [];
+var selectedLayerId = null;
+var layerIdSeed = 0; //图片图层的 id 自增
+var layerNameSeed = 1; //图片图层的名字自增（图层1 已被人物占用）
+var layerPositionLimit = 2048; //图层位置上限(不限制在画布内，可随意拖出画面)
 let ctx = canvas.getContext("2d");
 let ctx_bqb = bqbCanvas.getContext("2d");
 var allRowLists = [];
 hideDialogView();
-
-function resetActorSize(){
-    document.getElementById("input_actorSize").value = 100;
-    document.getElementById("input_actorSizeText").innerHTML = "100%";
-    document.getElementById("input_actorSize").oninput();
-}
-function resetActorPosition(){
-    document.getElementById("input_actorPositionX").value = canvasSizeX / 2;
-    document.getElementById("input_actorPositionY").value = canvasSizeY / 2;
-    document.getElementById("input_actorPositionX").oninput();
-    document.getElementById("input_actorPositionY").oninput();
-}
 
 
 
@@ -81,6 +71,7 @@ async function render(){
     }
     else if(nowMode == "bqb"){
         //如果是人物模式，绘制到 bqb 画板
+        refreshActorLayerThumb(); //主画布变了，顺手刷新人物图层的缩略图
         drawBqbResult();
     }
 }
@@ -93,27 +84,17 @@ function drawBqbResult(){
     // 色板 input[type=color] 返回的是 hex 格式(如 #ffffff)，而非 rgb，所以需要用兼容判断
     var bgColor = document.getElementById("backgroundColorWell").value;
     var isWhite = (bgColor === "#ffffff" || bgColor === "#FFFFFF" || bgColor === "rgb(255, 255, 255)" || bgColor === "white");
-    if(isWhite){
+    if(isWhite && nowMode == "bqb"){
         img_canvasResult.style.border = "1px solid #949494ff";
     }
     else{
         img_canvasResult.style.border = "none";
     }
     ctx_bqb.fillRect(0, 0, 512, 512);
-    // 把主画布内容按 人物大小 缩放后，以 人物位置 为锚点在 bqb 画板内位移
-    const baseScale = Math.min(bqbCanvas.width / canvasSizeX, bqbCanvas.height / canvasSizeY);
-    const scale = baseScale * (actorSize / 100);
-    const drawW = canvasSizeX * scale;
-    const drawH = canvasSizeY * scale;
-    const offsetX = (actorPositionX / canvasSizeX) * bqbCanvas.width - drawW / 2;
-    const offsetY = bqbCanvas.height - (actorPositionY / canvasSizeY) * bqbCanvas.height - drawH / 2; //翻转y轴
-    //绕人物中心旋转，翻转作用于人物自身
-    ctx_bqb.save();
-    ctx_bqb.translate(offsetX + drawW / 2, offsetY + drawH / 2);
-    ctx_bqb.scale(actorFlipX ? -1 : 1, 1);
-    ctx_bqb.rotate(actorRotation * Math.PI / 180);
-    ctx_bqb.drawImage(canvas, -drawW / 2, -drawH / 2, drawW, drawH);
-    ctx_bqb.restore();
+    // 按数组顺序(从下到上)逐个绘制图层，位置统一用 bqb 画布坐标，无翻转轴
+    for(const layer of bqbLayers){
+        drawBqbLayer(layer);
+    }
     // 底部居中绘制字幕，描边为圆角
     if(subtitleText){
         ctx_bqb.font = "bold " + subtitleFontSize + "px sans-serif";
@@ -248,9 +229,18 @@ function checkUpdate(){
         }
         else{
             tip("当前已是最新版本");
+            hideDialogViewUpdate();
         }
     });
-
+    setTimeout(function(){
+        hideTheStartView();
+    }, 1500);
+}
+function hideTheStartView(){
+    document.getElementById("theStartView").style.animation = "hideTheStartView 1s forwards";
+    setTimeout(function(){
+        document.getElementById("theStartView").style.display = "none";
+    }, 1000);
 }
 function downloadSprite(){
     // 先判断一下环境
@@ -345,11 +335,12 @@ function switchMode(mode){
     if(mode == "sprite"){
         nowMode = "sprite";
         tip("完整立绘模式");
+        img_canvasResult.style.border = "none";
     }
     else if(mode == "bqb"){
         nowMode = "bqb";
         tip("表情包模式");
-        initBqbPosition();
+        initBqbLayers();
     }
     //表情包模式显示设置面板，立绘模式隐藏
     document.getElementById("bqbView").style.display = (mode == "bqb") ? "" : "none";
@@ -360,66 +351,305 @@ function switchMode(mode){
     render();
 }
 
-//↓一堆、表情包模式的设置项
-//bqb 模式的位置/大小初始化：位置滑条范围为主画布尺寸，默认居中；大小默认 100%
-function initBqbPosition(){
-    document.getElementById("input_actorPositionX").max = canvasSizeX;
-    document.getElementById("input_actorPositionY").max = canvasSizeY;
-    document.getElementById("input_actorPositionX").min = -canvasSizeX;
-    document.getElementById("input_actorPositionY").min = -canvasSizeY;
+//↓一堆、表情包模式的设置项（多图层）
+//图层自然尺寸：人物用主画布尺寸，图片用图片自身尺寸
+function layerNaturalSize(layer){
+    if(layer.type == "actor"){ return {w: canvasSizeX, h: canvasSizeY}; }
+    if(layer.image){ return {w: layer.image.width, h: layer.image.height}; }
+    return {w: 0, h: 0};
+}
+//图层基准缩放：默认等比缩到能完整放进 bqb 画布(contain)，再乘以用户设置的大小百分比
+function layerBaseScale(layer){
+    const nat = layerNaturalSize(layer);
+    if(!nat.w || !nat.h){ return 1; }
+    return Math.min(bqbCanvas.width / nat.w, bqbCanvas.height / nat.h);
+}
+//绘制单个图层：以图层中心为锚点，翻转作用于图层自身、再旋转
+function drawBqbLayer(layer){
+    const nat = layerNaturalSize(layer);
+    const scale = layerBaseScale(layer) * (layer.size / 100);
+    const w = nat.w * scale;
+    const h = nat.h * scale;
+    const src = (layer.type == "actor") ? canvas : layer.image;
+    if(!src || !w || !h){ return; }
+    ctx_bqb.save();
+    ctx_bqb.translate(layer.positionX, layer.positionY);
+    ctx_bqb.scale(layer.flipX ? -1 : 1, 1);
+    ctx_bqb.rotate(layer.rotation * Math.PI / 180);
+    ctx_bqb.drawImage(src, -w / 2, -h / 2, w, h);
+    ctx_bqb.restore();
+}
 
-    document.getElementById("input_actorPositionX").value = canvasSizeX / 2;
-    document.getElementById("input_actorPositionY").value = canvasSizeY / 2;
-    actorPositionX = canvasSizeX / 2;
-    actorPositionY = canvasSizeY / 2;
-    document.getElementById("input_actorPositionXText").innerHTML = actorPositionX + "px";
-    document.getElementById("input_actorPositionYText").innerHTML = actorPositionY + "px";
-    document.getElementById("input_actorRotation").value = 0;
-    actorRotation = 0;
-    document.getElementById("input_actorRotationText").innerHTML = "0°";
-    actorFlipX = false;
-    document.getElementById("button_actorFlip").innerHTML = "左右翻转：关";
+//初始化图层：没有图层时创建「图层1 = 人物」，并保证有选中项
+function initBqbLayers(){
+    if(bqbLayers.length == 0){
+        bqbLayers.push({
+            id: "layer_actor",
+            name: "图层1",
+            type: "actor",
+            image: null,
+            thumb: "",
+            size: 100,
+            positionX: 256,
+            positionY: 256,
+            rotation: 0,
+            flipX: false
+        });
+    }
+    if(!selectedLayerId){
+        selectedLayerId = bqbLayers[0].id;
+    }
+    renderBqbLayerList();
+    syncLayerSliders();
 }
-initBqbPosition();
-dragOverlay.style.display = "none"; //默认是 sprite 模式，手势层隐藏（切到 bqb 时由 switchMode 打开）
-document.getElementById("input_actorSize").oninput = function(){
-    actorSize = Number(this.value);
-    document.getElementById("input_actorSizeText").innerHTML = this.value + "%";
-    document.getElementById("input_actorPositionX").max = canvasSizeX;
-    document.getElementById("input_actorPositionY").max = canvasSizeY;
-    render();
+function getLayerById(id){
+    for(const layer of bqbLayers){
+        if(layer.id == id){ return layer; }
+    }
+    return null;
 }
-document.getElementById("input_actorRotation").oninput = function(){
-    actorRotation = Number(this.value);
-    document.getElementById("input_actorRotationText").innerHTML = this.value + "°";
-    drawBqbResult(); //同步重绘，拖动更跟手
+function getSelectedLayer(){
+    return getLayerById(selectedLayerId);
 }
-function resetActorRotation(){
-    document.getElementById("input_actorRotation").value = 0;
-    actorRotation = 0;
-    document.getElementById("input_actorRotationText").innerHTML = "0°";
+//人物图层的缩略图：把主画布等比缩小画到小画布上导出
+function makeActorThumb(){
+    if(!canvas.width || !canvas.height || !canvasSizeX || !canvasSizeY){ return ""; }
+    const c = document.createElement("canvas");
+    c.width = 64;
+    c.height = 98;
+    const cc = c.getContext("2d");
+    const s = Math.min(c.width / canvasSizeX, c.height / canvasSizeY);
+    const w = canvasSizeX * s;
+    const h = canvasSizeY * s;
+    cc.drawImage(canvas, (c.width - w) / 2, (c.height - h) / 2, w, h);
+    return c.toDataURL("image/png");
+}
+//刷新人物图层缩略图（只在主画布重绘后调用，避免拖动时反复生成）
+function refreshActorLayerThumb(){
+    const layer = getLayerById("layer_actor");
+    if(!layer){ return; }
+    const thumb = makeActorThumb();
+    if(!thumb){ return; }
+    layer.thumb = thumb;
+    const imgEl = document.querySelector('#bqbLayerList [data-layer-id="' + layer.id + '"] img');
+    if(imgEl){ imgEl.src = thumb; }
+}
+//渲染图层列表：顶层显示在最前面，选中项高亮（样式沿用 rowList）
+function renderBqbLayerList(){
+    const list = document.getElementById("bqbLayerList");
+    if(!list){ return; }
+    list.innerHTML = "";
+    for(let i = bqbLayers.length - 1; i >= 0; i--){
+        const layer = bqbLayers[i];
+        const item = document.createElement("div");
+        item.classList.add("rowList_Item");
+        item.dataset.layerId = layer.id;
+        const imgEl = document.createElement("img");
+        imgEl.src = layer.thumb || "";
+        item.appendChild(imgEl);
+        const nameEl = document.createElement("p");
+        nameEl.innerText = layer.name;
+        nameEl.style.fontSize = "14px";
+        item.appendChild(nameEl);
+        item.addEventListener("click", function(){ selectLayer(layer.id); });
+        if(layer.id == selectedLayerId){
+            item.style.setProperty("background-color", "var(--color-primary)");
+            item.style.color = "#fff";
+        }
+        list.appendChild(item);
+    }
+}
+//选中某个图层：高亮并让滑条对准该图层的参数
+function selectLayer(id){
+    if(!getLayerById(id)){ return; }
+    selectedLayerId = id;
+    renderBqbLayerList();
+    syncLayerSliders();
+}
+//把选中图层的参数写回滑条
+function syncLayerSliders(){
+    const layer = getSelectedLayer();
+    if(!layer){ return; }
+    document.getElementById("input_layerSize").value = layer.size;
+    document.getElementById("input_layerSizeText").innerHTML = Math.round(layer.size) + "%";
+    document.getElementById("input_layerPositionX").value = Math.round(layer.positionX);
+    document.getElementById("input_layerPositionY").value = Math.round(layer.positionY);
+    document.getElementById("input_layerPositionXText").innerHTML = Math.round(layer.positionX) + "px";
+    document.getElementById("input_layerPositionYText").innerHTML = Math.round(layer.positionY) + "px";
+    document.getElementById("input_layerRotation").value = layer.rotation;
+    document.getElementById("input_layerRotationText").innerHTML = Math.round(layer.rotation) + "°";
+    document.getElementById("button_layerFlip").innerHTML = "左右翻转：" + (layer.flipX ? "开" : "关");
+}
+//添加图层：手机端(HBuilderX/HTML5+)走系统相册，电脑端走文件选择
+function addBqbLayer(){
+    if(typeof plus !== "undefined" && plus.gallery && plus.gallery.pick){
+        plus.gallery.pick(function(path){
+            readLayerImageFromPlus(path);
+        }, function(err){
+            console.log("gallery.pick 取消或失败", err);
+        }, {filter: "image", multiple: false});
+    }
+    else{
+        document.getElementById("input_bgImage").click();
+    }
+}
+//HTML5+ 环境：用 FileReader 把相册图片读成 dataURL，避免本地图片污染画布导致 toDataURL 失败
+function readLayerImageFromPlus(path){
+    plus.io.resolveLocalFileSystemURL(path, function(entry){
+        entry.file(function(file){
+            var reader = new plus.io.FileReader();
+            reader.onloadend = function(e){
+                addImageLayer(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }, function(err){
+            tip("读取图片失败", 3000, "#ff6b6b");
+            console.error(err);
+        });
+    }, function(err){
+        //拿不到 entry 时退回本地路径
+        addImageLayer(plus.io.convertLocalFileSystemURL ? plus.io.convertLocalFileSystemURL(path) : path);
+        console.error(err);
+    });
+}
+//新增一个图片图层（默认放在最上层，可用上移/下移调整）
+function addImageLayer(src){
+    var img = new Image();
+    img.onload = function(){
+        layerIdSeed++;
+        layerNameSeed++;
+        var layer = {
+            id: "layer_" + layerIdSeed,
+            name: "图层" + layerNameSeed,
+            type: "image",
+            image: img,
+            thumb: src,
+            size: 100,
+            positionX: 256,
+            positionY: 256,
+            rotation: 0,
+            flipX: false
+        };
+        bqbLayers.push(layer);
+        selectedLayerId = layer.id;
+        renderBqbLayerList();
+        syncLayerSliders();
+        drawBqbResult();
+        tip("已添加：" + layer.name);
+    };
+    img.onerror = function(){
+        tip("图片加载失败", 3000, "#ff6b6b");
+    };
+    img.src = src;
+}
+document.getElementById("input_bgImage").onchange = function(){
+    var file = this.files && this.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e){ addImageLayer(e.target.result); };
+    reader.readAsDataURL(file);
+    this.value = ""; //清空，允许重复选择同一张图片
+};
+//删除选中的图层（人物图层不可删除）
+function deleteBqbLayer(){
+    const layer = getSelectedLayer();
+    if(!layer){ tip("还没有选中图层"); return; }
+    if(layer.type == "actor"){ tip("人物图层不可删除"); return; }
+    const idx = bqbLayers.indexOf(layer);
+    bqbLayers.splice(idx, 1);
+    selectedLayerId = bqbLayers[Math.min(idx, bqbLayers.length - 1)].id;
+    renderBqbLayerList();
+    syncLayerSliders();
+    drawBqbResult();
+    tip("已删除：" + layer.name);
+}
+//上移/下移选中图层：direction 1 向上(更靠前)，-1 向下(更靠后)
+function moveBqbLayer(direction){
+    const layer = getSelectedLayer();
+    if(!layer){ tip("还没有选中图层"); return; }
+    const idx = bqbLayers.indexOf(layer);
+    const newIdx = idx + direction;
+    if(newIdx < 0 || newIdx >= bqbLayers.length){ return; }
+    bqbLayers.splice(idx, 1);
+    bqbLayers.splice(newIdx, 0, layer);
+    renderBqbLayerList();
     drawBqbResult();
 }
-function toggleActorFlip(){
-    actorFlipX = !actorFlipX;
-    document.getElementById("button_actorFlip").innerHTML = "左右翻转：" + (actorFlipX ? "开" : "关");
+document.getElementById("input_layerSize").oninput = function(){
+    const layer = getSelectedLayer();
+    if(!layer) return;
+    layer.size = Number(this.value);
+    document.getElementById("input_layerSizeText").innerHTML = this.value + "%";
+    drawBqbResult();
+};
+document.getElementById("input_layerPositionX").oninput = function(){
+    const layer = getSelectedLayer();
+    if(!layer) return;
+    layer.positionX = Number(this.value);
+    document.getElementById("input_layerPositionXText").innerHTML = this.value + "px";
+    drawBqbResult();
+};
+document.getElementById("input_layerPositionY").oninput = function(){
+    const layer = getSelectedLayer();
+    if(!layer) return;
+    layer.positionY = Number(this.value);
+    document.getElementById("input_layerPositionYText").innerHTML = this.value + "px";
+    drawBqbResult();
+};
+document.getElementById("input_layerRotation").oninput = function(){
+    const layer = getSelectedLayer();
+    if(!layer) return;
+    layer.rotation = Number(this.value);
+    document.getElementById("input_layerRotationText").innerHTML = this.value + "°";
+    drawBqbResult();
+};
+function resetLayerSize(){
+    const layer = getSelectedLayer();
+    if(!layer) return;
+    layer.size = 100;
+    syncLayerSliders();
     drawBqbResult();
 }
-
-
-document.getElementById("input_actorPositionX").oninput = function(){
-    actorPositionX = Number(this.value);
-    document.getElementById("input_actorPositionXText").innerHTML = this.value + "px";
-    render();
+function resetLayerPosition(){
+    const layer = getSelectedLayer();
+    if(!layer) return;
+    layer.positionX = 256;
+    layer.positionY = 256;
+    syncLayerSliders();
+    drawBqbResult();
 }
-document.getElementById("input_actorPositionY").oninput = function(){
-    actorPositionY = Number(this.value);
-    document.getElementById("input_actorPositionYText").innerHTML = this.value + "px";
-    render();
+function resetLayerRotation(){
+    const layer = getSelectedLayer();
+    if(!layer) return;
+    layer.rotation = 0;
+    syncLayerSliders();
+    drawBqbResult();
+}
+function toggleLayerFlip(){
+    const layer = getSelectedLayer();
+    if(!layer) return;
+    layer.flipX = !layer.flipX;
+    syncLayerSliders();
+    drawBqbResult();
+}
+//重置人物图层的大小/位置/旋转/翻转（切换立绘时回到默认）
+function resetActorLayerTransform(){
+    const layer = getLayerById("layer_actor");
+    if(!layer){ return; }
+    layer.size = 100;
+    layer.positionX = 256;
+    layer.positionY = 256;
+    layer.rotation = 0;
+    layer.flipX = false;
+    if(layer.id == selectedLayerId){ syncLayerSliders(); }
+    if(nowMode == "bqb"){ drawBqbResult(); }
 }
 document.getElementById("backgroundColorWell").oninput = function(){
     render();
-}
+};
+initBqbLayers();
+dragOverlay.style.display = "none"; //默认是 sprite 模式，手势层隐藏（切到 bqb 时由 switchMode 打开）
+//↑一堆、表情包模式的设置项（多图层）
 document.getElementById("input_subtitleText").oninput = function(){
     subtitleText = this.value;
     render();
@@ -449,7 +679,7 @@ document.getElementById("input_subtitleBottomMargin").oninput = function(){
 }
 //↑一堆、表情包模式的设置项
 
-// ===== 表情包模式：拖拽预览图移动人物（鼠标/触屏通用） =====
+// ===== 表情包模式：拖拽预览图移动选中的图层（鼠标/触屏通用） =====
 var isDraggingBqb = false;
 var dragStartClientX = 0;
 var dragStartClientY = 0;
@@ -458,10 +688,12 @@ var dragStartPosY = 0;
 
 //把拖拽后的位置同步回滑条和文字
 function syncBqbSliders(){
-    document.getElementById("input_actorPositionX").value = actorPositionX;
-    document.getElementById("input_actorPositionY").value = actorPositionY;
-    document.getElementById("input_actorPositionXText").innerHTML = Math.round(actorPositionX) + "px";
-    document.getElementById("input_actorPositionYText").innerHTML = Math.round(actorPositionY) + "px";
+    const layer = getSelectedLayer();
+    if(!layer){ return; }
+    document.getElementById("input_layerPositionX").value = Math.round(layer.positionX);
+    document.getElementById("input_layerPositionY").value = Math.round(layer.positionY);
+    document.getElementById("input_layerPositionXText").innerHTML = Math.round(layer.positionX) + "px";
+    document.getElementById("input_layerPositionYText").innerHTML = Math.round(layer.positionY) + "px";
 }
 
 //移动端桌面端通用拖拽：手势绑在透明手势层 dragOverlay 上
@@ -474,27 +706,30 @@ function getDragClient(e){
 }
 function dragBqbStart(e){
     if(nowMode != "bqb") return;
+    const layer = getSelectedLayer();
+    if(!layer){ return; }
     e.preventDefault(); //阻止触摸默认行为
     const p = getDragClient(e);
     isDraggingBqb = true;
     dragStartClientX = p.x;
     dragStartClientY = p.y;
-    dragStartPosX = actorPositionX;
-    dragStartPosY = actorPositionY;
+    dragStartPosX = layer.positionX;
+    dragStartPosY = layer.positionY;
     dragOverlay.style.cursor = "grabbing";
 }
 function dragBqbMove(e){
     if(!isDraggingBqb || nowMode != "bqb") return;
+    const layer = getSelectedLayer();
+    if(!layer){ return; }
     if(e.cancelable) e.preventDefault(); //注意!@#$%夜路塞牙我要吃了你社会很单、纯，、不阻止的话移、。动端拖一下就会被页面滚动接管
     const p = getDragClient(e);
     //屏幕位移 → bqb画布位移（因为、预览图，被CSS缩放过，所以、要按显，示尺寸换算口牙，）
     const rect = img_canvasResult.getBoundingClientRect();
     const dx = (p.x - dragStartClientX) * (bqbCanvas.width / rect.width);
     const dy = (p.y - dragStartClientY) * (bqbCanvas.height / rect.height);
-    //与渲染映射严格互逆：offsetX 随位置变量正向变化，offsetY 反向（翻转轴）
-    //反正就是、不依赖缩，放余量，任何大小下都是 1:1 跟手；范围与滑条一、致口牙 [-canvasSize, +canvasSize]，人物也是可完全拖出画面，口牙
-    actorPositionX = Math.min(canvasSizeX, Math.max(-canvasSizeX, dragStartPosX + dx / bqbCanvas.width * canvasSizeX));
-    actorPositionY = Math.min(canvasSizeY, Math.max(-canvasSizeY, dragStartPosY - dy / bqbCanvas.height * canvasSizeY));
+    //图层位置本身就是 bqb 画布坐标，无翻转轴，范围跟滑条一致 [-layerPositionLimit, +layerPositionLimit]
+    layer.positionX = Math.min(layerPositionLimit, Math.max(-layerPositionLimit, dragStartPosX + dx));
+    layer.positionY = Math.min(layerPositionLimit, Math.max(-layerPositionLimit, dragStartPosY + dy));
     syncBqbSliders();
     drawBqbResult(); //同步重绘，不走异步 render，避免拖拽延迟
 }

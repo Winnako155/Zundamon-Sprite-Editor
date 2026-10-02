@@ -46,41 +46,54 @@
                 <p style="font-size: 30px; font-weight: bold;">表情包设置</p>
                 <button id="button_toggleBqbView" onclick="toggleBqbView()">折叠</button>
             </div>
-            <p style="margin-top: 10px;">人物大小</p>
+            <p style="margin-top: 10px;">图层</p>
+            <div style="display: flex; flex-direction: row; align-items: center; gap: 5px; flex-wrap: wrap;">
+                <button onclick="addBqbLayer()">添加图层</button>
+                <button onclick="deleteBqbLayer()">删除图层</button>
+                <button onclick="moveBqbLayer(1)">上移</button>
+                <button onclick="moveBqbLayer(-1)">下移</button>
+                <input type="file" accept="image/*" id="input_bgImage" style="display: none;" />
+            </div>
+            <div id="bqbLayerList" class="rowList" style="height: 100px;"></div>
+
+            <p style="margin-top: 10px;">大小</p>
             <div style="display: flex; flex-direction: row; align-items: center; gap: 5px;">
-                <input type="range" min="0" max="500" step="1" value="100" style="flex: 1;" id="input_actorSize" />
-                <p id="input_actorSizeText">100%</p>
-                <button onclick="resetActorSize()">重置</button>
+                <input type="range" min="0" max="500" step="1" value="100" style="flex: 1;" id="input_layerSize" />
+                <p id="input_layerSizeText">100%</p>
+                <button onclick="resetLayerSize()">重置</button>
             </div>
 
             <p style="margin-top: 10px; display: flex; flex-direction: row; align-items: center; justify-content: space-between;">
-                人物位置(也可直接拖拽)
-                <button onclick="resetActorPosition()" style="margin-left: 5px;">重置</button>
+                位置(也可直接拖拽)
+                <button onclick="resetLayerPosition()" style="margin-left: 5px;">重置</button>
             </p>
             <div style="display: flex; flex-direction: row; align-items: center; gap: 5px;">
                 <p>X:</p>
-                <input type="range" min="-1000" max="var(--canvasSizeX)" step="1" value="100" style="flex: 1;" id="input_actorPositionX" />
-                <p id="input_actorPositionXText">px</p>
+                <input type="range" min="-2048" max="2048" step="1" value="256" style="flex: 1;" id="input_layerPositionX" />
+                <p id="input_layerPositionXText">256px</p>
             </div>
             <div style="display: flex; flex-direction: row; align-items: center; gap: 5px; margin-top: 5px;">
                 <p>Y:</p>
-                <input type="range" min="-2000" max="var(--canvasSizeY)" step="1" value="100" style="flex: 1;" id="input_actorPositionY" />
-                <p id="input_actorPositionYText">px</p>
+                <input type="range" min="-2048" max="2048" step="1" value="256" style="flex: 1;" id="input_layerPositionY" />
+                <p id="input_layerPositionYText">256px</p>
             </div>
 
-            <p style="margin-top: 10px;">人物旋转</p>
+            <p style="margin-top: 10px;">旋转</p>
             <div style="display: flex; flex-direction: row; align-items: center; gap: 5px;">
-                <input type="range" min="-180" max="180" step="1" value="0" style="flex: 1;" id="input_actorRotation" />
-                <p id="input_actorRotationText">0°</p>
-                <button onclick="resetActorRotation()">重置</button>
+                <input type="range" min="-180" max="180" step="1" value="0" style="flex: 1;" id="input_layerRotation" />
+                <p id="input_layerRotationText">0°</p>
+                <button onclick="resetLayerRotation()">重置</button>
             </div>
 
             <p style="margin-top: 10px;">翻转</p>
             <div style="display: flex; flex-direction: row; align-items: center; gap: 5px;">
-                <button onclick="toggleActorFlip()" id="button_actorFlip">左右翻转：关</button>
+                <button onclick="toggleLayerFlip()" id="button_layerFlip">左右翻转：关</button>
             </div>
+
             <p style="margin-top: 10px;">背景颜色</p>
-            <input type="color" id="backgroundColorWell" value="#388E3C">
+            <div style="display: flex; flex-direction: row; align-items: center; gap: 5px;">
+                <input type="color" id="backgroundColorWell" value="#388E3C">
+            </div>
 
             <p style="margin-top: 10px;">字幕</p>
             <div style="display: flex; flex-direction: row; align-items: center; gap: 5px;">
@@ -109,11 +122,14 @@
                 <p id="input_subtitleStrokeSizeText">NaNpx</p>
             </div>
         </div>
+
         <div id="setView"><!-- 设置视图 -->
             <p style="font-size: 30px; font-weight: bold;">设置</p>
         </div>
+
     </div>
 
+    <!-- 选择框背景 -->
     <div id="decideView_backGround" onclick="hideDecideView()">
         <div id="aboutView">
             <div>
@@ -128,22 +144,48 @@
             <p style="font-size: 10px; color: rgba(255, 255, 255, 0.651); position: absolute; top: 10px; right: 10px;">点击点击空白处退出</p>
         </div>    
     </div>
+
+    <!-- 选择框 -->
     <div id="decideView" style="z-index: 10000;">
         <p style="font-size: 30px;">立绘款式</p>
         <div id="decideView_itemList"></div>
     </div>
+    
+    <!-- 对话框背景 -->
     <div id="dialogView_backGround"></div>
     <div id="dialogView">
         <h2 id="dialogView_title"></h2>
         <p id="dialogView_content"></p>
         <button onclick="hideDialogView()">确定</button>
     </div>
+    
+    <!-- 对话框_更新下载 -->
+    <div id="dialogView_update_backGround"></div>
+    <div id="dialogView_update">
+        <h2 id="dialogView_update_title">发现新版本</h2>
+        <div id="dialogView_update_content"></div>
+        <p id="dialogView_update_tip">蓝奏云提取码：<b>zunzun</b></p>
+        <div class="dialogView_update_buttons">
+            <button onclick="openDownload('123pan')">123云盘</button>
+            <button onclick="openDownload('lanzou')">蓝奏云</button>
+            <button onclick="openDownload('github')">GitHub</button>
+        </div>
+        <button class="dialogView_update_close" onclick="hideDialogViewUpdate()">稍后再说</button>
+    </div>
+    
+    <!-- 对话框_编辑器模式 -->
     <div id="dialogView_mode">
         <h1 style="margin-bottom: 20px;" id="dialogView_mode_title">编辑器模式</h1>
         <img src="res/img/mode_sprite.png" alt="完整立绘模式" id="dialogView_mode_sprite">
         <img src="res/img/mode_bqb.png" alt="表情包模式" id="dialogView_mode_bqb">
     </div>
+
+    <!--开场视图-->
+    <div id="theStartView" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #E8F5E9; z-index: 100000;">
+        <p style="font-size: 48px; color: #22854A;">加载中...</p>
+    </div>
 </body>
+
 <script src="rowList.js"></script>
 <script src="dialog.js"></script>
 <script src="scrpit.js"></script>

@@ -3,8 +3,8 @@
     "id" : "H5C09A581", /*应用的标识*/
     "name" : "俊达萌立绘编辑器", /*应用名称，程序桌面图标名称*/
     "version" : {
-        "name" : "1.5", /*应用版本名称*/
-        "code" : 150
+        "name" : "1.6", /*应用版本名称*/
+        "code" : 160
     },
     "description" : "一个能够更直观快捷的编辑俊达萌立绘的小工具", /*应用描述信息*/
     "icons" : {
@@ -206,9 +206,9 @@
                 "android" : {
                     "mdpi" : "", /*普通屏启动图片，分辨率：240x282*/
                     "ldpi" : "", /*大屏启动图片，分辨率：320x442*/
-                    "hdpi" : "C:/Users/wang/Downloads/画板 3 (1).png", /*高分屏启动图片，分辨率：480x762*/
-                    "xhdpi" : "C:/Users/wang/Downloads/画板 4.png", /*720P高分屏启动图片，分辨率：720x1242*/
-                    "xxhdpi" : "C:/Users/wang/Downloads/画板 5.png" /*1080P高分屏启动图片，分辨率：1080x1882*/
+                    "hdpi" : "C:/Users/Ywang/Desktop/画板 3.png", /*高分屏启动图片，分辨率：480x762*/
+                    "xhdpi" : "C:/Users/Ywang/Desktop/画板 4.png", /*720P高分屏启动图片，分辨率：720x1242*/
+                    "xxhdpi" : "C:/Users/Ywang/Desktop/画板 5.png" /*1080P高分屏启动图片，分辨率：1080x1882*/
                 },
                 "androidStyle" : "default"
             },
