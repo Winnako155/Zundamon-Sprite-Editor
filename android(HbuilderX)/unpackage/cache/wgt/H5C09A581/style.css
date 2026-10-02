@@ -73,7 +73,23 @@ body[data-actor="中国兔子"]{
     --color-item-selected: #e53935;
     --color-item-hover: #ffcdd273;
 }
-
+body[data-actor="四国煤炭"]{
+    --color-primary: #F06292;
+    --color-primary-light: #e5393521;
+    --color-primary-dark: #b81f52;
+    --color-primary-border: #b71c1c1c;
+    --color-bg-gradient-top: rgba(230, 200, 200, 1);
+    --color-item-selected: #F06292;
+    --color-item-hover: #ffcdd273;
+}
+@keyframes hideTheStartView {
+    0%{
+        opacity: 1;
+    }
+    100%{
+        opacity: 0;
+    }
+}
 * {
     margin: 0;
     padding: 0;

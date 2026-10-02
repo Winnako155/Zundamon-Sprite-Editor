@@ -37,6 +37,8 @@ async function checkGitHubVersion(owner, repo, currentVersion, options = {}) {
         // 优先尝试获取最新的 Release (这是最推荐的发布方式)
         let latestVersion = null;
         let releaseUrl = null;
+        let releaseName = null;
+        let releaseBody = null;
 
         const releaseRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/releases/latest`, { headers });
         
@@ -44,6 +46,8 @@ async function checkGitHubVersion(owner, repo, currentVersion, options = {}) {
             const releaseData = await releaseRes.json();
             latestVersion = releaseData.tag_name;
             releaseUrl = releaseData.html_url;
+            releaseName = releaseData.name || releaseData.tag_name; //版本标题
+            releaseBody = releaseData.body || "";                   //版本介绍(Markdown 原文)
         } else if (releaseRes.status === 404) {
             // 如果没有 Release，则退而求其次获取最新的 Tag
             const tagRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/tags?per_page=1`, { headers });
@@ -74,6 +78,8 @@ async function checkGitHubVersion(owner, repo, currentVersion, options = {}) {
             currentVersion,
             latestVersion,
             releaseUrl,
+            releaseName,
+            releaseBody,
             message: isUpToDate 
                 ? '当前已是最新版本' 
                 : `发现新版本: ${latestVersion}`
