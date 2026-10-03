@@ -1,4 +1,4 @@
-const nowBuild = "v1.6"; //当前版本
+const nowBuild = "v1.6.1"; //当前版本
 const OWNER = 'Winnako155'; //仓库所有者
 const REPO = 'Zundamon-Sprite-Editor'; //仓库名称
 
