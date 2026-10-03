@@ -28,7 +28,7 @@ addItem("res/zunAkihiyoB/ico.png","向日葵俊达萌正","res/js/zunAkihiyoB.js
 addItem("res/zunzun/ico.png","jito410俊达萌","res/js/zunzun.js");
 addItem("res/torakkaaZun/ico.png","とらっかぁ俊达萌","res/js/torakkaaZun.js");
 addItem("res/ankomon/ico.png","安可萌","res/js/ankomon.js");
-addItem("res/Kasukabe3.0/ico.png","春日部紬","res/js/Kasukabe3.0.js");
+addItem("res/Kasukabe3.0/ico.png","春日部紬","res/js/kasukabe3.0.js");
 addItem("res/kiritan/ico.png","东北切蒲英","res/js/kiritan.js");
 addItem("res/zunko/ico.png","东北俊子","res/js/zunko.js");
 addItem("res/metan/ico.png","四国煤炭","res/js/metan.js");

@@ -665,22 +665,21 @@ rowList_init("后发", true, [
 ]);
 actorHooks[nowActor] = function(clickItem){
     if(getListSelectStateByID("眼睛")!=null && clickItem.addTarget.theTitle.innerText == "眼睛"){
-        clearTheRowListState("瞳孔");
         clearTheRowListState("眼白");
     }
     if(getListSelectStateByID("眼白")!=null && clickItem.addTarget.theTitle.innerText == "眼白"){
         clearTheRowListState("眼睛");
     }
 
-    if(getItemStateByID("Hoodie (use with lining)") == true){
-        changeTheRowListState("左臂","",false);
-        changeTheRowListState("右臂","",false);
-        selectItemByID("Hoodie lining",true);
-    }
-    else{
+    if(clickItem.addTarget.theTitle.innerText == "服装"){
+        clearTheRowListState("其他服装");
         changeTheRowListState("左臂","",true);
         changeTheRowListState("右臂","",true);
-        selectItemByID("Hoodie lining",false);
+    }
+    if(clickItem.addTarget.theTitle.innerText == "其他服装"){
+        clearTheRowListState("服装");
+        changeTheRowListState("左臂","",false);
+        changeTheRowListState("右臂","",false);
     }
     if(getListSelectStateByID("眼白")!=null){
         changeTheRowListState("瞳孔","",true);
@@ -700,14 +699,6 @@ actorHooks[nowActor] = function(clickItem){
     else{
         changeTheRowListState("馒头","",false);
     }
-    if(clickItem.addTarget.theTitle.innerText == "服装"){
-        clearTheRowListState("其他服装");
-    }
-    if(clickItem.addTarget.theTitle.innerText == "其他服装"){
-        clearTheRowListState("服装");
-        changeTheRowListState("左臂","",false);
-        changeTheRowListState("右臂","",false);
-    }
 };
 selectItemByID("BangsSideburns", true);
 selectItemByID("HeartClip", true);
@@ -722,3 +713,4 @@ document.getElementById("Pointing").click();
 selectItemByID("Body", true);
 selectItemByID("TwinDrillRight", true);
 selectItemByID("TwinDrillLeft", true);
+ 

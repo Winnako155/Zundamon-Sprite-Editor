@@ -2,7 +2,8 @@ canvasSizeX = 1082;
 canvasSizeY = 1818;
 nowActor = "结月缘B";
 document.body.dataset.actor = nowActor;
-var readMe = `*应朋友建议所加
+var readMe = `*应朋友建议所加 
+含有少儿不宜内容，请斟酌后再使用。
 結月ゆかり立ち絵素材 触手もりもり版1.2
 ========================================
 
