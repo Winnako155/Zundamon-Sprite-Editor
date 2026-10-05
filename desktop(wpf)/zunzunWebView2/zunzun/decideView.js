@@ -19,6 +19,8 @@ function hideDecideView(){
 }
 
 showDecideView();
+
+// 添加人物选项
 addItem("res/zun2.3/ico.png","俊达萌","res/js/zun2.3.js");
 addItem("res/zun3.2/ico.png","俊达萌新","res/js/zun3.2.js");
 addItem("res/zun1.1/ico.png","俊达萌披风","res/js/zun1.1.js");
@@ -35,7 +37,8 @@ addItem("res/metan/ico.png","四国煤炭","res/js/metan.js");
 addItem("res/KetsugatsuYukari/ico.png","结月缘","res/js/KetsugatsuYukari.js");
 addItem("res/KetsugatsuYukariB/ico.png","结月缘B","res/js/KetsugatsuYukariB.js");
 addItem("res/ChuugokuUsagi/ico.png","中国兔子","res/js/ChuugokuUsagi.js");
-
+addItem("res/KotobaAoi/ico.png","琴叶葵","res/js/KotobaAoi.js");
+addItem("res/Kotoba Akane/ico.png","琴叶茜","res/js/Kotoba Akane.js");
 
 
 

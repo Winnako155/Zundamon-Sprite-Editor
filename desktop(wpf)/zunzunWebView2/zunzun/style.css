@@ -82,6 +82,24 @@ body[data-actor="四国煤炭"]{
     --color-item-selected: #F06292;
     --color-item-hover: #ffcdd273;
 }
+body[data-actor="琴叶葵"]{
+    --color-primary: #2196F3;
+    --color-primary-light: #2195f318;
+    --color-primary-dark: #1675c4;
+    --color-primary-border: #2195f32f;
+    --color-bg-gradient-top: #2195f333;
+    --color-item-selected: #1a72b9;
+    --color-item-hover: #2195f30c;
+}
+body[data-actor="琴叶茜"]{
+    --color-primary: pink;
+    --color-primary-light: rgba(255, 192, 203, 0.11);
+    --color-primary-dark: rgb(219, 154, 165);
+    --color-primary-border: rgba(255, 192, 203, 0.315);
+    --color-bg-gradient-top: rgba(255, 192, 203, 0.253);
+    --color-item-selected: pink;
+    --color-item-hover: rgba(255, 192, 203, 0.089);
+}
 @keyframes hideTheStartView {
     0%{
         opacity: 1;
