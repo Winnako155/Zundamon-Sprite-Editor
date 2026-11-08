@@ -42,7 +42,6 @@ addItem("res/Kotoba Akane/ico.png","琴叶茜","res/js/Kotoba Akane.js");
 addItem("res/sozai/ico.png","雨衣","res/js/sozai.js");
 
 
-
 function addItem(img,name,jsPath){
     let item = document.createElement("div");
     item.classList.add("decideView_item");

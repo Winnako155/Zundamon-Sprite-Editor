@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:zunzunWebView2"
         xmlns:Wpf="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf" x:Class="zunzunWebView2.MainWindow"
         mc:Ignorable="d"
-        Title="MainWindow" Height="700" Width="400" MinWidth="400" MinHeight="700">
+        Title="俊达萌立绘编辑器" Height="600" Width="800" MinWidth="380" MinHeight="500" WindowStartupLocation="CenterScreen" Icon="ico.png">
     <Grid>
         <Grid>
             <Wpf:WebView2 x:Name="webView" Margin="0"/>
