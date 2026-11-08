@@ -100,6 +100,15 @@ body[data-actor="琴叶茜"]{
     --color-item-selected: pink;
     --color-item-hover: rgba(255, 192, 203, 0.089);
 }
+body[data-actor="雨衣"]{
+    --color-primary: #A08090;
+    --color-primary-light: #a0809018;
+    --color-primary-dark: #6b4a5a;
+    --color-primary-border: #6b4a5a1c;
+    --color-bg-gradient-top: #a0809033;
+    --color-item-selected: #8a6577;
+    --color-item-hover: #a080900c;
+}
 @keyframes hideTheStartView {
     0%{
         opacity: 1;

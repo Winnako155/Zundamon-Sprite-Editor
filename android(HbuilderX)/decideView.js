@@ -35,6 +35,9 @@ addItem("res/metan/ico.png","四国煤炭","res/js/metan.js");
 addItem("res/KetsugatsuYukari/ico.png","结月缘","res/js/KetsugatsuYukari.js");
 addItem("res/KetsugatsuYukariB/ico.png","结月缘B","res/js/KetsugatsuYukariB.js");
 addItem("res/ChuugokuUsagi/ico.png","中国兔子","res/js/ChuugokuUsagi.js");
+addItem("res/KotobaAoi/ico.png","琴叶葵","res/js/KotobaAoi.js");
+addItem("res/Kotoba Akane/ico.png","琴叶茜","res/js/Kotoba Akane.js");
+addItem("res/sozai/ico.png","雨衣","res/js/sozai.js");
 
 
 

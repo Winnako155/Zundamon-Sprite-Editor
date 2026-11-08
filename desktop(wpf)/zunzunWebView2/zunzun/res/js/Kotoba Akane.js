@@ -28,18 +28,32 @@ https://oov.github.io/psdtool
 製作：坂本アヒル
 https://twitter.com/sakamoto_ahr`;
 showDialog("提示", readMe);
+
+//琴叶茜的选中判断逻辑
+actorHooks[nowActor] = function(clickItem){
+    var listTitle = clickItem.addTarget.theTitle.innerText;
+    //整眼表情与瞳孔、睫毛互斥，避免多套眼睛叠在一起
+    if(listTitle == "眼睛" && getListSelectStateByID("眼睛") != null){
+        clearTheRowListState("瞳孔");
+        clearTheRowListState("睫毛");
+    }
+    if((listTitle == "瞳孔" || listTitle == "睫毛") && getListSelectStateByID(listTitle) != null){
+        clearTheRowListState("眼睛");
+    }
+};
+
 rowList_init("记号", true, [
     { img: "res/Kotoba Akane/Symbols/Tears.png", name: "泪水", id: "Tears", x: 388, y: 332, width: 246, height: 166 },
     { img: "res/Kotoba Akane/Symbols/Sweat2.png", name: "汗2", id: "Sweat2", x: 411, y: 165, width: 201, height: 258 },
     { img: "res/Kotoba Akane/Symbols/Sweat.png", name: "汗", id: "Sweat", x: 414, y: 397, width: 19, height: 26 }
 ]);
-rowList_init("眉毛", true, [
+rowList_init("眉毛", false, [
     { img: "res/Kotoba Akane/Eyebrows/Angry.png", name: "怒眉", id: "Angry", x: 404, y: 206, width: 178, height: 40 },
     { img: "res/Kotoba Akane/Eyebrows/Troubled.png", name: "为难眉", id: "Troubled", x: 398, y: 211, width: 184, height: 45 },
     { img: "res/Kotoba Akane/Eyebrows/Happy.png", name: "愉快眉", id: "Happy", x: 402, y: 177, width: 180, height: 43 },
     { img: "res/Kotoba Akane/Eyebrows/Normal.png", name: "基本眉", id: "Normal", x: 408, y: 198, width: 164, height: 39 }
 ]);
-rowList_init("瞳孔", true, [
+rowList_init("瞳孔", false, [
     { img: "res/Kotoba Akane/Eyes/Eyelashes/Pupil/BlankEye.png", name: "白眼", id: "BlankEye", x: 402, y: 278, width: 207, height: 78 },
     { img: "res/Kotoba Akane/Eyes/Eyelashes/Pupil/SketchyEye.png", name: "不妙眼", id: "SketchyEye", x: 411, y: 286, width: 187, height: 59 },
     { img: "res/Kotoba Akane/Eyes/Eyelashes/Pupil/SpiralEye.png", name: "螺旋眼", id: "SpiralEye", x: 402, y: 278, width: 207, height: 78 },
@@ -50,19 +64,19 @@ rowList_init("瞳孔", true, [
     { img: "res/Kotoba Akane/Eyes/Eyelashes/Pupil/CameraGaze.png", name: "看镜头", id: "CameraGaze", x: 407, y: 278, width: 207, height: 78 },
     { img: "res/Kotoba Akane/Eyes/Eyelashes/Pupil/BasicPupil.png", name: "基本", id: "BasicPupil", x: 402, y: 278, width: 207, height: 78 }
 ]);
-rowList_init("睫毛", true, [
+rowList_init("睫毛", false, [
     { img: "res/Kotoba Akane/Eyes/Eyelashes/AngryLashes.png", name: "怒睫毛", id: "AngryLashes", x: 375, y: 267, width: 268, height: 38 },
     { img: "res/Kotoba Akane/Eyes/Eyelashes/HalfLashes.png", name: "半眼睫毛", id: "HalfLashes", x: 380, y: 254, width: 255, height: 73 },
     { img: "res/Kotoba Akane/Eyes/Eyelashes/BasicLashes.png", name: "基本睫毛", id: "BasicLashes", x: 383, y: 252, width: 250, height: 86 }
 ]);
-rowList_init("眼睛", true, [
+rowList_init("眼睛", false, [
     { img: "res/Kotoba Akane/Eyes/SmileEyes.png", name: "笑眼", id: "SmileEyes", x: 389, y: 287, width: 236, height: 63 },
     { img: "res/Kotoba Akane/Eyes/CrossEyes.png", name: "＞＜", id: "CrossEyes", x: 386, y: 276, width: 232, height: 82 },
     { img: "res/Kotoba Akane/Eyes/CalmEyes.png", name: "和缓眼", id: "CalmEyes", x: 390, y: 293, width: 230, height: 56 },
     { img: "res/Kotoba Akane/Eyes/ClosedEyes.png", name: "闭眼", id: "ClosedEyes", x: 397, y: 302, width: 217, height: 51 },
     { img: "res/Kotoba Akane/Eyes/VerticalLineEyes.png", name: "竖线眼", id: "VerticalLineEyes", x: 418, y: 277, width: 171, height: 76 }
 ]);
-rowList_init("嘴巴", true, [
+rowList_init("嘴巴", false, [
     { img: "res/Kotoba Akane/Mouth/Nn.png", name: "嗯——", id: "Nn", x: 497, y: 402, width: 31, height: 17 },
     { img: "res/Kotoba Akane/Mouth/Hoo.png", name: "呼——", id: "Hoo", x: 495, y: 386, width: 43, height: 34 },
     { img: "res/Kotoba Akane/Mouth/Muu.png", name: "呣——", id: "Muu", x: 501, y: 396, width: 31, height: 20 },
@@ -89,14 +103,14 @@ rowList_init("脸色", true, [
 rowList_init("根图层2", true, [
     { img: "res/Kotoba Akane/ClothingOrnament.png", name: "服饰缀饰", id: "ClothingOrnament", x: 427, y: 543, width: 149, height: 276 }
 ]);
-rowList_init("左臂", true, [
+rowList_init("左臂", false, [
     { img: "res/Kotoba Akane/LeftArm/SpreadArms.png", name: "张开双臂", id: "SpreadArms", x: 515, y: 509, width: 386, height: 435 },
     { img: "res/Kotoba Akane/LeftArm/HandsUp.png", name: "万岁", id: "HandsUp", x: 506, y: 170, width: 438, height: 485 },
     { img: "res/Kotoba Akane/LeftArm/Peace.png", name: "剪刀手", id: "Peace", x: 515, y: 496, width: 321, height: 300 },
     { img: "res/Kotoba Akane/LeftArm/Thinking.png", name: "思考", id: "Thinking", x: 497, y: 432, width: 218, height: 354 },
     { img: "res/Kotoba Akane/LeftArm/Basic.png", name: "基本", id: "Basic", x: 515, y: 509, width: 334, height: 559 }
 ]);
-rowList_init("右臂", true, [
+rowList_init("右臂", false, [
     { img: "res/Kotoba Akane/RightArm/SpreadArms.png", name: "张开双臂", id: "SpreadArmsRightArm", x: 76, y: 522, width: 426, height: 392 },
     { img: "res/Kotoba Akane/RightArm/HandsUp.png", name: "万岁", id: "HandsUpRightArm", x: 86, y: 173, width: 422, height: 462 },
     { img: "res/Kotoba Akane/RightArm/KitchenKnife.png", name: "菜刀", id: "KitchenKnife", x: 177, y: 325, width: 325, height: 477 },
@@ -113,7 +127,6 @@ rowList_init("根图层", true, [
 selectItemByID("Normal", true);
 selectItemByID("BasicPupil", true);
 selectItemByID("BasicLashes", true);
-selectItemByID("VerticalLineEyes", true);
 selectItemByID("GentleSmile", true);
 selectItemByID("SideburnPieces", true);
 selectItemByID("Cheeks", true);
