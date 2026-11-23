@@ -37,3 +37,12 @@
 {"logTime": "1108/113129", "session": "START"}
 {"logTime": "1108/113129", "level": "INFO", "location": "chrome\\browser\\sessions\\session_service_log.cc:326 EdgeLogSessionServiceMessage", "message": "SessionServiceEvent: kStart - {\r\n   \"crashed\": false,\r\n   \"type\": 0\r\n}\r\n"}
 {"logTime": "1108/113150", "session": "END"}
+{"logTime": "1123/125754", "session": "START"}
+{"logTime": "1123/125754", "level": "INFO", "location": "chrome\\browser\\sessions\\session_service_log.cc:326 EdgeLogSessionServiceMessage", "message": "SessionServiceEvent: kStart - {\r\n   \"crashed\": false,\r\n   \"type\": 0\r\n}\r\n"}
+{"logTime": "1123/125813", "session": "END"}
+{"logTime": "1123/125846", "session": "START"}
+{"logTime": "1123/125846", "level": "INFO", "location": "chrome\\browser\\sessions\\session_service_log.cc:326 EdgeLogSessionServiceMessage", "message": "SessionServiceEvent: kStart - {\r\n   \"crashed\": false,\r\n   \"type\": 0\r\n}\r\n"}
+{"logTime": "1123/130134", "session": "END"}
+{"logTime": "1123/130348", "session": "START"}
+{"logTime": "1123/130348", "level": "INFO", "location": "chrome\\browser\\sessions\\session_service_log.cc:326 EdgeLogSessionServiceMessage", "message": "SessionServiceEvent: kStart - {\r\n   \"crashed\": false,\r\n   \"type\": 0\r\n}\r\n"}
+{"logTime": "1123/131319", "session": "END"}

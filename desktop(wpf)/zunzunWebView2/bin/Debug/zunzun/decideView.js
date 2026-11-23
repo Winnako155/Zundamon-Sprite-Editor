@@ -39,8 +39,8 @@ addItem("res/KetsugatsuYukariB/ico.png","结月缘B","res/js/KetsugatsuYukariB.j
 addItem("res/ChuugokuUsagi/ico.png","中国兔子","res/js/ChuugokuUsagi.js");
 addItem("res/KotobaAoi/ico.png","琴叶葵","res/js/KotobaAoi.js");
 addItem("res/Kotoba Akane/ico.png","琴叶茜","res/js/Kotoba Akane.js");
+addItem("res/noyaZundamon/ico.png","noya俊达萌","res/js/noyaZundamon.js");
 addItem("res/sozai/ico.png","雨衣","res/js/sozai.js");
-
 
 
 function addItem(img,name,jsPath){
