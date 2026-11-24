@@ -1721,6 +1721,13 @@ function lipShowExportView() {
     // 手动录屏是手机端专属：桌面端隐藏这个标签，DOM 与逻辑仍保留，保证三份代码一致
     var tabManual = document.getElementById("button_lipExportTabManual");
     if (tabManual) { tabManual.style.display = lipManualSupported() ? "" : "none"; }
+    // 「不推荐」标注也只在手机端出现：手机端有手动录屏这条推荐路径，
+    // 桌面端只有 GIF / MP4 两种选择，再标「不推荐」会让人无从下手
+    var tabNotes = document.querySelectorAll("#exportLipOptions .lipExportTabNote");
+    var showTabNotes = lipManualSupported();
+    for (var i = 0; i < tabNotes.length; i++) {
+        tabNotes[i].style.display = showTabNotes ? "" : "none";
+    }
     if (!isLip) {
         // 文件名默认用当前立绘名；换过立绘才覆盖，保留用户手打的名称
         var nameInput = document.getElementById("input_exportFileName");
@@ -2462,10 +2469,19 @@ var lipHelpTexts = {
     },
     exportPreset: {
         title: "导出与预设码",
-        content: "立绘 / 表情包模式：填写文件名后导出 PNG，下方的预设码可以复制分享。\n"
-            + "朗读对口型的 GIF / MP4 不推荐：手机端要先把成品转成 base64，再经桥接写入文件，文件越大越慢，"
-            + "写入期间界面会无响应，几 MB 就要几分钟。\n"
-            + "推荐用「手动录屏」配合手机自带录屏：倒计时结束开始播放，播完停止录屏，瞬间完成。"
+        // 说明文字按平台取值：手机端讲桥接写盘的代价，桌面端讲 GIF / MP4 本身的代价
+        content: function () {
+            var common = "立绘 / 表情包模式：填写文件名后导出 PNG，下方的预设码可以复制分享。\n";
+            if (typeof plus === "undefined") {
+                return common
+                    + "朗读对口型的透明 GIF 体积大、编码慢；MP4 需要实时录制，导出时间与音频等长。\n"
+                    + "电脑端推荐直接用「MP4输出」，文件小、兼容性好。";
+            }
+            return common
+                + "朗读对口型的 GIF / MP4 不推荐：手机端要先把成品转成 base64，再经桥接写入文件，文件越大越慢，"
+                + "写入期间界面会无响应，几 MB 就要几分钟。\n"
+                + "推荐用「手动录屏」配合手机自带录屏：倒计时结束开始播放，播完停止录屏，瞬间完成。";
+        }
     },
     presetRegion: {
         title: "片段预设码",
@@ -2475,7 +2491,9 @@ var lipHelpTexts = {
 function lipShowHelp(key) {
     var item = lipHelpTexts[key];
     if (!item) { return; }
-    showDialog(item.title, item.content);
+    // content 允许写成函数：需要按平台给不同说明时，在打开弹框时再取值
+    var content = (typeof item.content === "function") ? item.content() : item.content;
+    showDialog(item.title, content);
 }
 
 // 导出帧数输入：回车或失焦时校验，非法输入回到上次有效值
