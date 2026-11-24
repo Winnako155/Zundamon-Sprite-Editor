@@ -55,7 +55,7 @@ var lipState = {
     exportW: 0,
     exportH: 0,
     exportBg: "#0000FF",    // 蓝底颜色
-    exportFps: 30,          // 导出帧率（GIF / MP4 共用，来自导出区设置）
+    exportFps: 60,          // 导出帧率（GIF / MP4 共用，来自导出区设置，默认 60）
     exportLastDrawAt: 0,    // 录制时上一帧导出画面绘制的时间，用于按帧率节流
     mediaDest: null,        // 音频 MediaStreamDestination（录视频时抓音轨）
     mediaSource: null,      // <audio> 的 MediaElementAudioSourceNode
@@ -66,6 +66,21 @@ var lipState = {
 
 // 图片缓存：素材路径 -> Image，避免每帧重复 new Image
 var lipImgCache = {};
+
+// 手动录屏（全屏演示）状态：倒计时 → 从头播放 → 结束卡 → 自动退出
+var lipManual = {
+    active: false,      // 是否处于全屏演示中
+    ended: false,       // 播放是否已经结束（避免 ended 事件重复收尾）
+    stage: null,        // 全屏遮罩
+    canvas: null,       // 只画立绘的画布（背景由遮罩显示）
+    ctx: null,
+    countdownEl: null,  // 倒计时数字
+    endCardEl: null,    // 左上角结束卡
+    countdownTimer: 0,  // 倒计时 interval
+    endTimer: 0,        // 结束卡停留计时
+    wait: 0,            // 开始等待秒数
+    bg: "#0000FF"       // 全屏底色
+};
 
 // ---------- 一些通用小工具 ----------
 function lipClamp(v, min, max) {
@@ -92,6 +107,31 @@ function lipSetStatus(text) {
 function lipSetExportStatus(text) {
     var el = document.getElementById("text_lipExportStatus");
     if (el) { el.innerHTML = text; }
+}
+// 保存进度条：导出 MP4/GIF 期间显示，完成或失败后隐藏
+function lipShowSaveProgress() {
+    var box = document.getElementById("lipSaveProgress");
+    if (!box) { return; }
+    box.style.display = "flex";
+    lipSetSaveProgress(0);
+    // 内容区高度有限，滚动到底部确保进度条可见
+    if (box.parentNode && box.parentNode.scrollHeight > box.parentNode.clientHeight) {
+        box.parentNode.scrollTop = box.parentNode.scrollHeight;
+    }
+}
+function lipSetSaveProgress(pct) {
+    var bar = document.getElementById("lipSaveProgressBar");
+    var label = document.getElementById("text_lipSaveProgressPct");
+    var v = Number(pct);
+    if (isNaN(v)) { v = 0; }
+    v = Math.max(0, Math.min(100, v));
+    if (bar) { bar.style.width = v + "%"; }
+    if (label) { label.innerText = Math.round(v) + "%"; }
+}
+function lipHideSaveProgress() {
+    var box = document.getElementById("lipSaveProgress");
+    if (box) { box.style.display = "none"; }
+    lipSetSaveProgress(0);
 }
 function lipSafeFileName() {
     // 立绘名字里可能有空格/符号，简单清理一下再拼文件名
@@ -135,12 +175,27 @@ function lipEnterMode() {
     lipDrawPreviewNow(true);
 }
 
+// 进入对口型模式的手机端迁移提示：只有 HTML5+ / plus 环境才弹，桌面端直接执行 onClose
+// 与原有的“测试功能”提示串行播放，由 switchMode 统一编排
+function lipShowMigrationNotice(onClose) {
+    var next = (typeof onClose === "function") ? onClose : null;
+    if (typeof plus === "undefined") {
+        if (next) { next(); }
+        return;
+    }
+    showDialog("提示",
+        "手机端正在迁移 Capacitor，暂时继续使用导出速度较慢的旧方案。\n"
+        + "有条件的可以在电脑端体验，导出会快很多。",
+        next);
+}
+
 // 离开朗读模式：停止播放和录制，并把嘴巴列表恢复成原来的单选状态
 // （不清空已选音频，方便再切回来）
 function lipLeaveMode() {
     document.body.classList.remove("lipMode");
     lipSetViewCollapsed(false); // 离开模式时恢复素材区，避免其它模式里被收起却看不到展开按钮
     lipHideExportView(); // 导出弹框只在朗读模式使用
+    lipManualExit(); // 全屏演示还没结束就离开模式时，直接收掉
     lipRestoreMouthMultiSelect();
     if (lipState.recording) {
         lipState.cancelRecording = true;
@@ -672,6 +727,8 @@ function lipCreateRegion(start, end, select) {
         start: Math.round(start * 10) / 10,
         end: Math.round(end * 10) / 10,
         actor: nowActor,
+        actorKey: nowActorKey, //预设码用的人物 id
+        mouthPicks: presetMouthPicksFromSelection(), //预设码里额外记录嘴部 index
         ops: ops
     };
     if (region.end <= region.start) { region.end = region.start + 0.1; }
@@ -874,8 +931,82 @@ function lipSaveCurrentRegion() {
     if (!ops.length) { return; }
     region.ops = ops;
     region.actor = nowActor;
+    region.actorKey = nowActorKey;
+    region.mouthPicks = presetMouthPicksFromSelection(); //嘴部只用于预设码，不参与绘制
     lipPreloadRegion(region); // 内部会重新加载图片并重画预览
 }
+
+// ---------- 片段预设码：每个片段单独复制 / 导入 ----------
+// 把片段快照里的图片反查成图层索引，再拼成和全局预设一致的格式；
+// 嘴部单独记录在 mouthPicks 里（片段绘制本身不固化嘴部）
+function lipRegionPresetCode(region) {
+    if (!region) { return ""; }
+    var imgs = [];
+    for (var i = 0; i < region.ops.length; i++) {
+        var op = region.ops[i];
+        if (op.type === "img" && op.img) { imgs.push(op.img); }
+    }
+    var picks = presetPicksFromImages(imgs, true); //快照里不含嘴部图片
+    var mouthPicks = (region.mouthPicks && region.mouthPicks.length)
+        ? region.mouthPicks
+        : presetMouthPicksFromSelection();
+    for (var j = 0; j < mouthPicks.length; j++) { picks.push(mouthPicks[j]); }
+    return buildPresetCode(region.actorKey || nowActorKey, picks);
+}
+
+// 复制当前选中片段的预设码
+function lipCopySelectedRegionPreset() {
+    var region = lipFindRegionById(lipState.selectedRegionId);
+    if (!region) {
+        tip("请先选中一个片段", 2000, "#ff6b6b");
+        return;
+    }
+    var code = lipRegionPresetCode(region);
+    var ok = copyText(code);
+    tip(ok === false ? "复制失败，请手动选中预设码复制" : "本片段预设码已复制", 2000);
+}
+
+// 打开导入弹窗（目标固定为当前片段）
+function lipShowRegionPresetImport() {
+    var region = lipFindRegionById(lipState.selectedRegionId);
+    if (!region) {
+        tip("请先选中一个片段", 2000, "#ff6b6b");
+        return;
+    }
+    showPresetImportView("region");
+}
+
+// 导入到当前选中片段：先套用勾选，再按当前素材抓取快照，覆盖该片段的样式
+function lipImportRegionPreset(code) {
+    var parsed = parsePresetCode(code);
+    if (!parsed) {
+        tip("预设码格式不正确", 3000, "#ff6b6b");
+        return false;
+    }
+    if (parsed.actorKey !== nowActorKey) {
+        tip("这个预设码属于「" + parsed.actorKey + "」，请先切换到同一立绘", 3000, "#ff6b6b");
+        return false;
+    }
+    var region = lipFindRegionById(lipState.selectedRegionId);
+    if (!region) {
+        tip("请先选中一个片段", 2000, "#ff6b6b");
+        return false;
+    }
+    //对口型模式导入舍弃嘴部，嘴由音频驱动，不能被预设覆盖
+    var applied = applyPresetPicks(parsed.picks, true, true); // 不触发 render，避免自动保存抢先覆盖
+    if (!applied) {
+        tip("预设码里没有可用的图层", 3000, "#ff6b6b");
+        return false;
+    }
+    lipRefreshStatic();          // 让静态绘制指令与面板勾选一致
+    lipSaveCurrentRegion();      // 抓取快照写回当前片段
+    lipState.selectionSig = lipSelectionSignature();
+    lipRenderRegions();
+    lipDrawPreviewNow(true);
+    tip("已导入片段预设");
+    return true;
+}
+
 
 // 当前所有 rowList 的勾选签名，用来判断用户是否改了立绘样式
 function lipSelectionSignature() {
@@ -1309,11 +1440,13 @@ function lipStartLoop() {
         lipState.smooth += (target - lipState.smooth) * k;
 
         lipDrawPreviewNow(false);
+        // 手动录屏：全屏舞台同步绘制当前口型（背景色由遮罩负责）
+        if (lipManual.active) { lipDrawManualFrame(t); }
         lipState.lastFrameAt = now;
         if (lipState.recording) {
             // 按设置的导出帧率更新录像画布：rAF 通常有 60Hz，不能每帧都画，
             // 否则低帧率设置会被实际绘制带偏；这里按帧间隔节流。
-            var frameGap = 1000 / (lipState.exportFps || 30);
+            var frameGap = 1000 / (lipState.exportFps || 60);
             if (!lipState.exportLastDrawAt || now - lipState.exportLastDrawAt >= frameGap - 1) {
                 lipDrawExportFrame(t);
                 lipState.exportLastDrawAt = now;
@@ -1364,8 +1497,63 @@ function lipDrawExportFrame(t) {
 // 六、导出 GIF（GIF89a + LZW，透明背景）
 // ============================================================
 
-// 下载 Blob：浏览器直接触发下载；HBuilder 打包环境额外写一份到 _downloads
-function lipDownloadBlob(blob, filename) {
+// 生成不重名的文件名：加时间戳，避免覆盖上一次导出
+function lipUniqueFileName(filename) {
+    var dot = filename.lastIndexOf(".");
+    var base = dot > 0 ? filename.slice(0, dot) : filename;
+    var ext = dot > 0 ? filename.slice(dot) : "";
+    var d = new Date();
+    function pad(n, len) {
+        var s = String(n);
+        while (s.length < (len || 2)) { s = "0" + s; }
+        return s;
+    }
+    var stamp = d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate())
+        + "_" + pad(d.getHours()) + pad(d.getMinutes()) + pad(d.getSeconds())
+        + pad(d.getMilliseconds(), 3);
+    return base + "_" + stamp + ext;
+}
+
+// 统一的错误文字，方便控制台和提示里看清原因
+function lipErrText(err) {
+    if (!err) { return "未知错误"; }
+    if (typeof err === "string") { return err; }
+    return err.message || err.msg || (err.code != null ? "code=" + err.code : "未知错误");
+}
+
+// Blob 转 base64（去掉 data:xxx;base64, 前缀和所有空白字符）
+function lipBlobToBase64(blob) {
+    return new Promise(function (resolve, reject) {
+        var reader = new FileReader();
+        reader.onload = function () {
+            var s = String(reader.result || "");
+            var comma = s.indexOf(",");
+            if (comma >= 0) { s = s.slice(comma + 1); }
+            s = s.replace(/\s+/g, "");
+            resolve(s);
+        };
+        reader.onerror = function () {
+            reject(reader.error || new Error("FileReader 读取失败"));
+        };
+        reader.readAsDataURL(blob);
+    });
+}
+
+// 下载 Blob：HBuilder 打包环境走和立绘 PNG 一样的通道（写入文件后存相册）；
+// 普通浏览器才用 <a download>，因为安卓 WebView 里它是无效的。
+function lipDownloadBlob(blob, filename, onDone, onFail) {
+    var hasPlus = typeof plus !== "undefined" && !!plus.io;
+    console.log("[lipExport] 保存入口：filename=" + filename
+        + "，大小=" + (blob ? blob.size : "?") + " 字节"
+        + "，type=" + (blob ? blob.type : "?")
+        + "，plus.io=" + hasPlus
+        + "，plus.android=" + (typeof plus !== "undefined" && !!plus.android)
+        + "，plus.gallery=" + (typeof plus !== "undefined" && !!plus.gallery));
+    if (hasPlus) {
+        lipSaveBlobToAlbum(blob, filename, onDone, onFail);
+        return;
+    }
+
     var url = URL.createObjectURL(blob);
     var a = document.createElement("a");
     a.href = url;
@@ -1376,24 +1564,597 @@ function lipDownloadBlob(blob, filename) {
         URL.revokeObjectURL(url);
         a.remove();
     }, 10000);
+    if (onDone) { onDone(); }
+}
 
-    if (typeof plus !== "undefined" && plus.io) {
+// 用指定的解码函数按 chunkSize 分段写入（按 4 字符对齐），返回 { ok, len, chunks, chunkSize, reason }
+// 这正是 2026-11-24 15:47 真机导出成功时的实现（android.util.Base64 / 分段 2048 / 523 段），
+// 不要改回“先探测再只写一个分段”的做法：探测只写一小段，探测通过不能代表整份写入正确。
+function lipWriteChunksWithDecoder(base64, absPath, chunkSize, decodeFn, expectedSize) {
+    var out = null;
+    try {
+        var FileOutputStream = plus.android.importClass("java.io.FileOutputStream");
+        out = new FileOutputStream(absPath); // 覆盖写：上一次失败留下的内容会被清掉
+        var pos = 0;
+        var chunks = 0;
+        // 同一个 FileOutputStream 连续 write，不 seek：流自身游标会一直向后，等于追加
+        while (pos < base64.length) {
+            var take = Math.min(chunkSize - (chunkSize % 4), base64.length - pos);
+            take -= take % 4; // 保证每段都是完整的 base64 4 字符组
+            if (take <= 0) { take = base64.length - pos; } // 兜底：最后不足 4 字符
+            var chunk = base64.substring(pos, pos + take);
+            var bytes = decodeFn(chunk);
+            if (!bytes) {
+                try { out.close(); } catch (e1) { }
+                return { ok: false, reason: "第 " + (chunks + 1) + " 段 decode 返回 null（分段 " + chunkSize + "）" };
+            }
+            out.write(bytes);
+            chunks++;
+            pos += take;
+        }
+        out.flush();
+        out.close();
+        out = null;
+
+        var len = -1;
         try {
-            plus.io.requestFileSystem(plus.io.PRIVATE_DOC, function (fs) {
-                fs.root.getDirectory("_downloads", { create: true }, function (dir) {
-                    dir.getFile(filename, { create: true }, function (entry) {
-                        entry.createWriter(function (writer) {
-                            writer.onwrite = function () { tip("已保存到 _downloads/" + filename, 3000); };
-                            writer.onerror = function (err) { console.error("写入失败", err); };
-                            writer.write(blob);
-                        }, function (err) { console.error("createWriter 失败", err); });
-                    }, function (err) { console.error("getFile 失败", err); });
-                }, function (err) { console.error("getDirectory 失败", err); });
-            }, function (err) { console.error("requestFileSystem 失败", err); });
+            var File = plus.android.importClass("java.io.File");
+            len = new File(absPath).length();
+            if (len !== -1) { len = Number(len); }
+        } catch (e2) {
+            console.warn("[lipExport] 读取写入后文件大小失败：" + lipErrText(e2));
+        }
+        if (len <= 0) {
+            return { ok: false, reason: "写入后文件大小为 " + len + " 字节" };
+        }
+        if (expectedSize > 0 && len !== expectedSize) {
+            return { ok: false, reason: "文件长度不符：写入 " + len + "，预期 " + expectedSize };
+        }
+        return { ok: true, len: len, chunks: chunks, chunkSize: chunkSize };
+    } catch (e) {
+        if (out) { try { out.close(); } catch (e3) { } }
+        return { ok: false, reason: lipErrText(e) };
+    }
+}
+
+// 策略 1：android.util.Base64.decode(String, int)，分段大小自适应（32768 → 8192 → 2048 → 256）
+// 每个分段都做整份写入并按最终文件长度校验，校验不过才换下一个分段。
+function lipWriteWithAndroidBase64(base64, absPath, expectedSize) {
+    var errors = [];
+    var B64 = plus.android.importClass("android.util.Base64");
+    var sizes = [32768, 8192, 2048, 256];
+    for (var i = 0; i < sizes.length; i++) {
+        var size = sizes[i];
+        var res = lipWriteChunksWithDecoder(base64, absPath, size, function (chunk) {
+            return B64.decode(chunk, 0);
+        }, expectedSize);
+        if (res.ok) {
+            res.method = "android.util.Base64";
+            return res;
+        }
+        var line = "android.util.Base64 分段 " + size + " 失败：" + res.reason;
+        console.warn("[lipExport] " + line);
+        errors.push(line);
+    }
+    return { ok: false, errors: errors };
+}
+
+// 策略 2：java.util.Base64.getDecoder().decode(String)（API 26+，不依赖 android.util.Base64）
+function lipWriteWithJavaBase64(base64, absPath, expectedSize) {
+    var errors = [];
+    var JB64 = plus.android.importClass("java.util.Base64");
+    var decoder = JB64.getDecoder();
+    var sizes = [8192, 2048, 256];
+    for (var i = 0; i < sizes.length; i++) {
+        var size = sizes[i];
+        var res = lipWriteChunksWithDecoder(base64, absPath, size, function (chunk) {
+            return decoder.decode(chunk);
+        }, expectedSize);
+        if (res.ok) {
+            res.method = "java.util.Base64";
+            return res;
+        }
+        var line = "java.util.Base64 分段 " + size + " 失败：" + res.reason;
+        console.warn("[lipExport] " + line);
+        errors.push(line);
+    }
+    return { ok: false, errors: errors };
+}
+
+// 把 base64 以二进制写入文件：依次尝试多种分段和两种解码器，全部失败时返回每一步的原因
+function lipWriteBase64ToFile(base64, absPath, expectedSize) {
+    if (typeof plus === "undefined" || !plus.android) {
+        return { ok: false, errors: ["当前环境没有 plus.android"] };
+    }
+    if (!base64) {
+        return { ok: false, errors: ["base64 内容为空"] };
+    }
+
+    var errors = [];
+    try {
+        var r1 = lipWriteWithAndroidBase64(base64, absPath, expectedSize);
+        if (r1.ok) {
+            console.log("[lipExport] 写入成功：" + r1.method + "，分段 " + r1.chunkSize
+                + " 字符，共 " + r1.chunks + " 段，文件 " + r1.len + " 字节");
+            return r1;
+        }
+        errors = errors.concat(r1.errors || []);
+    } catch (e1) {
+        var l1 = "android.util.Base64 异常：" + lipErrText(e1);
+        console.error("[lipExport] " + l1);
+        errors.push(l1);
+    }
+
+    try {
+        var r2 = lipWriteWithJavaBase64(base64, absPath, expectedSize);
+        if (r2.ok) {
+            console.log("[lipExport] 写入成功：" + r2.method + "，分段 " + r2.chunkSize
+                + " 字符，共 " + r2.chunks + " 段，文件 " + r2.len + " 字节");
+            return r2;
+        }
+        errors = errors.concat(r2.errors || []);
+    } catch (e2) {
+        var l2 = "java.util.Base64 异常：" + lipErrText(e2);
+        console.error("[lipExport] " + l2);
+        errors.push(l2);
+    }
+
+    return { ok: false, errors: errors };
+}
+
+// 兜底写入：仅用于没有 Native.js 的平台（如 iOS）。
+// 安卓上 plus.io 的 FileWriter.write 只接受 DOMString，写 Blob 会抛异常，所以安卓不再走这里。
+function lipWriteBlobByWriter(blob, entry, callback) {
+    entry.createWriter(function (writer) {
+        writer.onwrite = function () {
+            // 写回调成功不代表真的写进了内容，再查一次文件大小，0 字节按失败处理
+            entry.file(function (file) {
+                console.log("[lipExport] FileWriter 兜底写入后文件大小：" + file.size + " 字节");
+                callback(file.size > 0);
+            }, function (err) {
+                console.warn("[lipExport] 兜底写入后读取文件大小失败：" + lipErrText(err));
+                callback(true);
+            });
+        };
+        writer.onerror = function (err) {
+            console.error("[lipExport] FileWriter 兜底写入失败：" + lipErrText(err));
+            callback(false);
+        };
+        try {
+            writer.write(blob);
         } catch (e) {
-            console.warn("plus 保存失败", e);
+            console.error("[lipExport] FileWriter.write 异常：" + lipErrText(e));
+            callback(false);
+        }
+    }, function (err) {
+        console.error("[lipExport] createWriter 失败：" + lipErrText(err));
+        callback(false);
+    });
+}
+
+// 创建 Java byte[] 缓冲区（数组始终留在 Java 侧，不回流到 JS）
+function lipMakeJavaByteBuffer(size) {
+    try {
+        var ArrayCls = plus.android.importClass("java.lang.reflect.Array");
+        var ByteCls = plus.android.importClass("java.lang.Byte");
+        return ArrayCls.newInstance(ByteCls.TYPE, size);
+    } catch (e1) {
+        try {
+            return plus.android.newObject("[B", size);
+        } catch (e2) {
+            return null;
         }
     }
+}
+
+// 策略 3：Java 端流式解码，不经过 JS 的 byte[]。
+// 1) base64 文本按块写入临时 .b64 文件，每写完一块上报真实进度（15%→45%）；
+// 2) 再用 Base64InputStream 逐块解码到目标文件，每块之间让出主线程并上报进度（45%→90%）。
+function lipWriteBase64ByStream(base64, absPath, dir, tempName, expectedSize, callback) {
+    var TEMP_CHUNK = 262144; // 256K 字符一块，减少 FileWriter 往返
+    var IO_BUFFER = 262144; // 256KB Java 缓冲区，减少 read/write 往返
+    console.log("[lipExport] 流式参数：临时块 " + TEMP_CHUNK + " 字符，解码缓冲 " + IO_BUFFER + " 字节");
+
+    function finish(res, tmpEntry) {
+        if (tmpEntry) {
+            try { tmpEntry.remove(function () { }, function () { }); } catch (e) { }
+        }
+        if (callback) { callback(res); }
+    }
+
+    function verifyAndFinish(tmpEntry, copied, method) {
+        var len = -1;
+        try {
+            var File = plus.android.importClass("java.io.File");
+            len = Number(new File(absPath).length());
+        } catch (e1) { }
+        console.log("[lipExport] 流式解码完成：共写入 " + copied + " 字节，文件 " + len + " 字节");
+        if (len <= 0) {
+            finish({ ok: false, reason: "流式解码后文件大小为 " + len }, tmpEntry);
+            return;
+        }
+        if (expectedSize > 0 && len !== expectedSize) {
+            finish({ ok: false, reason: "流式解码长度不符：写入 " + len + "，预期 " + expectedSize }, tmpEntry);
+            return;
+        }
+        lipSetSaveProgress(90);
+        finish({ ok: true, len: len, method: method }, tmpEntry);
+    }
+
+    // 拿不到缓冲区时的后备：Files.copy 一次完成，期间无法上报细粒度进度
+    function decodeByFilesCopy(tmpEntry, tmpPath) {
+        var fin = null, bin = null, out = null;
+        try {
+            var FileInputStream = plus.android.importClass("java.io.FileInputStream");
+            var FileOutputStream = plus.android.importClass("java.io.FileOutputStream");
+            var Base64InputStream = plus.android.importClass("android.util.Base64InputStream");
+            var Files = plus.android.importClass("java.nio.file.Files");
+            fin = new FileInputStream(tmpPath);
+            bin = new Base64InputStream(fin, 0);
+            out = new FileOutputStream(absPath);
+            var copied = Number(Files.copy(bin, out));
+            out.close(); out = null;
+            bin.close(); bin = null;
+            fin.close(); fin = null;
+            verifyAndFinish(tmpEntry, copied, "Java 流式解码（Files.copy）");
+        } catch (e) {
+            if (out) { try { out.close(); } catch (e3) { } }
+            if (bin) { try { bin.close(); } catch (e4) { } }
+            if (fin) { try { fin.close(); } catch (e5) { } }
+            finish({ ok: false, reason: "流式解码异常：" + lipErrText(e) }, tmpEntry);
+        }
+    }
+
+    function decodeByBuffer(tmpEntry, tmpPath) {
+        var fin = null, bin = null, out = null;
+        try {
+            var FileInputStream = plus.android.importClass("java.io.FileInputStream");
+            var FileOutputStream = plus.android.importClass("java.io.FileOutputStream");
+            var Base64InputStream = plus.android.importClass("android.util.Base64InputStream");
+            var buf = lipMakeJavaByteBuffer(IO_BUFFER);
+            if (!buf) { throw new Error("无法创建 Java byte[] 缓冲区"); }
+            fin = new FileInputStream(tmpPath);
+            bin = new Base64InputStream(fin, 0);
+            out = new FileOutputStream(absPath);
+
+            var copied = 0;
+            var lastPct = 45;
+            function step() {
+                var n = 0;
+                try {
+                    n = bin.read(buf);
+                } catch (eRead) {
+                    closeAll();
+                    finish({ ok: false, reason: "读取解码数据失败：" + lipErrText(eRead) }, tmpEntry);
+                    return;
+                }
+                if (n > 0) {
+                    try {
+                        out.write(buf, 0, n);
+                    } catch (eWrite) {
+                        closeAll();
+                        finish({ ok: false, reason: "写入解码数据失败：" + lipErrText(eWrite) }, tmpEntry);
+                        return;
+                    }
+                    copied += n;
+                    var ratio = expectedSize > 0 ? Math.min(1, copied / expectedSize) : 0;
+                    var pct = 45 + Math.round(ratio * 45);
+                    if (pct > lastPct) {
+                        lastPct = pct;
+                        lipSetSaveProgress(pct);
+                        lipSetExportStatus("正在解码写入 " + pct + "%");
+                    }
+                    setTimeout(step, 0); // 让出主线程，进度条才能真正刷新
+                    return;
+                }
+                if (n === 0) {
+                    setTimeout(step, 0);
+                    return;
+                }
+                closeAll();
+                verifyAndFinish(tmpEntry, copied, "Java 流式解码（缓冲区逐块）");
+            }
+            function closeAll() {
+                if (out) { try { out.flush(); out.close(); } catch (e6) { } out = null; }
+                if (bin) { try { bin.close(); } catch (e7) { } bin = null; }
+                if (fin) { try { fin.close(); } catch (e8) { } fin = null; }
+            }
+            step();
+        } catch (e) {
+            if (out) { try { out.close(); } catch (e3) { } }
+            if (bin) { try { bin.close(); } catch (e4) { } }
+            if (fin) { try { fin.close(); } catch (e5) { } }
+            console.warn("[lipExport] 缓冲区解码不可用，退回 Files.copy：" + lipErrText(e));
+            decodeByFilesCopy(tmpEntry, tmpPath);
+        }
+    }
+
+    try {
+        dir.getFile(tempName, { create: true }, function (tmpEntry) {
+            tmpEntry.createWriter(function (writer) {
+                var written = 0;
+                function writeNext() {
+                    if (written >= base64.length) {
+                        var tmpPath = lipEntryAbsPath(tmpEntry);
+                        if (!tmpPath) {
+                            finish({ ok: false, reason: "无法推导临时 base64 文件路径" }, tmpEntry);
+                            return;
+                        }
+                        console.log("[lipExport] 临时 base64 文件已写入：" + tmpPath
+                            + "，共 " + base64.length + " 字符，分块 " + Math.ceil(base64.length / TEMP_CHUNK));
+                        // 核对临时文件长度，确认分块写入没有互相覆盖
+                        try {
+                            var TmpFile = plus.android.importClass("java.io.File");
+                            var tmpLen = Number(new TmpFile(tmpPath).length());
+                            if (tmpLen !== base64.length) {
+                                finish({ ok: false, reason: "临时 base64 文件长度不符：写入 " + tmpLen + "，预期 " + base64.length }, tmpEntry);
+                                return;
+                            }
+                        } catch (eTmp) {
+                            console.warn("[lipExport] 读取临时文件长度失败：" + lipErrText(eTmp));
+                        }
+                        lipSetSaveProgress(45);
+                        lipSetExportStatus("正在解码写入...");
+                        console.log("[lipExport] 开始 Java 解码：缓冲 " + IO_BUFFER + " 字节");
+                        decodeByBuffer(tmpEntry, tmpPath);
+                        return;
+                    }
+                    var take = Math.min(TEMP_CHUNK, base64.length - written);
+                    take -= take % 4;
+                    if (take <= 0) { take = base64.length - written; }
+                    var chunk = base64.substring(written, written + take);
+                    writer.onwrite = function () {
+                        written += take;
+                        var ratio = written / base64.length;
+                        lipSetSaveProgress(15 + Math.round(ratio * 30));
+                        lipSetExportStatus("正在写入临时文件 " + Math.round(ratio * 100) + "%");
+                        writeNext();
+                    };
+                    writer.onerror = function (err) {
+                        finish({ ok: false, reason: "写入临时 base64 文件失败：" + lipErrText(err) }, tmpEntry);
+                    };
+                    try {
+                        // 不主动 seek：plus.io FileWriter 每次写入后指针会自动后移，连续写即追加
+                        writer.write(chunk);
+                    } catch (eWrite2) {
+                        finish({ ok: false, reason: "写入临时 base64 文件异常：" + lipErrText(eWrite2) }, tmpEntry);
+                    }
+                }
+                writeNext();
+            }, function (err) {
+                finish({ ok: false, reason: "创建临时文件写入器失败：" + lipErrText(err) }, tmpEntry);
+            });
+        }, function (err) {
+            finish({ ok: false, reason: "创建临时 base64 文件失败：" + lipErrText(err) }, null);
+        });
+    } catch (e) {
+        finish({ ok: false, reason: "流式解码准备失败：" + lipErrText(e) }, null);
+    }
+}
+
+// entry.fullPath 在真机上已经是 /storage/... 绝对路径；不是的话再从 toLocalURL 推导
+function lipEntryAbsPath(entry) {
+    var full = String(entry.fullPath || "");
+    if (full.charAt(0) === "/") { return full; }
+    var local = String(entry.toLocalURL() || "");
+    if (local.indexOf("file://") === 0) { local = local.substring(7); }
+    try { local = decodeURIComponent(local); } catch (e) { }
+    if (local.charAt(0) === "/") { return local; }
+    return "";
+}
+
+// requestFileSystem 的常量在真机上是数字（如 PUBLIC_DOWNLOADS = 4），日志里转成可读名字
+function lipRootLabel(rootConst) {
+    try {
+        if (rootConst === plus.io.PUBLIC_DOWNLOADS) { return "PUBLIC_DOWNLOADS"; }
+        if (rootConst === plus.io.PRIVATE_DOC) { return "PRIVATE_DOC"; }
+        if (rootConst === plus.io.PUBLIC_DOCUMENTS) { return "PUBLIC_DOCUMENTS"; }
+    } catch (e) { }
+    return String(rootConst);
+}
+
+// 把 Blob 写进 _downloads，再交给相册保存（参考 scrpit.js 里立绘 PNG 的保存方式）
+function lipSaveBlobToAlbum(blob, filename, onDone, onFail) {
+    var tStart = Date.now();
+    var currentStep = "1/6 准备保存";
+    // 看门狗：真机上某一步回调不触发时，控制台能直接看出卡在哪
+    function armWatchdog() {
+        return setTimeout(function () {
+            console.error("[lipExport] 保存超时（60 秒），当前卡在 " + currentStep + "，后续回调没有触发");
+            lipHideSaveProgress();
+            tip("导出保存超时，请查看控制台 [lipExport] 日志", 5000);
+            if (onFail) { onFail("保存超时（" + currentStep + "）"); }
+        }, 60000);
+    }
+    var watchdog = armWatchdog();
+
+    function fail(stage, err) {
+        clearTimeout(watchdog);
+        lipHideSaveProgress();
+        var msg = stage + "：" + lipErrText(err);
+        console.error("[lipExport] " + msg + "（当前步骤 " + currentStep + "）");
+        tip(msg, 5000);
+        if (onFail) { onFail(msg); }
+    }
+    function finish() {
+        clearTimeout(watchdog);
+        lipHideSaveProgress();
+        console.log("[lipExport] 6/6 全部完成");
+        if (onDone) { onDone(); }
+    }
+
+    console.log("[lipExport] 1/6 开始保存 " + filename);
+    if (!blob || !blob.size) {
+        fail("导出内容为空", null);
+        return;
+    }
+    if (!plus.gallery) {
+        fail("当前环境不支持保存到相册", null);
+        return;
+    }
+
+    lipShowSaveProgress();
+    lipSetSaveProgress(5);
+    lipSetExportStatus("正在准备保存...");
+
+    // Blob→base64 期间没有细粒度回调，用计时器缓慢推进到 14%，完成后再校正到 15%
+    var base64Pct = 5;
+    var base64Timer = setInterval(function () {
+        if (base64Pct < 14) {
+            base64Pct++;
+            lipSetSaveProgress(base64Pct);
+            lipSetExportStatus("正在转换数据 " + base64Pct + "%");
+        }
+    }, 250);
+
+    var name = lipUniqueFileName(filename);
+
+    lipBlobToBase64(blob).then(function (base64) {
+        clearInterval(base64Timer);
+        currentStep = "2/6 Blob 转 base64";
+        console.log("[lipExport] 2/6 Blob 转 base64 完成，长度 " + base64.length
+            + "，耗时 " + (Date.now() - tStart) + " ms");
+        lipSetSaveProgress(15);
+
+        function saveToGallery(entry, dir) {
+            // Native.js 需要系统绝对路径（/storage/...）。
+            // 不能拿 requestFileSystem 的常量拼路径（真机上是数字 4），要用 entry 自身的路径推导。
+            var absPath = lipEntryAbsPath(entry);
+            console.log("[lipExport] 4/6 entry.fullPath=" + entry.fullPath
+                + "，toLocalURL=" + entry.toLocalURL()
+                + "，推导绝对路径=" + absPath);
+            if (!absPath) {
+                fail("无法推导导出文件的绝对路径", null);
+                return;
+            }
+
+            var writeStart = Date.now();
+
+            function startGallery(writeRes) {
+                var writeMs = Date.now() - writeStart;
+                console.log("[lipExport] 4/6 写入结果：ok=" + writeRes.ok
+                    + "，方式=" + (writeRes.method || "-")
+                    + "，文件大小 " + writeRes.len + " 字节（预期 " + blob.size + "）"
+                    + "，写入耗时 " + writeMs + " ms");
+                if (!writeRes.ok) {
+                    console.error("[lipExport] 写入尝试汇总：\n"
+                        + (writeRes.errors || [writeRes.reason || "无详细原因"]).join("\n"));
+                    fail("写入导出文件失败（详见上方 [lipExport] 日志）", null);
+                    return;
+                }
+
+                currentStep = "6/6 保存到相册";
+                var galleryStart = Date.now();
+                lipSetSaveProgress(94);
+                lipSetExportStatus("正在保存到相册...");
+                // 相册保存期间没有进度回调，用计时器缓慢推进到 99%，成功后校正到 100%
+                var galleryPct = 94;
+                var galleryTimer = setInterval(function () {
+                    if (galleryPct < 99) {
+                        galleryPct++;
+                        lipSetSaveProgress(galleryPct);
+                    }
+                }, 200);
+                var localUrl = entry.toLocalURL();
+                console.log("[lipExport] 5/6 写入完成，开始保存到相册：" + localUrl);
+
+                function tryGallery(path, isRetry) {
+                    plus.gallery.save(path, function () {
+                        var galleryMs = Date.now() - galleryStart;
+                        console.log("[lipExport] 相册保存成功：" + path + "，耗时 " + galleryMs + " ms");
+                        console.log("[lipExport] 耗时汇总：总计 " + (Date.now() - tStart)
+                            + " ms（写入 " + writeMs + " ms，相册 " + galleryMs + " ms）");
+                        clearInterval(galleryTimer);
+                        lipSetSaveProgress(100);
+                        lipSetExportStatus("保存完成");
+                        tip("已保存到相册", 3000);
+                        setTimeout(function () {
+                            lipHideSaveProgress();
+                            finish();
+                        }, 600);
+                    }, function (err) {
+                        console.error("[lipExport] gallery.save 失败：" + lipErrText(err) + "，path=" + path);
+                        if (!isRetry && absPath && absPath !== path) {
+                            console.warn("[lipExport] 改用绝对路径重试相册保存：" + absPath);
+                            tryGallery(absPath, true);
+                            return;
+                        }
+                        clearInterval(galleryTimer);
+                        fail("相册保存失败（文件在 " + absPath + "）", err);
+                    });
+                }
+                tryGallery(localUrl, false);
+            }
+
+            currentStep = "4/6 写入文件";
+            if (!plus.android) {
+                console.warn("[lipExport] 当前平台没有 Native.js，尝试 FileWriter 兜底");
+                lipWriteBlobByWriter(blob, entry, function (ok) {
+                    startGallery({ ok: ok, len: ok ? blob.size : -1, method: "FileWriter" });
+                });
+                return;
+            }
+            // 与 15:47 成功那次一致：先做“最终文件长度 == blob.size”校验的分段写入，
+            // 只有所有分段都校验失败，才退回 Java 流式解码。
+            lipSetExportStatus("正在写入...");
+            // 同步写入期间主线程被占满，看门狗本来也触发不了；写完后重新计时，只用来守后续异步回调
+            clearTimeout(watchdog);
+            var writeRes = lipWriteBase64ToFile(base64, absPath, blob.size);
+            watchdog = armWatchdog();
+            if (writeRes.ok) {
+                startGallery(writeRes);
+                return;
+            }
+            console.error("[lipExport] 分段写入全部失败，尝试 Java 流式解码（Base64InputStream）");
+            lipSetExportStatus("正在尝试 Java 流式解码...");
+            lipWriteBase64ByStream(base64, absPath, dir, name + ".b64", blob.size, function (streamRes) {
+                if (!streamRes.ok) {
+                    streamRes = {
+                        ok: false,
+                        len: -1,
+                        reason: (writeRes.errors || []).concat("流式解码：" + streamRes.reason).join("；")
+                    };
+                }
+                startGallery(streamRes);
+            });
+        }
+
+        function openRoot(rootConst, fallbackConst) {
+            currentStep = "3/6 打开文件系统（" + lipRootLabel(rootConst) + "）";
+            plus.io.requestFileSystem(rootConst, function (fs) {
+                console.log("[lipExport] 3/6 文件系统就绪：" + lipRootLabel(rootConst));
+                currentStep = "4/6 创建文件";
+                fs.root.getFile(name, { create: true }, function (entry) {
+                    console.log("[lipExport] 4/6 已创建文件：" + entry.fullPath);
+                    saveToGallery(entry, fs.root);
+                }, function (err) {
+                    fail("创建导出文件失败", err);
+                });
+            }, function (err) {
+                console.error("[lipExport] 打开文件系统失败：" + lipErrText(err));
+                if (fallbackConst) {
+                    console.warn("[lipExport] 改用备用目录：" + lipRootLabel(fallbackConst));
+                    openRoot(fallbackConst, null);
+                } else {
+                    fail("访问文件系统失败", err);
+                }
+            });
+        }
+
+        // 优先用和 PNG 导出相同的 _downloads 公共下载目录，失败再退回 _doc
+        var rootConst = plus.io.PUBLIC_DOWNLOADS || plus.io.PRIVATE_DOC || "_downloads";
+        var fallbackConst = null;
+        if (plus.io.PRIVATE_DOC && rootConst !== plus.io.PRIVATE_DOC) {
+            fallbackConst = plus.io.PRIVATE_DOC;
+        }
+        openRoot(rootConst, fallbackConst);
+    }, function (err) {
+        clearInterval(base64Timer);
+        fail("Blob 转 base64 失败", err);
+    }).catch(function (err) {
+        clearInterval(base64Timer);
+        fail("保存流程异常", err);
+    });
 }
 
 // 找调色板里最接近的颜色
@@ -1542,17 +2303,18 @@ function lipCommitExportFps() {
 
 // ---------- 导出弹框 ----------
 
-// 当前选择的导出格式
-var lipExportKind = "gif";
+// 手动录屏只在手机端（HTML5+ / plus 环境）可用；桌面端保留同一套 DOM、样式与逻辑，只是不启用
+function lipManualSupported() {
+    return typeof plus !== "undefined";
+}
 
-// 右上角「导出」：朗读模式打开导出弹框，其它模式保持原来的整图导出
+// 当前选择的导出格式：手机端默认手动录屏，桌面端默认 MP4输出
+var lipExportKind = lipManualSupported() ? "manual" : "mp4";
+
+// 右上角「导出」：所有模式都先打开导出弹窗；
+// 立绘/表情包模式在弹窗里命名导出 PNG，对口型模式仍走 GIF / MP4
 function handleExportButton() {
-    if (nowMode === "lip") {
-        lipShowExportView();
-    }
-    else {
-        downloadSprite();
-    }
+    lipShowExportView();
 }
 
 // 关闭动画的延时句柄：300ms 内重新打开时要取消，否则刚打开又被关掉
@@ -1564,7 +2326,40 @@ function lipShowExportView() {
     var box = document.getElementById("dialogView_export");
     var bg = document.getElementById("dialogView_export_backGround");
     if (!box || !bg) { return; }
-    lipSelectExportKind(lipExportKind); // 同步按钮选中态与蓝底色的可用状态
+    lipHideSaveProgress(); // 每次打开导出面板都先复位进度条
+    var isLip = nowMode === "lip";
+    // 口型模式显示 GIF/MP4 选项；其它模式显示文件名 + 预设码
+    var lipOptions = document.getElementById("exportLipOptions");
+    var spriteOptions = document.getElementById("exportSpriteOptions");
+    var presetBox = document.getElementById("exportPresetBox");
+    var status = document.getElementById("text_lipExportStatus");
+    var okBtn = document.getElementById("dialogView_export_ok");
+    if (lipOptions) { lipOptions.style.display = isLip ? "" : "none"; }
+    if (spriteOptions) { spriteOptions.style.display = isLip ? "none" : ""; }
+    if (presetBox) { presetBox.style.display = isLip ? "none" : ""; }
+    if (status) { status.style.display = isLip ? "" : "none"; }
+    if (okBtn) { okBtn.innerHTML = isLip ? "开始导出" : "导出 PNG"; }
+    // 手动录屏是手机端专属：桌面端隐藏这个标签，DOM 与逻辑仍保留，保证三份代码一致
+    var tabManual = document.getElementById("button_lipExportTabManual");
+    if (tabManual) { tabManual.style.display = lipManualSupported() ? "" : "none"; }
+    if (!isLip) {
+        // 文件名默认用当前立绘名；换过立绘才覆盖，保留用户手打的名称
+        var nameInput = document.getElementById("input_exportFileName");
+        if (nameInput) {
+            if (nameInput.dataset.actor !== nowActor) {
+                nameInput.dataset.actor = nowActor;
+                nameInput.value = nowActor || "";
+            }
+        }
+        // 预设码文本框每次打开都按当前勾选重新生成
+        var codeEl = document.getElementById("text_exportPresetCode");
+        if (codeEl) {
+            var code = buildCurrentPresetCode();
+            codeEl.value = code || "请先选择立绘";
+        }
+    }
+    // 默认选中：手机端「手动录屏」，桌面端「MP4输出」
+    lipSelectExportKind(isLip ? (lipManualSupported() ? "manual" : "mp4") : lipExportKind);
     if (lipExportHideTimer) {
         clearTimeout(lipExportHideTimer);
         lipExportHideTimer = null;
@@ -1578,6 +2373,7 @@ function lipHideExportView() {
     var box = document.getElementById("dialogView_export");
     var bg = document.getElementById("dialogView_export_backGround");
     if (!box || !bg) { return; }
+    lipHideSaveProgress(); // 关闭面板时一并隐藏进度条
     if (box.style.display !== "flex") { return; } // 本来就没打开，不重复播放关闭动画
     box.style.animation = "hideDialog 0.3s forwards ease";
     bg.style.animation = "hideDialog_BackGround 0.3s forwards ease";
@@ -1589,27 +2385,216 @@ function lipHideExportView() {
     }, 300);
 }
 
-// 选择导出格式（GIF / MP4），蓝底色只对 MP4 有意义
+// 选择导出格式（透明 GIF / MP4输出 / 手动录屏）
+// 背景色对 MP4 和手动录屏都有意义，只有 GIF 不使用
 function lipSelectExportKind(kind) {
-    lipExportKind = kind === "mp4" ? "mp4" : "gif";
-    var isMp4 = lipExportKind === "mp4";
+    // 桌面端不支持手动录屏：即使被程序调用也回落到 MP4输出
+    if (kind === "manual" && !lipManualSupported()) { kind = "mp4"; }
+    lipExportKind = kind === "mp4" ? "mp4" : (kind === "manual" ? "manual" : "gif");
+    var isGif = lipExportKind === "gif";
+    var isManual = lipExportKind === "manual";
     var tabGif = document.getElementById("button_lipExportTabGif");
     var tabMp4 = document.getElementById("button_lipExportTabMp4");
-    if (tabGif) { tabGif.classList.toggle("lipExportTabActive", !isMp4); }
-    if (tabMp4) { tabMp4.classList.toggle("lipExportTabActive", isMp4); }
+    var tabManual = document.getElementById("button_lipExportTabManual");
+    if (tabGif) { tabGif.classList.toggle("lipExportTabActive", lipExportKind === "gif"); }
+    if (tabMp4) { tabMp4.classList.toggle("lipExportTabActive", lipExportKind === "mp4"); }
+    if (tabManual) { tabManual.classList.toggle("lipExportTabActive", isManual); }
     var bg = document.getElementById("input_lipMp4Bg");
-    if (bg) { bg.disabled = !isMp4; }
+    if (bg) { bg.disabled = isGif; }
+    var bgHint = document.getElementById("text_lipExportBgHint");
+    if (bgHint) {
+        bgHint.innerHTML = isGif ? "GIF 不使用" : (isManual ? "录屏底色" : "仅 MP4 使用");
+    }
+    var manualRow = document.getElementById("lipExportManualRow");
+    if (manualRow) { manualRow.style.display = isManual ? "" : "none"; }
+    // 手动录屏只保留背景色和等待时间：尺寸、帧数对它没有意义，直接隐藏，不留空行
+    var sizeRow = document.getElementById("lipExportSizeRow");
+    if (sizeRow) { sizeRow.style.display = isManual ? "none" : ""; }
+    var fpsRow = document.getElementById("lipExportFpsRow");
+    if (fpsRow) { fpsRow.style.display = isManual ? "none" : ""; }
+    // 手动录屏不生成文件，按钮文案改成“开始录屏”
+    var okBtn = document.getElementById("dialogView_export_ok");
+    if (okBtn && nowMode === "lip") {
+        okBtn.innerHTML = isManual ? "开始录屏" : "开始导出";
+    }
 }
 
-// 开始导出：沿用原有的两条导出流程
+// 开始导出：GIF / MP4 沿用原有两条流程；手动录屏只做全屏演示，不生成文件
 function lipStartExport() {
     lipCommitExportFps(); // 先让输入框里的帧数生效
+    if (lipExportKind === "manual") {
+        lipStartManual();
+        return;
+    }
     if (lipExportKind === "mp4") {
         lipExportMp4();
     }
     else {
         lipExportGif();
     }
+}
+
+// ============================================================
+// 手动录屏：全屏演示（不生成任何文件，也不走保存链路）
+// 时间线：铺满背景色 → 倒计时 N 秒 → 从 0 播放一遍 → 左上角结束卡闪 2 秒 → 自动退出
+// ============================================================
+
+// 读取开始等待时间：默认 5 秒，限制在 0~60 秒
+function lipGetManualWait() {
+    var el = document.getElementById("input_lipManualWait");
+    var v = el ? Number(el.value) : NaN;
+    if (!isFinite(v)) { return 5; }
+    v = Math.round(v);
+    if (v < 0) { v = 0; }
+    if (v > 60) { v = 60; }
+    return v;
+}
+// 把输入框里的等待时间规整后再写回（回车 / 失焦时调用）
+function lipCommitManualWait() {
+    var el = document.getElementById("input_lipManualWait");
+    if (!el) { return; }
+    el.value = lipGetManualWait();
+}
+
+// 按立绘比例把画布铺进全屏遮罩：保证整张立绘完整显示，并居中
+function lipResizeManualCanvas() {
+    var stage = lipManual.stage || document.getElementById("lipManualStage");
+    var cv = lipManual.canvas || document.getElementById("lipManualCanvas");
+    if (!stage || !cv || !canvasSizeX || !canvasSizeY) { return; }
+    var sw = stage.clientWidth || window.innerWidth || 1;
+    var sh = stage.clientHeight || window.innerHeight || 1;
+    var scale = Math.min(sw / canvasSizeX, sh / canvasSizeY);
+    if (!(scale > 0)) { scale = 1; }
+    var w = Math.max(1, Math.round(canvasSizeX * scale));
+    var h = Math.max(1, Math.round(canvasSizeY * scale));
+    var dpr = window.devicePixelRatio || 1;
+    cv.width = Math.max(1, Math.round(w * dpr));
+    cv.height = Math.max(1, Math.round(h * dpr));
+    cv.style.width = w + "px";
+    cv.style.height = h + "px";
+    lipManual.ctx = cv.getContext("2d");
+}
+
+// 画一帧全屏画面：只画立绘，背景保持透明，露出遮罩铺的底色
+function lipDrawManualFrame(t) {
+    var cv = lipManual.canvas || document.getElementById("lipManualCanvas");
+    if (!cv) { return; }
+    var ctx = lipManual.ctx || cv.getContext("2d");
+    if (!ctx) { return; }
+    lipManual.ctx = ctx;
+    lipDrawScene(ctx, cv.width || 1, cv.height || 1, lipState.smooth, null, t || 0);
+}
+
+// 窗口尺寸变化时重新铺画布（只在演示中生效）
+function lipManualOnResize() {
+    if (!lipManual.active) { return; }
+    lipResizeManualCanvas();
+    lipDrawManualFrame(lipState.playing ? (lipGetAudioEl().currentTime || 0) : 0);
+}
+
+// 开始手动录屏：检查素材 → 铺满背景 → 进入全屏遮罩 → 倒计时 → 播放
+function lipStartManual() {
+    // 桌面端没有 plus，手动录屏不启用（标签也已隐藏，这里再兜底一次）
+    if (!lipManualSupported()) { tip("手动录屏仅支持手机端"); return; }
+    lipCommitManualWait();
+    if (lipState.exporting) { tip("正在导出中，请稍等"); return; }
+    if (!lipState.file || !lipState.envelope) { tip("请先选择并等待音频分析完成"); return; }
+    if (!lipState.staticReady) { tip("立绘还在加载，请稍等"); return; }
+    if (lipManual.active) { return; }
+
+    var stage = document.getElementById("lipManualStage");
+    var cv = document.getElementById("lipManualCanvas");
+    var cd = document.getElementById("lipManualCountdown");
+    var card = document.getElementById("lipManualEndCard");
+    if (!stage || !cv || !cd || !card) { tip("全屏演示界面缺少元素"); return; }
+
+    var bgEl = document.getElementById("input_lipMp4Bg");
+    lipManual.bg = (bgEl && bgEl.value) ? bgEl.value : "#0000FF";
+    lipManual.wait = lipGetManualWait();
+    lipManual.active = true;
+    lipManual.ended = false;
+    lipManual.stage = stage;
+    lipManual.canvas = cv;
+    lipManual.countdownEl = cd;
+    lipManual.endCardEl = card;
+
+    lipHideExportView();
+    lipStopPlayback(); // 回到开头，停掉预览动画
+    stage.style.background = lipManual.bg;
+    stage.classList.add("lipManualOn");
+    card.classList.remove("lipManualOn");
+    cd.classList.remove("lipManualOn");
+    lipResizeManualCanvas();
+    lipDrawManualFrame(0);
+    window.addEventListener("resize", lipManualOnResize);
+
+    if (lipManual.wait <= 0) {
+        lipManualBeginPlayback();
+        return;
+    }
+    // 倒计时：每秒减 1，数字归零时立刻开始播放
+    var left = lipManual.wait;
+    cd.innerHTML = left;
+    cd.classList.add("lipManualOn");
+    lipManual.countdownTimer = setInterval(function () {
+        left--;
+        if (left <= 0) {
+            clearInterval(lipManual.countdownTimer);
+            lipManual.countdownTimer = 0;
+            cd.classList.remove("lipManualOn");
+            lipManualBeginPlayback();
+            return;
+        }
+        cd.innerHTML = left;
+    }, 1000);
+}
+
+// 倒计时结束：从头播放一遍对口型内容
+function lipManualBeginPlayback() {
+    if (!lipManual.active) { return; }
+    var audio = lipGetAudioEl();
+    try { audio.currentTime = 0; } catch (e) { }
+    lipManual.ended = false;
+    lipPlay();
+}
+
+// 播放结束：停住画面，左上角闪 2 秒结束卡，然后自动退出
+function lipManualFinish() {
+    if (!lipManual.active || lipManual.ended) { return; }
+    lipManual.ended = true;
+    var audio = lipGetAudioEl();
+    try { audio.pause(); } catch (e) { }
+    lipState.playing = false;
+    if (lipState.rafId) {
+        cancelAnimationFrame(lipState.rafId);
+        lipState.rafId = 0;
+    }
+    lipDrawManualFrame(lipState.duration);
+    if (lipManual.endCardEl) { lipManual.endCardEl.classList.add("lipManualOn"); }
+    lipManual.endTimer = setTimeout(function () {
+        lipManual.endTimer = 0;
+        lipManualExit();
+    }, 2000);
+}
+
+// 退出全屏演示：收掉遮罩 / 倒计时 / 结束卡，恢复主界面
+function lipManualExit() {
+    if (!lipManual.active) { return; }
+    lipManual.active = false;
+    lipManual.ended = false;
+    if (lipManual.countdownTimer) { clearInterval(lipManual.countdownTimer); lipManual.countdownTimer = 0; }
+    if (lipManual.endTimer) { clearTimeout(lipManual.endTimer); lipManual.endTimer = 0; }
+    if (lipManual.countdownEl) { lipManual.countdownEl.classList.remove("lipManualOn"); }
+    if (lipManual.endCardEl) { lipManual.endCardEl.classList.remove("lipManualOn"); }
+    var stage = lipManual.stage || document.getElementById("lipManualStage");
+    if (stage) { stage.classList.remove("lipManualOn"); }
+    var cv = lipManual.canvas || document.getElementById("lipManualCanvas");
+    if (cv && cv.getContext) {
+        var ctx = cv.getContext("2d");
+        if (ctx) { ctx.clearRect(0, 0, cv.width, cv.height); }
+    }
+    window.removeEventListener("resize", lipManualOnResize);
+    lipStopPlayback(); // 回到开头，重画主界面预览
 }
 
 // 按累计时间取整计算每帧的 GIF 延时（单位 1/100 秒）。
@@ -1731,10 +2716,14 @@ function lipExportGif() {
         if (frame >= total) {
             parts.push(new Uint8Array([0x3B])); // GIF 结束符
             var blob = new Blob(parts, { type: "image/gif" });
-            lipDownloadBlob(blob, lipSafeFileName() + "_对口型.gif");
-            lipSetExportStatus("GIF 导出完成（" + total + " 帧）");
-            tip("GIF 导出完成");
             lipState.exporting = false;
+            // 保存是异步的：先提示“正在保存”，真正写入并进相册后再提示完成
+            lipSetExportStatus("GIF 已生成，正在保存...");
+            lipDownloadBlob(blob, lipSafeFileName() + "_对口型.gif", function () {
+                lipSetExportStatus("GIF 导出完成（" + total + " 帧）");
+            }, function (msg) {
+                lipSetExportStatus("GIF 保存失败：" + msg);
+            });
             return;
         }
         var t = frame / fps;
@@ -1924,15 +2913,18 @@ function lipExportMp4() {
         var blob = new Blob(chunks, { type: (rec.mimeType || mime || "video/webm").split(";")[0] });
         var isMp4 = blob.type.indexOf("mp4") >= 0;
         var ext = isMp4 ? ".mp4" : ".webm";
-        lipDownloadBlob(blob, lipSafeFileName() + "_蓝底对口型" + ext);
-        if (isMp4) {
-            lipSetExportStatus("MP4 导出完成");
-            tip("MP4 导出完成");
-        }
-        else {
-            lipSetExportStatus("当前环境不支持 MP4，已导出 WebM");
-            tip("当前环境不支持 MP4，已导出 WebM", 3000);
-        }
+        // 保存是异步的：先提示“正在保存”，真正写入并进相册后再提示完成
+        lipSetExportStatus("视频已录制，正在保存...");
+        lipDownloadBlob(blob, lipSafeFileName() + "_蓝底对口型" + ext, function () {
+            if (isMp4) {
+                lipSetExportStatus("MP4 导出完成");
+            }
+            else {
+                lipSetExportStatus("当前环境不支持 MP4，已导出 WebM");
+            }
+        }, function (msg) {
+            lipSetExportStatus("视频保存失败：" + msg);
+        });
     }).catch(function (err) {
         console.error("录制失败", err);
         lipState.recording = false;
@@ -2091,6 +3083,21 @@ var lipHelpTexts = {
     transition: {
         title: "片段衔接",
         content: "只在首尾相接的两个片段之间生效，默认关闭。\n开启后交接处会先挤压再回弹：挤压/回弹时长控制两段动画的时长，挤压幅度与回弹强度控制形变大小。"
+    },
+    preset: {
+        title: "立绘预设码",
+        content: "预设码记录人物 id 和各个图层的序号，可以直接复制分享。\n在选立绘界面粘贴后点「导入」，会切换到对应立绘并还原图层。\n对口型模式下嘴部由音频驱动，导入时会忽略预设里的嘴部。"
+    },
+    exportPreset: {
+        title: "导出与预设码",
+        content: "立绘 / 表情包模式：填写文件名后导出 PNG，下方的预设码可以复制分享。\n"
+            + "朗读对口型的 GIF / MP4 不推荐：手机端要先把成品转成 base64，再经桥接写入文件，文件越大越慢，"
+            + "写入期间界面会无响应，几 MB 就要几分钟。\n"
+            + "推荐用「手动录屏」配合手机自带录屏：倒计时结束开始播放，播完停止录屏，瞬间完成。"
+    },
+    presetRegion: {
+        title: "片段预设码",
+        content: "复制当前片段的预设码，或粘贴别人的片段预设码导入。\n预设码会记录图层和嘴部序号；对口型模式导入时嘴部仍跟随音频，不会被覆盖。"
     }
 };
 function lipShowHelp(key) {
@@ -2108,8 +3115,19 @@ if (lipExportFpsInput) {
     lipExportFpsInput.onblur = lipCommitExportFps;
 }
 
+// 手动录屏的开始等待时间：回车或失焦时夹到 0~60 秒
+var lipManualWaitInput = document.getElementById("input_lipManualWait");
+if (lipManualWaitInput) {
+    lipManualWaitInput.onkeydown = function (e) {
+        if (e.key === "Enter") { e.preventDefault(); lipCommitManualWait(); this.blur(); }
+    };
+    lipManualWaitInput.onblur = lipCommitManualWait;
+}
+
 // 音频自然播放结束
 document.getElementById("lipAudio").addEventListener("ended", function () {
+    // 手动录屏：播放一遍结束，进入结束卡流程
+    if (lipManual.active) { lipManualFinish(); return; }
     if (lipState.recording) { return; } // 录制流程自己会收尾
     lipState.playing = false;
     if (lipState.rafId) {

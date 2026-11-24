@@ -55,7 +55,7 @@ var lipState = {
     exportW: 0,
     exportH: 0,
     exportBg: "#0000FF",    // 蓝底颜色
-    exportFps: 30,          // 导出帧率（GIF / MP4 共用，来自导出区设置）
+    exportFps: 60,          // 导出帧率（GIF / MP4 共用，来自导出区设置，默认 60）
     exportLastDrawAt: 0,    // 录制时上一帧导出画面绘制的时间，用于按帧率节流
     mediaDest: null,        // 音频 MediaStreamDestination（录视频时抓音轨）
     mediaSource: null,      // <audio> 的 MediaElementAudioSourceNode
@@ -66,6 +66,21 @@ var lipState = {
 
 // 图片缓存：素材路径 -> Image，避免每帧重复 new Image
 var lipImgCache = {};
+
+// 手动录屏（全屏演示）状态：倒计时 → 从头播放 → 结束卡 → 自动退出
+var lipManual = {
+    active: false,      // 是否处于全屏演示中
+    ended: false,       // 播放是否已经结束（避免 ended 事件重复收尾）
+    stage: null,        // 全屏遮罩
+    canvas: null,       // 只画立绘的画布（背景由遮罩显示）
+    ctx: null,
+    countdownEl: null,  // 倒计时数字
+    endCardEl: null,    // 左上角结束卡
+    countdownTimer: 0,  // 倒计时 interval
+    endTimer: 0,        // 结束卡停留计时
+    wait: 0,            // 开始等待秒数
+    bg: "#0000FF"       // 全屏底色
+};
 
 // ---------- 一些通用小工具 ----------
 function lipClamp(v, min, max) {
@@ -92,6 +107,31 @@ function lipSetStatus(text) {
 function lipSetExportStatus(text) {
     var el = document.getElementById("text_lipExportStatus");
     if (el) { el.innerHTML = text; }
+}
+// 保存进度条：导出 MP4/GIF 期间显示，完成或失败后隐藏
+function lipShowSaveProgress() {
+    var box = document.getElementById("lipSaveProgress");
+    if (!box) { return; }
+    box.style.display = "flex";
+    lipSetSaveProgress(0);
+    // 内容区高度有限，滚动到底部确保进度条可见
+    if (box.parentNode && box.parentNode.scrollHeight > box.parentNode.clientHeight) {
+        box.parentNode.scrollTop = box.parentNode.scrollHeight;
+    }
+}
+function lipSetSaveProgress(pct) {
+    var bar = document.getElementById("lipSaveProgressBar");
+    var label = document.getElementById("text_lipSaveProgressPct");
+    var v = Number(pct);
+    if (isNaN(v)) { v = 0; }
+    v = Math.max(0, Math.min(100, v));
+    if (bar) { bar.style.width = v + "%"; }
+    if (label) { label.innerText = Math.round(v) + "%"; }
+}
+function lipHideSaveProgress() {
+    var box = document.getElementById("lipSaveProgress");
+    if (box) { box.style.display = "none"; }
+    lipSetSaveProgress(0);
 }
 function lipSafeFileName() {
     // 立绘名字里可能有空格/符号，简单清理一下再拼文件名
@@ -135,12 +175,27 @@ function lipEnterMode() {
     lipDrawPreviewNow(true);
 }
 
+// 进入对口型模式的手机端迁移提示：只有 HTML5+ / plus 环境才弹，桌面端直接执行 onClose
+// 与原有的“测试功能”提示串行播放，由 switchMode 统一编排
+function lipShowMigrationNotice(onClose) {
+    var next = (typeof onClose === "function") ? onClose : null;
+    if (typeof plus === "undefined") {
+        if (next) { next(); }
+        return;
+    }
+    showDialog("提示",
+        "手机端正在迁移 Capacitor，暂时继续使用导出速度较慢的旧方案。\n"
+        + "有条件的可以在电脑端体验，导出会快很多。",
+        next);
+}
+
 // 离开朗读模式：停止播放和录制，并把嘴巴列表恢复成原来的单选状态
 // （不清空已选音频，方便再切回来）
 function lipLeaveMode() {
     document.body.classList.remove("lipMode");
     lipSetViewCollapsed(false); // 离开模式时恢复素材区，避免其它模式里被收起却看不到展开按钮
     lipHideExportView(); // 导出弹框只在朗读模式使用
+    lipManualExit(); // 全屏演示还没结束就离开模式时，直接收掉
     lipRestoreMouthMultiSelect();
     if (lipState.recording) {
         lipState.cancelRecording = true;
@@ -672,6 +727,8 @@ function lipCreateRegion(start, end, select) {
         start: Math.round(start * 10) / 10,
         end: Math.round(end * 10) / 10,
         actor: nowActor,
+        actorKey: nowActorKey, //预设码用的人物 id
+        mouthPicks: presetMouthPicksFromSelection(), //预设码里额外记录嘴部 index
         ops: ops
     };
     if (region.end <= region.start) { region.end = region.start + 0.1; }
@@ -874,8 +931,82 @@ function lipSaveCurrentRegion() {
     if (!ops.length) { return; }
     region.ops = ops;
     region.actor = nowActor;
+    region.actorKey = nowActorKey;
+    region.mouthPicks = presetMouthPicksFromSelection(); //嘴部只用于预设码，不参与绘制
     lipPreloadRegion(region); // 内部会重新加载图片并重画预览
 }
+
+// ---------- 片段预设码：每个片段单独复制 / 导入 ----------
+// 把片段快照里的图片反查成图层索引，再拼成和全局预设一致的格式；
+// 嘴部单独记录在 mouthPicks 里（片段绘制本身不固化嘴部）
+function lipRegionPresetCode(region) {
+    if (!region) { return ""; }
+    var imgs = [];
+    for (var i = 0; i < region.ops.length; i++) {
+        var op = region.ops[i];
+        if (op.type === "img" && op.img) { imgs.push(op.img); }
+    }
+    var picks = presetPicksFromImages(imgs, true); //快照里不含嘴部图片
+    var mouthPicks = (region.mouthPicks && region.mouthPicks.length)
+        ? region.mouthPicks
+        : presetMouthPicksFromSelection();
+    for (var j = 0; j < mouthPicks.length; j++) { picks.push(mouthPicks[j]); }
+    return buildPresetCode(region.actorKey || nowActorKey, picks);
+}
+
+// 复制当前选中片段的预设码
+function lipCopySelectedRegionPreset() {
+    var region = lipFindRegionById(lipState.selectedRegionId);
+    if (!region) {
+        tip("请先选中一个片段", 2000, "#ff6b6b");
+        return;
+    }
+    var code = lipRegionPresetCode(region);
+    var ok = copyText(code);
+    tip(ok === false ? "复制失败，请手动选中预设码复制" : "本片段预设码已复制", 2000);
+}
+
+// 打开导入弹窗（目标固定为当前片段）
+function lipShowRegionPresetImport() {
+    var region = lipFindRegionById(lipState.selectedRegionId);
+    if (!region) {
+        tip("请先选中一个片段", 2000, "#ff6b6b");
+        return;
+    }
+    showPresetImportView("region");
+}
+
+// 导入到当前选中片段：先套用勾选，再按当前素材抓取快照，覆盖该片段的样式
+function lipImportRegionPreset(code) {
+    var parsed = parsePresetCode(code);
+    if (!parsed) {
+        tip("预设码格式不正确", 3000, "#ff6b6b");
+        return false;
+    }
+    if (parsed.actorKey !== nowActorKey) {
+        tip("这个预设码属于「" + parsed.actorKey + "」，请先切换到同一立绘", 3000, "#ff6b6b");
+        return false;
+    }
+    var region = lipFindRegionById(lipState.selectedRegionId);
+    if (!region) {
+        tip("请先选中一个片段", 2000, "#ff6b6b");
+        return false;
+    }
+    //对口型模式导入舍弃嘴部，嘴由音频驱动，不能被预设覆盖
+    var applied = applyPresetPicks(parsed.picks, true, true); // 不触发 render，避免自动保存抢先覆盖
+    if (!applied) {
+        tip("预设码里没有可用的图层", 3000, "#ff6b6b");
+        return false;
+    }
+    lipRefreshStatic();          // 让静态绘制指令与面板勾选一致
+    lipSaveCurrentRegion();      // 抓取快照写回当前片段
+    lipState.selectionSig = lipSelectionSignature();
+    lipRenderRegions();
+    lipDrawPreviewNow(true);
+    tip("已导入片段预设");
+    return true;
+}
+
 
 // 当前所有 rowList 的勾选签名，用来判断用户是否改了立绘样式
 function lipSelectionSignature() {
@@ -1309,11 +1440,13 @@ function lipStartLoop() {
         lipState.smooth += (target - lipState.smooth) * k;
 
         lipDrawPreviewNow(false);
+        // 手动录屏：全屏舞台同步绘制当前口型（背景色由遮罩负责）
+        if (lipManual.active) { lipDrawManualFrame(t); }
         lipState.lastFrameAt = now;
         if (lipState.recording) {
             // 按设置的导出帧率更新录像画布：rAF 通常有 60Hz，不能每帧都画，
             // 否则低帧率设置会被实际绘制带偏；这里按帧间隔节流。
-            var frameGap = 1000 / (lipState.exportFps || 30);
+            var frameGap = 1000 / (lipState.exportFps || 60);
             if (!lipState.exportLastDrawAt || now - lipState.exportLastDrawAt >= frameGap - 1) {
                 lipDrawExportFrame(t);
                 lipState.exportLastDrawAt = now;
@@ -1366,12 +1499,19 @@ function lipDrawExportFrame(t) {
 
 // 下载 Blob：浏览器直接触发下载；HBuilder 打包环境额外写一份到 _downloads
 function lipDownloadBlob(blob, filename) {
+    // 桌面浏览器下载拿不到真实写入进度，这里按“开始下载 → 下载已开始”两段推进
+    lipShowSaveProgress();
+    lipSetSaveProgress(20);
+    lipSetExportStatus("正在准备下载：" + filename);
     var url = URL.createObjectURL(blob);
     var a = document.createElement("a");
     a.href = url;
     a.download = filename;
     document.body.appendChild(a);
     a.click();
+    lipSetSaveProgress(100);
+    lipSetExportStatus("下载已开始：" + filename);
+    setTimeout(lipHideSaveProgress, 800);
     setTimeout(function () {
         URL.revokeObjectURL(url);
         a.remove();
@@ -1542,17 +1682,18 @@ function lipCommitExportFps() {
 
 // ---------- 导出弹框 ----------
 
-// 当前选择的导出格式
-var lipExportKind = "gif";
+// 手动录屏只在手机端（HTML5+ / plus 环境）可用；桌面端保留同一套 DOM、样式与逻辑，只是不启用
+function lipManualSupported() {
+    return typeof plus !== "undefined";
+}
 
-// 右上角「导出」：朗读模式打开导出弹框，其它模式保持原来的整图导出
+// 当前选择的导出格式：手机端默认手动录屏，桌面端默认 MP4输出
+var lipExportKind = lipManualSupported() ? "manual" : "mp4";
+
+// 右上角「导出」：所有模式都先打开导出弹窗；
+// 立绘/表情包模式在弹窗里命名导出 PNG，对口型模式仍走 GIF / MP4
 function handleExportButton() {
-    if (nowMode === "lip") {
-        lipShowExportView();
-    }
-    else {
-        downloadSprite();
-    }
+    lipShowExportView();
 }
 
 // 关闭动画的延时句柄：300ms 内重新打开时要取消，否则刚打开又被关掉
@@ -1564,7 +1705,40 @@ function lipShowExportView() {
     var box = document.getElementById("dialogView_export");
     var bg = document.getElementById("dialogView_export_backGround");
     if (!box || !bg) { return; }
-    lipSelectExportKind(lipExportKind); // 同步按钮选中态与蓝底色的可用状态
+    lipHideSaveProgress(); // 每次打开导出面板都先复位进度条
+    var isLip = nowMode === "lip";
+    // 口型模式显示 GIF/MP4 选项；其它模式显示文件名 + 预设码
+    var lipOptions = document.getElementById("exportLipOptions");
+    var spriteOptions = document.getElementById("exportSpriteOptions");
+    var presetBox = document.getElementById("exportPresetBox");
+    var status = document.getElementById("text_lipExportStatus");
+    var okBtn = document.getElementById("dialogView_export_ok");
+    if (lipOptions) { lipOptions.style.display = isLip ? "" : "none"; }
+    if (spriteOptions) { spriteOptions.style.display = isLip ? "none" : ""; }
+    if (presetBox) { presetBox.style.display = isLip ? "none" : ""; }
+    if (status) { status.style.display = isLip ? "" : "none"; }
+    if (okBtn) { okBtn.innerHTML = isLip ? "开始导出" : "导出 PNG"; }
+    // 手动录屏是手机端专属：桌面端隐藏这个标签，DOM 与逻辑仍保留，保证三份代码一致
+    var tabManual = document.getElementById("button_lipExportTabManual");
+    if (tabManual) { tabManual.style.display = lipManualSupported() ? "" : "none"; }
+    if (!isLip) {
+        // 文件名默认用当前立绘名；换过立绘才覆盖，保留用户手打的名称
+        var nameInput = document.getElementById("input_exportFileName");
+        if (nameInput) {
+            if (nameInput.dataset.actor !== nowActor) {
+                nameInput.dataset.actor = nowActor;
+                nameInput.value = nowActor || "";
+            }
+        }
+        // 预设码文本框每次打开都按当前勾选重新生成
+        var codeEl = document.getElementById("text_exportPresetCode");
+        if (codeEl) {
+            var code = buildCurrentPresetCode();
+            codeEl.value = code || "请先选择立绘";
+        }
+    }
+    // 默认选中：手机端「手动录屏」，桌面端「MP4输出」
+    lipSelectExportKind(isLip ? (lipManualSupported() ? "manual" : "mp4") : lipExportKind);
     if (lipExportHideTimer) {
         clearTimeout(lipExportHideTimer);
         lipExportHideTimer = null;
@@ -1578,6 +1752,7 @@ function lipHideExportView() {
     var box = document.getElementById("dialogView_export");
     var bg = document.getElementById("dialogView_export_backGround");
     if (!box || !bg) { return; }
+    lipHideSaveProgress(); // 关闭面板时一并隐藏进度条
     if (box.style.display !== "flex") { return; } // 本来就没打开，不重复播放关闭动画
     box.style.animation = "hideDialog 0.3s forwards ease";
     bg.style.animation = "hideDialog_BackGround 0.3s forwards ease";
@@ -1589,27 +1764,216 @@ function lipHideExportView() {
     }, 300);
 }
 
-// 选择导出格式（GIF / MP4），蓝底色只对 MP4 有意义
+// 选择导出格式（透明 GIF / MP4输出 / 手动录屏）
+// 背景色对 MP4 和手动录屏都有意义，只有 GIF 不使用
 function lipSelectExportKind(kind) {
-    lipExportKind = kind === "mp4" ? "mp4" : "gif";
-    var isMp4 = lipExportKind === "mp4";
+    // 桌面端不支持手动录屏：即使被程序调用也回落到 MP4输出
+    if (kind === "manual" && !lipManualSupported()) { kind = "mp4"; }
+    lipExportKind = kind === "mp4" ? "mp4" : (kind === "manual" ? "manual" : "gif");
+    var isGif = lipExportKind === "gif";
+    var isManual = lipExportKind === "manual";
     var tabGif = document.getElementById("button_lipExportTabGif");
     var tabMp4 = document.getElementById("button_lipExportTabMp4");
-    if (tabGif) { tabGif.classList.toggle("lipExportTabActive", !isMp4); }
-    if (tabMp4) { tabMp4.classList.toggle("lipExportTabActive", isMp4); }
+    var tabManual = document.getElementById("button_lipExportTabManual");
+    if (tabGif) { tabGif.classList.toggle("lipExportTabActive", lipExportKind === "gif"); }
+    if (tabMp4) { tabMp4.classList.toggle("lipExportTabActive", lipExportKind === "mp4"); }
+    if (tabManual) { tabManual.classList.toggle("lipExportTabActive", isManual); }
     var bg = document.getElementById("input_lipMp4Bg");
-    if (bg) { bg.disabled = !isMp4; }
+    if (bg) { bg.disabled = isGif; }
+    var bgHint = document.getElementById("text_lipExportBgHint");
+    if (bgHint) {
+        bgHint.innerHTML = isGif ? "GIF 不使用" : (isManual ? "录屏底色" : "仅 MP4 使用");
+    }
+    var manualRow = document.getElementById("lipExportManualRow");
+    if (manualRow) { manualRow.style.display = isManual ? "" : "none"; }
+    // 手动录屏只保留背景色和等待时间：尺寸、帧数对它没有意义，直接隐藏，不留空行
+    var sizeRow = document.getElementById("lipExportSizeRow");
+    if (sizeRow) { sizeRow.style.display = isManual ? "none" : ""; }
+    var fpsRow = document.getElementById("lipExportFpsRow");
+    if (fpsRow) { fpsRow.style.display = isManual ? "none" : ""; }
+    // 手动录屏不生成文件，按钮文案改成“开始录屏”
+    var okBtn = document.getElementById("dialogView_export_ok");
+    if (okBtn && nowMode === "lip") {
+        okBtn.innerHTML = isManual ? "开始录屏" : "开始导出";
+    }
 }
 
-// 开始导出：沿用原有的两条导出流程
+// 开始导出：GIF / MP4 沿用原有两条流程；手动录屏只做全屏演示，不生成文件
 function lipStartExport() {
     lipCommitExportFps(); // 先让输入框里的帧数生效
+    if (lipExportKind === "manual") {
+        lipStartManual();
+        return;
+    }
     if (lipExportKind === "mp4") {
         lipExportMp4();
     }
     else {
         lipExportGif();
     }
+}
+
+// ============================================================
+// 手动录屏：全屏演示（不生成任何文件，也不走保存链路）
+// 时间线：铺满背景色 → 倒计时 N 秒 → 从 0 播放一遍 → 左上角结束卡闪 2 秒 → 自动退出
+// ============================================================
+
+// 读取开始等待时间：默认 5 秒，限制在 0~60 秒
+function lipGetManualWait() {
+    var el = document.getElementById("input_lipManualWait");
+    var v = el ? Number(el.value) : NaN;
+    if (!isFinite(v)) { return 5; }
+    v = Math.round(v);
+    if (v < 0) { v = 0; }
+    if (v > 60) { v = 60; }
+    return v;
+}
+// 把输入框里的等待时间规整后再写回（回车 / 失焦时调用）
+function lipCommitManualWait() {
+    var el = document.getElementById("input_lipManualWait");
+    if (!el) { return; }
+    el.value = lipGetManualWait();
+}
+
+// 按立绘比例把画布铺进全屏遮罩：保证整张立绘完整显示，并居中
+function lipResizeManualCanvas() {
+    var stage = lipManual.stage || document.getElementById("lipManualStage");
+    var cv = lipManual.canvas || document.getElementById("lipManualCanvas");
+    if (!stage || !cv || !canvasSizeX || !canvasSizeY) { return; }
+    var sw = stage.clientWidth || window.innerWidth || 1;
+    var sh = stage.clientHeight || window.innerHeight || 1;
+    var scale = Math.min(sw / canvasSizeX, sh / canvasSizeY);
+    if (!(scale > 0)) { scale = 1; }
+    var w = Math.max(1, Math.round(canvasSizeX * scale));
+    var h = Math.max(1, Math.round(canvasSizeY * scale));
+    var dpr = window.devicePixelRatio || 1;
+    cv.width = Math.max(1, Math.round(w * dpr));
+    cv.height = Math.max(1, Math.round(h * dpr));
+    cv.style.width = w + "px";
+    cv.style.height = h + "px";
+    lipManual.ctx = cv.getContext("2d");
+}
+
+// 画一帧全屏画面：只画立绘，背景保持透明，露出遮罩铺的底色
+function lipDrawManualFrame(t) {
+    var cv = lipManual.canvas || document.getElementById("lipManualCanvas");
+    if (!cv) { return; }
+    var ctx = lipManual.ctx || cv.getContext("2d");
+    if (!ctx) { return; }
+    lipManual.ctx = ctx;
+    lipDrawScene(ctx, cv.width || 1, cv.height || 1, lipState.smooth, null, t || 0);
+}
+
+// 窗口尺寸变化时重新铺画布（只在演示中生效）
+function lipManualOnResize() {
+    if (!lipManual.active) { return; }
+    lipResizeManualCanvas();
+    lipDrawManualFrame(lipState.playing ? (lipGetAudioEl().currentTime || 0) : 0);
+}
+
+// 开始手动录屏：检查素材 → 铺满背景 → 进入全屏遮罩 → 倒计时 → 播放
+function lipStartManual() {
+    // 桌面端没有 plus，手动录屏不启用（标签也已隐藏，这里再兜底一次）
+    if (!lipManualSupported()) { tip("手动录屏仅支持手机端"); return; }
+    lipCommitManualWait();
+    if (lipState.exporting) { tip("正在导出中，请稍等"); return; }
+    if (!lipState.file || !lipState.envelope) { tip("请先选择并等待音频分析完成"); return; }
+    if (!lipState.staticReady) { tip("立绘还在加载，请稍等"); return; }
+    if (lipManual.active) { return; }
+
+    var stage = document.getElementById("lipManualStage");
+    var cv = document.getElementById("lipManualCanvas");
+    var cd = document.getElementById("lipManualCountdown");
+    var card = document.getElementById("lipManualEndCard");
+    if (!stage || !cv || !cd || !card) { tip("全屏演示界面缺少元素"); return; }
+
+    var bgEl = document.getElementById("input_lipMp4Bg");
+    lipManual.bg = (bgEl && bgEl.value) ? bgEl.value : "#0000FF";
+    lipManual.wait = lipGetManualWait();
+    lipManual.active = true;
+    lipManual.ended = false;
+    lipManual.stage = stage;
+    lipManual.canvas = cv;
+    lipManual.countdownEl = cd;
+    lipManual.endCardEl = card;
+
+    lipHideExportView();
+    lipStopPlayback(); // 回到开头，停掉预览动画
+    stage.style.background = lipManual.bg;
+    stage.classList.add("lipManualOn");
+    card.classList.remove("lipManualOn");
+    cd.classList.remove("lipManualOn");
+    lipResizeManualCanvas();
+    lipDrawManualFrame(0);
+    window.addEventListener("resize", lipManualOnResize);
+
+    if (lipManual.wait <= 0) {
+        lipManualBeginPlayback();
+        return;
+    }
+    // 倒计时：每秒减 1，数字归零时立刻开始播放
+    var left = lipManual.wait;
+    cd.innerHTML = left;
+    cd.classList.add("lipManualOn");
+    lipManual.countdownTimer = setInterval(function () {
+        left--;
+        if (left <= 0) {
+            clearInterval(lipManual.countdownTimer);
+            lipManual.countdownTimer = 0;
+            cd.classList.remove("lipManualOn");
+            lipManualBeginPlayback();
+            return;
+        }
+        cd.innerHTML = left;
+    }, 1000);
+}
+
+// 倒计时结束：从头播放一遍对口型内容
+function lipManualBeginPlayback() {
+    if (!lipManual.active) { return; }
+    var audio = lipGetAudioEl();
+    try { audio.currentTime = 0; } catch (e) { }
+    lipManual.ended = false;
+    lipPlay();
+}
+
+// 播放结束：停住画面，左上角闪 2 秒结束卡，然后自动退出
+function lipManualFinish() {
+    if (!lipManual.active || lipManual.ended) { return; }
+    lipManual.ended = true;
+    var audio = lipGetAudioEl();
+    try { audio.pause(); } catch (e) { }
+    lipState.playing = false;
+    if (lipState.rafId) {
+        cancelAnimationFrame(lipState.rafId);
+        lipState.rafId = 0;
+    }
+    lipDrawManualFrame(lipState.duration);
+    if (lipManual.endCardEl) { lipManual.endCardEl.classList.add("lipManualOn"); }
+    lipManual.endTimer = setTimeout(function () {
+        lipManual.endTimer = 0;
+        lipManualExit();
+    }, 2000);
+}
+
+// 退出全屏演示：收掉遮罩 / 倒计时 / 结束卡，恢复主界面
+function lipManualExit() {
+    if (!lipManual.active) { return; }
+    lipManual.active = false;
+    lipManual.ended = false;
+    if (lipManual.countdownTimer) { clearInterval(lipManual.countdownTimer); lipManual.countdownTimer = 0; }
+    if (lipManual.endTimer) { clearTimeout(lipManual.endTimer); lipManual.endTimer = 0; }
+    if (lipManual.countdownEl) { lipManual.countdownEl.classList.remove("lipManualOn"); }
+    if (lipManual.endCardEl) { lipManual.endCardEl.classList.remove("lipManualOn"); }
+    var stage = lipManual.stage || document.getElementById("lipManualStage");
+    if (stage) { stage.classList.remove("lipManualOn"); }
+    var cv = lipManual.canvas || document.getElementById("lipManualCanvas");
+    if (cv && cv.getContext) {
+        var ctx = cv.getContext("2d");
+        if (ctx) { ctx.clearRect(0, 0, cv.width, cv.height); }
+    }
+    window.removeEventListener("resize", lipManualOnResize);
+    lipStopPlayback(); // 回到开头，重画主界面预览
 }
 
 // 按累计时间取整计算每帧的 GIF 延时（单位 1/100 秒）。
@@ -2091,6 +2455,21 @@ var lipHelpTexts = {
     transition: {
         title: "片段衔接",
         content: "只在首尾相接的两个片段之间生效，默认关闭。\n开启后交接处会先挤压再回弹：挤压/回弹时长控制两段动画的时长，挤压幅度与回弹强度控制形变大小。"
+    },
+    preset: {
+        title: "立绘预设码",
+        content: "预设码记录人物 id 和各个图层的序号，可以直接复制分享。\n在选立绘界面粘贴后点「导入」，会切换到对应立绘并还原图层。\n对口型模式下嘴部由音频驱动，导入时会忽略预设里的嘴部。"
+    },
+    exportPreset: {
+        title: "导出与预设码",
+        content: "立绘 / 表情包模式：填写文件名后导出 PNG，下方的预设码可以复制分享。\n"
+            + "朗读对口型的 GIF / MP4 不推荐：手机端要先把成品转成 base64，再经桥接写入文件，文件越大越慢，"
+            + "写入期间界面会无响应，几 MB 就要几分钟。\n"
+            + "推荐用「手动录屏」配合手机自带录屏：倒计时结束开始播放，播完停止录屏，瞬间完成。"
+    },
+    presetRegion: {
+        title: "片段预设码",
+        content: "复制当前片段的预设码，或粘贴别人的片段预设码导入。\n预设码会记录图层和嘴部序号；对口型模式导入时嘴部仍跟随音频，不会被覆盖。"
     }
 };
 function lipShowHelp(key) {
@@ -2108,8 +2487,19 @@ if (lipExportFpsInput) {
     lipExportFpsInput.onblur = lipCommitExportFps;
 }
 
+// 手动录屏的开始等待时间：回车或失焦时夹到 0~60 秒
+var lipManualWaitInput = document.getElementById("input_lipManualWait");
+if (lipManualWaitInput) {
+    lipManualWaitInput.onkeydown = function (e) {
+        if (e.key === "Enter") { e.preventDefault(); lipCommitManualWait(); this.blur(); }
+    };
+    lipManualWaitInput.onblur = lipCommitManualWait;
+}
+
 // 音频自然播放结束
 document.getElementById("lipAudio").addEventListener("ended", function () {
+    // 手动录屏：播放一遍结束，进入结束卡流程
+    if (lipManual.active) { lipManualFinish(); return; }
     if (lipState.recording) { return; } // 录制流程自己会收尾
     lipState.playing = false;
     if (lipState.rafId) {

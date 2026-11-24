@@ -22,3 +22,10 @@ document.getElementById("dialogView_mode_bqb").onclick = function(){
 document.getElementById("dialogView_mode_lip").onclick = function(){
     switchMode("lip");
 }
+//点击遮罩关闭模式选择窗：只有模式窗实际显示时才处理
+//遮罩是模式窗的兄弟节点，点击窗口内部不会触发这里，不影响窗口内点击和模式切换
+document.getElementById("dialogView_backGround").addEventListener("click", function(){
+    var modeView = document.getElementById("dialogView_mode");
+    if(modeView.style.display !== "flex"){ return; }
+    hideDialogViewMode();
+});

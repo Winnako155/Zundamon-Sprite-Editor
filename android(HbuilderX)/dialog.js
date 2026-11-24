@@ -1,6 +1,19 @@
-function showDialog(title, content) {
+// 关闭回调：showDialog 第三个参数传入函数时，在关闭动画结束后执行一次
+var dialogViewOnClose = null;
+var dialogViewHideTimer = 0;
+
+function showDialog(title, content, onClose) {
+    // 新弹框替换旧内容前先取消未完成的关闭定时器，避免它把新弹框一起隐藏
+    if (dialogViewHideTimer) {
+        clearTimeout(dialogViewHideTimer);
+        dialogViewHideTimer = 0;
+    }
+    dialogViewOnClose = (typeof onClose === "function") ? onClose : null;
     document.getElementById("dialogView_title").innerHTML = title;
     document.getElementById("dialogView_content").innerHTML = content.replace(/\n/g, "<br>");
+    //说明弹窗可能从导出/预设/选立绘等更高层的界面打开，临时提到最上层
+    document.getElementById("dialogView").style.zIndex = "10010";
+    document.getElementById("dialogView_backGround").style.zIndex = "10009";
     document.getElementById("dialogView").style.display = "flex";
     document.getElementById("dialogView_backGround").style.display = "flex";
     document.getElementById("dialogView").style.animation = "showDialog 0.3s forwards ease";
@@ -9,9 +22,20 @@ function showDialog(title, content) {
 function hideDialogView() {
     document.getElementById("dialogView").style.animation = "hideDialog 0.3s forwards ease";
     document.getElementById("dialogView_backGround").style.animation = "hideDialog_BackGround 0.3s forwards ease";
-    setTimeout(() => {
+    if (dialogViewHideTimer) {
+        clearTimeout(dialogViewHideTimer);
+    }
+    dialogViewHideTimer = setTimeout(() => {
+        dialogViewHideTimer = 0;
         document.getElementById("dialogView").style.display = "none";
         document.getElementById("dialogView_backGround").style.display = "none";
+        //还原层级，避免影响复用同一遮罩的模式选择弹窗
+        document.getElementById("dialogView").style.zIndex = "";
+        document.getElementById("dialogView_backGround").style.zIndex = "";
+        //收起动画结束后再执行关闭回调：下一个弹框复用同一个遮罩，提前弹会被动画收掉
+        var cb = dialogViewOnClose;
+        dialogViewOnClose = null;
+        if (cb) { cb(); }
     }, 300);
 }
 
@@ -93,13 +117,33 @@ function openDownload(channel) {
         window.open(url, "_blank");
     }
 }
-//复制文本到剪贴板
-function copyText(text) {
+//复制文本到剪贴板：返回 true 表示已发起复制，false 表示环境不支持
+function copyText(text){
+    var str = String(text == null ? "" : text);
     if (typeof plus !== "undefined" && plus.navigator && plus.navigator.setClipboard) {
-        plus.navigator.setClipboard(text);
-        return;
+        plus.navigator.setClipboard(str);
+        return true;
     }
     if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).catch(function(){});
+        navigator.clipboard.writeText(str).catch(function(){});
+        return true;
+    }
+    //老 WebView / 非安全上下文：退回到临时文本框 + execCommand
+    try {
+        var area = document.createElement("textarea");
+        area.value = str;
+        area.style.position = "fixed";
+        area.style.left = "-9999px";
+        area.style.top = "0";
+        document.body.appendChild(area);
+        area.select();
+        area.setSelectionRange(0, area.value.length);
+        var ok = document.execCommand("copy");
+        document.body.removeChild(area);
+        return ok;
+    }
+    catch (e) {
+        console.error(e);
+        return false;
     }
 }

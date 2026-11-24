@@ -42,6 +42,15 @@
             <div id="dragOverlay"></div> <!--透明手势层：接管触摸，避免 webview 长按图片触发原生拖拽-->
             <!-- 电脑端（WebView2）复制按钮：贴着展示区左下角内侧，跟随展示区尺寸/布局；手机端由脚本自动隐藏 -->
             <button id="button_copyResult" class="copyResultButton" onclick="copyResultImage()">复制</button>
+            <!-- 立绘模式缩放：右下角加减按钮，仅立绘模式显示；电脑端另支持滚轮缩放 -->
+            <div id="zoomControls">
+                <button id="button_zoomIn" type="button" onclick="zoomSprite(1)" title="放大" aria-label="放大">
+                    <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M8 3v10M3 8h10"/></svg>
+                </button>
+                <button id="button_zoomOut" type="button" onclick="zoomSprite(-1)" title="缩小" aria-label="缩小">
+                    <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3 8h10"/></svg>
+                </button>
+            </div>
         </div>
 
         <div id="bqbView"><!--表情包设置视图-->
@@ -198,6 +207,11 @@
                            autocomplete="off" spellcheck="false" />
                     <button class="lipRegionEditorDelete" onclick="lipDeleteSelectedRegion()">删除片段</button>
                 </div>
+                <!-- 每个片段各自的预设码：复制 / 导入（嘴部图层不参与） -->
+                <div class="lipRegionEditorRow">
+                    <button class="lipRegionPresetButton" onclick="lipCopySelectedRegionPreset()">复制本片段预设码</button>
+                    <button class="lipRegionPresetButton" onclick="lipShowRegionPresetImport()">导入预设码</button>
+                </div>
             </div>
 
             <div class="lipSectionTitle">
@@ -272,38 +286,109 @@
     <!-- 导出对话框：复用确认框的遮罩、标题、按钮与弹出/关闭动画 -->
     <div id="dialogView_export_backGround" onclick="lipHideExportView()"></div>
     <div id="dialogView_export">
-        <h2>导出</h2>
+        <div class="dialogTitleWithHelp">
+            <h2 id="dialogView_export_title">导出</h2>
+            <button class="lipHelpButton" type="button" onclick="lipShowHelp('exportPreset')"
+                    aria-label="导出与预设码说明">?</button>
+        </div>
         <div class="lipExportContent">
-            <!-- 导出格式：GIF 与 MP4 二选一 -->
-            <div class="lipExportTabs">
-                <button id="button_lipExportTabGif" class="lipExportTab lipExportTabActive" onclick="lipSelectExportKind('gif')">透明 GIF</button>
-                <button id="button_lipExportTabMp4" class="lipExportTab" onclick="lipSelectExportKind('mp4')">蓝底 MP4</button>
+            <!-- 对口型模式：GIF / MP4 导出选项 -->
+            <div id="exportLipOptions">
+                <!-- 导出格式：透明 GIF（不推荐）/ MP4输出（不推荐）/ 手动录屏（仅手机端） -->
+                <div class="lipExportTabs">
+                    <button id="button_lipExportTabGif" class="lipExportTab" onclick="lipSelectExportKind('gif')">透明 GIF<span class="lipExportTabNote">不推荐</span></button>
+                    <button id="button_lipExportTabMp4" class="lipExportTab" onclick="lipSelectExportKind('mp4')">MP4输出<span class="lipExportTabNote">不推荐</span></button>
+                    <button id="button_lipExportTabManual" class="lipExportTab" onclick="lipSelectExportKind('manual')">手动录屏</button>
+                </div>
+                <div class="lipExportRow" id="lipExportSizeRow">
+                    <p>尺寸:</p>
+                    <select id="input_lipExportSize">
+                        <option value="480">大(480)</option>
+                        <option value="360" selected>中(360)</option>
+                        <option value="240">小(240)</option>
+                    </select>
+                </div>
+                <div class="lipExportRow" id="lipExportBgRow">
+                    <p>背景色:</p>
+                    <input type="color" id="input_lipMp4Bg" value="#0000FF" />
+                    <p class="lipExportHint" id="text_lipExportBgHint">仅 MP4 使用</p>
+                </div>
+                <!-- 帧数：GIF 与 MP4 共用，1~60，输入非法时回到上次的有效值 -->
+                <div class="lipExportRow" id="lipExportFpsRow">
+                    <p>帧数:</p>
+                    <input type="text" id="input_lipExportFps" inputmode="decimal" enterkeyhint="done"
+                           autocomplete="off" spellcheck="false" value="60" />
+                    <p class="lipExportHint">fps（1–60）</p>
+                </div>
+                <!-- 手动录屏：开始等待时间，0~60 秒，默认 5 秒 -->
+                <div class="lipExportRow" id="lipExportManualRow" style="display: none;">
+                    <p>等待:</p>
+                    <input type="text" id="input_lipManualWait" inputmode="numeric" enterkeyhint="done"
+                           autocomplete="off" spellcheck="false" value="5" />
+                    <p class="lipExportHint">秒（0–60，先开始录屏再等待播放）</p>
+                </div>
             </div>
-            <div class="lipExportRow">
-                <p>尺寸:</p>
-                <select id="input_lipExportSize">
-                    <option value="480">大(480)</option>
-                    <option value="360" selected>中(360)</option>
-                    <option value="240">小(240)</option>
-                </select>
-            </div>
-            <div class="lipExportRow" id="lipExportBgRow">
-                <p>蓝底色:</p>
-                <input type="color" id="input_lipMp4Bg" value="#0000FF" />
-                <p class="lipExportHint">仅 MP4 使用</p>
-            </div>
-            <!-- 帧数：GIF 与 MP4 共用，1~60，输入非法时回到上次的有效值 -->
-            <div class="lipExportRow">
-                <p>帧数:</p>
-                <input type="text" id="input_lipExportFps" inputmode="decimal" enterkeyhint="done"
-                       autocomplete="off" spellcheck="false" value="30" />
-                <p class="lipExportHint">fps（1–60）</p>
+            <!-- 立绘 / 表情包模式：命名导出 PNG -->
+            <div id="exportSpriteOptions">
+                <div class="lipExportRow">
+                    <p>文件名:</p>
+                    <input type="text" id="input_exportFileName" placeholder="输入图片名称"
+                           autocomplete="off" spellcheck="false" style="flex: 1;" />
+                    <p class="lipExportHint">.png</p>
+                </div>
             </div>
             <p id="text_lipExportStatus" class="lipExportStatus"></p>
+            <!-- 保存进度：导出 MP4/GIF 期间显示，完成或失败后隐藏 -->
+            <div id="lipSaveProgress" class="lipSaveProgress" style="display: none;">
+                <div class="lipSaveProgressHead">
+                    <span id="text_lipSaveProgressLabel">保存中，请不要退出应用</span>
+                    <span id="text_lipSaveProgressPct">0%</span>
+                </div>
+                <div class="lipSaveProgressTrack">
+                    <div id="lipSaveProgressBar" class="lipSaveProgressBar"></div>
+                </div>
+            </div>
+            <!-- 立绘 / 表情包模式：预设码可直接复制分享 -->
+            <div id="exportPresetBox">
+                <p class="exportPresetLabel">预设码</p>
+                <div class="exportPresetCodeRow">
+                    <textarea id="text_exportPresetCode" readonly spellcheck="false"></textarea>
+                    <button type="button" class="exportPresetCopyButton" onclick="copySpritePresetCode()"
+                            title="复制预设码" aria-label="复制预设码">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect x="9" y="9" width="11" height="11" rx="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
         </div>
         <div class="dialogView_export_buttons">
             <button class="dialogView_export_close" onclick="lipHideExportView()">关闭</button>
-            <button class="dialogView_export_ok" onclick="lipStartExport()">开始导出</button>
+            <button id="dialogView_export_ok" class="dialogView_export_ok" onclick="exportDialogOk()">开始导出</button>
+        </div>
+    </div>
+
+    <!-- 手动录屏全屏演示：铺满背景色，只显示立绘；倒计时 → 播放 → 结束卡 → 自动退出 -->
+    <div id="lipManualStage">
+        <canvas id="lipManualCanvas"></canvas>
+        <div id="lipManualCountdown"></div>
+        <div id="lipManualEndCard">終</div>
+    </div>
+
+    <!-- 导入预设码对话框（对口型片段使用；选立绘界面的入口在标题下方） -->
+    <div id="dialogView_preset_backGround" onclick="hidePresetImportView()"></div>
+    <div id="dialogView_preset">
+        <div class="dialogTitleWithHelp">
+            <h2>导入预设码</h2>
+            <button class="lipHelpButton" type="button" onclick="lipShowHelp('presetRegion')"
+                    aria-label="片段预设码说明">?</button>
+        </div>
+        <textarea id="input_presetCode" placeholder="粘贴预设码，例如 zun2.3|1.2,3.1" spellcheck="false"></textarea>
+        <div class="dialogView_preset_buttons">
+            <button class="dialogView_preset_cancel" onclick="hidePresetImportView()">取消</button>
+            <button class="dialogView_preset_ok" onclick="presetImportOk()">导入</button>
         </div>
     </div>
 
@@ -344,6 +429,18 @@
     <!-- 选择框 -->
     <div id="decideView" style="z-index: 10000;">
         <p style="font-size: 30px;">立绘款式</p>
+        <!-- 预设码导入：把别人分享的预设码粘贴进来，直接还原人物和图层 -->
+        <div id="decideView_preset">
+            <div class="decideView_presetTitle">
+                <p>导入预设码</p>
+                <button class="lipHelpButton" type="button" onclick="lipShowHelp('preset')"
+                        aria-label="预设码说明">?</button>
+            </div>
+            <div class="decideView_presetRow">
+                <textarea id="input_decidePreset" placeholder="粘贴预设码，例如 zun2.3|1.2,3.1" spellcheck="false"></textarea>
+                <button id="button_importPreset" onclick="importPresetFromDecideView()">导入</button>
+            </div>
+        </div>
         <div id="decideView_itemList"></div>
     </div>
     
@@ -390,7 +487,6 @@
 
     <!--开场视图-->
     <div id="theStartView" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #E8F5E9; z-index: 100000;">
-        <p style="font-size: 48px; color: #22854A;">加载中...</p>
     </div>
 </body>
 

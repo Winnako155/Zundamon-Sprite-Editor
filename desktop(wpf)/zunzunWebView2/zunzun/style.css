@@ -677,6 +677,23 @@ body.webview2 #canvasView img{
 #lipView .lipRegionEditorDelete:active{
     transform: scale(0.95);
 }
+/* 片段预设码按钮：普通浅色按钮，和删除按钮区分开 */
+#lipView .lipRegionPresetButton{
+    padding: 4px 10px;
+    font-size: 12px;
+    border: 1px solid var(--color-primary-border);
+    border-radius: 4px;
+    background-color: var(--color-primary-light);
+    color: var(--color-primary-dark);
+    cursor: pointer;
+}
+#lipView .lipRegionPresetButton:hover{
+    background-color: var(--color-primary);
+    color: #ffffff;
+}
+#lipView .lipRegionPresetButton:active{
+    transform: scale(0.95);
+}
 /* 朗读对口型：功能标题 + 右侧浅色问号按钮（只做说明入口，不抢视觉） */
 .lipSectionTitle{
     display: flex;
@@ -694,7 +711,11 @@ body.webview2 #canvasView img{
     text-overflow: ellipsis;
     white-space: nowrap;
 }
-#lipView .lipHelpButton{
+.lipHelpButton,
+#lipView .lipHelpButton,
+#decideView .lipHelpButton,
+#dialogView_export .lipHelpButton,
+#dialogView_preset .lipHelpButton{
     width: 18px;
     height: 18px;
     min-width: 18px;
@@ -711,11 +732,19 @@ body.webview2 #canvasView img{
     opacity: 0.75;
     flex: 0 0 auto;
 }
-#lipView .lipHelpButton:hover{
+.lipHelpButton:hover,
+#lipView .lipHelpButton:hover,
+#decideView .lipHelpButton:hover,
+#dialogView_export .lipHelpButton:hover,
+#dialogView_preset .lipHelpButton:hover{
     opacity: 1;
     transform: none;
 }
-#lipView .lipHelpButton:active{
+.lipHelpButton:active,
+#lipView .lipHelpButton:active,
+#decideView .lipHelpButton:active,
+#dialogView_export .lipHelpButton:active,
+#dialogView_preset .lipHelpButton:active{
     transform: scale(0.9);
 }
 /* 电脑端 WebView2：「复制」按钮，把成品图写入系统剪贴板
@@ -742,4 +771,117 @@ body.webview2 #canvasView img{
 }
 .copyResultButton:active{
     transform: scale(0.95);
+}
+/* 立绘模式：右下角缩放按钮（与复制按钮同风格；电脑端滚轮缩放在脚本里处理）
+   默认隐藏，由脚本按当前模式切换显示，只在立绘模式出现 */
+#zoomControls{
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    z-index: 60;
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+}
+#zoomControls button{
+    width: 34px;
+    height: 34px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: 50%; /* 圆形按钮 */
+    background-color: transparent; /* 默认无背景，只有悬浮时才渐显 */
+    color: #888; /* 默认灰色图标 */
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease, opacity 0.15s ease;
+}
+#zoomControls button:hover{
+    background-color: rgba(0, 0, 0, 0.35); /* 悬浮时渐显黑色半透明背景 */
+    transform: scale(1.05);
+}
+#zoomControls button:active{
+    transform: scale(0.95);
+}
+#zoomControls button:disabled{
+    opacity: 0.45;
+    cursor: default;
+    transform: none;
+    background-color: transparent; /* 到达缩放极限时不显示悬浮背景 */
+}
+/* 加减号用内联 SVG 画线，避免像素字体缺字或不同环境字形不一致 */
+#zoomControls svg{
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    pointer-events: none;
+}
+
+/* ============================================================
+   手动录屏全屏演示（不生成文件）
+   时间线：铺满背景色 → 倒计时 → 播放 → 左上角结束卡闪 2 秒 → 自动退出
+   ============================================================ */
+#lipManualStage{
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10050; /* 盖住导出弹框与所有工具栏 */
+    display: none;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+#lipManualStage.lipManualOn{
+    display: flex;
+}
+#lipManualCanvas{
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+}
+/* 倒计时数字：白字加深色光晕，任何底色下都看得清 */
+#lipManualCountdown{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: clamp(72px, 18vmin, 200px);
+    font-weight: bold;
+    color: #ffffff;
+    text-shadow: 0 0 12px rgba(0, 0, 0, 0.55), 0 4px 18px rgba(0, 0, 0, 0.45);
+    display: none;
+    pointer-events: none;
+}
+#lipManualCountdown.lipManualOn{
+    display: block;
+}
+/* 结束卡：参照日本电视台节目结束卡，黑底白字方形，闪烁约 2 秒 */
+#lipManualEndCard{
+    position: absolute;
+    left: max(16px, 4vmin);
+    top: max(16px, 6vmin);
+    width: clamp(88px, 22vmin, 220px);
+    height: clamp(88px, 22vmin, 220px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background-color: #000000;
+    color: #ffffff;
+    font-size: clamp(44px, 11vmin, 110px);
+    font-weight: bold;
+    line-height: 1;
+    box-sizing: border-box;
+    animation: lipManualEndBlink 1s steps(1, end) infinite;
+}
+#lipManualEndCard.lipManualOn{
+    display: flex;
+}
+@keyframes lipManualEndBlink{
+    0%, 49%{ opacity: 1; }
+    50%, 100%{ opacity: 0.15; }
 }

@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:zunzunWebView2"
         xmlns:Wpf="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf" x:Class="zunzunWebView2.MainWindow"
         mc:Ignorable="d"
-        Title="俊达萌立绘编辑器" Height="600" Width="800" MinWidth="380" MinHeight="500" WindowStartupLocation="CenterScreen" Icon="ico.png"
+        Title="俊达萌立绘编辑器" Height="600" Width="800" MinWidth="300" MinHeight="500" WindowStartupLocation="CenterScreen" Icon="ico.png"
         WindowStyle="None" ResizeMode="CanResize" Background="#E8F5E9" UseLayoutRounding="True" SnapsToDevicePixels="True"
         Opacity="0" ShowActivated="False" ShowInTaskbar="False"
         StateChanged="Window_StateChanged">
@@ -114,14 +114,20 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" Background="#E8F5E9" BorderBrush="#0E5A111C" BorderThickness="0,0,0,1">
+        <Border Grid.Row="0" Background="#E8F5E9" BorderBrush="#0E5A111C" BorderThickness="0,0,0,1" ClipToBounds="True">
             <Grid>
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0" IsHitTestVisible="False">
-                    <Image Source="ico.png" Width="16" Height="16"/>
-                    <TextBlock Text="俊达萌立绘编辑器" Margin="8,0,0,0" FontSize="12"
+                <!-- 标题区占剩余宽度并自动省略号截断；按钮列固定 Auto，窄窗口下优先保证按钮完整可见 -->
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <DockPanel Grid.Column="0" Margin="10,0,8,0" VerticalAlignment="Center" IsHitTestVisible="False" LastChildFill="True">
+                    <Image Source="ico.png" Width="16" Height="16" VerticalAlignment="Center"/>
+                    <TextBlock Text="俊达萌立绘编辑器" Margin="8,0,0,0" FontSize="12" TextWrapping="NoWrap"
+                               TextTrimming="CharacterEllipsis"
                                Foreground="#0E5A11" VerticalAlignment="Center"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+                </DockPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
                     <ToggleButton x:Name="button_pin" Style="{StaticResource TitleBarPinButton}"
                                   Content="&#xE718;" Checked="button_pin_Checked" Unchecked="button_pin_Unchecked"/>
                     <Button x:Name="button_min" Style="{StaticResource TitleBarButton}"

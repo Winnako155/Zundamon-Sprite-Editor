@@ -119,6 +119,10 @@
   <ItemGroup>
     <Resource Include="画板 1.png" />
     <Resource Include="ico_256x256.ico" />
+    <!-- 同时复制到输出目录：运行时用 LoadImage 按尺寸取 ICO 里的对应帧设置窗口图标 -->
+    <Content Include="ico_256x256.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Resource Include="ico.png" />
     <Content Include="zunzun\**\*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

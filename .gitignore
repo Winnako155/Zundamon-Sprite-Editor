@@ -1,0 +1,20 @@
+# ===== WPF / Visual Studio =====
+[Bb]in/
+[Oo]bj/
+.vs/
+packages/
+*.user
+*.suo
+
+# ===== HBuilderX =====
+android(HbuilderX)/unpackage/cache/
+android(HbuilderX)/unpackage/release/
+android(HbuilderX)/.hbuilderx/
+android(HbuilderX)/backup/
+
+# ===== 临时文件 / 分享产物 =====
+.screenshots/
+.trae-html-share-packages/
+*.bak
+*.tmp
+*.b64

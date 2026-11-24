@@ -3,6 +3,7 @@ const OWNER = 'Winnako155'; //仓库所有者
 const REPO = 'Zundamon-Sprite-Editor'; //仓库名称
 
 var nowActor = ""; //当前选中的立绘
+var nowActorKey = ""; //当前立绘的预设 id（与 res/js 文件名对应，用于预设码导入/导出）
 var nowMode = "sprite"; //当前模式：sprite/actor
 
 
@@ -224,6 +225,244 @@ function isAbleToUse(clickItem){
 
 
 
+// ============================================================
+// 立绘预设码：导入 / 导出
+// ------------------------------------------------------------
+// 格式：人物id|列表序号.素材序号,列表序号.素材序号
+//   例：zun2.3|2.2,4.1,9.4,12.1
+//   · | 前是人物 id（res/js 文件名），| 后是各个图层
+//   · 列表序号 = allRowLists 里的顺序（从 1 开始，即素材面板里的分组顺序）
+//   · 素材序号 = 该列表里的素材顺序（从 1 开始）
+//   · 多选列表可以重复写同一个列表序号
+// 嘴部图层也正常记录；只有在对口型模式导入时才丢弃嘴部的值（嘴由音频驱动占用）。
+// ============================================================
+
+//判断一个 rowList 是不是嘴部列表（与 lipSync.js 的命名规则保持一致）
+function presetIsMouthList(list){
+    if(!list || !list.id){ return false; }
+    var id = String(list.id);
+    return id.indexOf("嘴巴") === 0 || id === "嘴" || id === "口";
+}
+//把预设码拼出来：actorKey + 图层索引
+function buildPresetCode(actorKey, picks){
+    var tokens = [];
+    for(var i = 0; i < picks.length; i++){
+        tokens.push(picks[i].list + "." + picks[i].item);
+    }
+    return String(actorKey || "") + "|" + tokens.join(",");
+}
+//读取当前勾选生成图层索引（包含嘴部）
+function presetPicksFromSelection(){
+    var picks = [];
+    for(var li = 0; li < allRowLists.length; li++){
+        var list = allRowLists[li];
+        if(!list || !list.items){ continue; }
+        for(var ii = 0; ii < list.items.length; ii++){
+            if(list.items[ii].isSelected){
+                picks.push({ list: li + 1, item: ii + 1 });
+            }
+        }
+    }
+    return picks;
+}
+//只读取当前嘴部勾选（片段预设码里单独记录嘴部，导入时再决定是否使用）
+function presetMouthPicksFromSelection(){
+    var picks = [];
+    for(var li = 0; li < allRowLists.length; li++){
+        var list = allRowLists[li];
+        if(!list || !list.items || !presetIsMouthList(list)){ continue; }
+        for(var ii = 0; ii < list.items.length; ii++){
+            if(list.items[ii].isSelected){
+                picks.push({ list: li + 1, item: ii + 1 });
+            }
+        }
+    }
+    return picks;
+}
+//把一组图片路径反查成图层索引（对口型的片段快照只有图片，没有列表信息）
+//skipMouth=true 时跳过嘴部列表（片段快照里本来就没有嘴部图片）
+function presetPicksFromImages(imgs, skipMouth){
+    var remain = {};
+    for(var i = 0; i < imgs.length; i++){
+        var src = imgs[i];
+        if(!src){ continue; }
+        remain[src] = (remain[src] || 0) + 1;
+    }
+    var picks = [];
+    for(var li = 0; li < allRowLists.length; li++){
+        var list = allRowLists[li];
+        if(!list || !list.items){ continue; }
+        if(skipMouth && presetIsMouthList(list)){ continue; }
+        for(var ii = 0; ii < list.items.length; ii++){
+            var item = list.items[ii];
+            if(item.img && remain[item.img]){
+                remain[item.img]--;
+                picks.push({ list: li + 1, item: ii + 1 });
+            }
+        }
+    }
+    return picks;
+}
+//导出当前立绘的预设码（没有选人物时返回空字符串）
+function buildCurrentPresetCode(){
+    if(!nowActorKey){ return ""; }
+    return buildPresetCode(nowActorKey, presetPicksFromSelection());
+}
+//解析预设码：格式不对返回 null；只做语法校验，不检查立绘和图层是否存在
+function parsePresetCode(raw){
+    var text = String(raw == null ? "" : raw).trim();
+    if(!text){ return null; }
+    //宽容处理中文逗号/分号，方便手机输入法
+    text = text.replace(/[，、；;]/g, ",");
+    var bar = text.indexOf("|");
+    if(bar <= 0){ return null; }
+    var actorKey = text.slice(0, bar).trim();
+    if(!/^[A-Za-z0-9._-]+$/.test(actorKey)){ return null; }
+    var body = text.slice(bar + 1).trim();
+    var picks = [];
+    if(body){
+        var tokens = body.split(/[\s,]+/);
+        for(var i = 0; i < tokens.length; i++){
+            var token = tokens[i];
+            if(!token){ continue; }
+            //列表和素材之间用 . 或 : 都行
+            var m = /^(\d+)\s*[.:]\s*(\d+)$/.exec(token);
+            if(!m){ return null; }
+            var listNo = Number(m[1]);
+            var itemNo = Number(m[2]);
+            if(listNo < 1 || itemNo < 1){ return null; }
+            picks.push({ list: listNo, item: itemNo });
+        }
+    }
+    return { actorKey: actorKey, picks: picks };
+}
+//按 isSelected 把所有素材项的视觉状态重新刷一遍
+//（changeTheRowListState 只改数据不画样式，导入后需要统一同步一次）
+function syncAllRowListStyles(){
+    for(var li = 0; li < allRowLists.length; li++){
+        var list = allRowLists[li];
+        if(!list || !list.items){ continue; }
+        for(var ii = 0; ii < list.items.length; ii++){
+            var item = list.items[ii];
+            if(item.isSelected){
+                item.style.setProperty("background-color", "var(--color-primary)");
+                item.style.color = "#fff";
+            }
+            else{
+                item.style.backgroundColor = "";
+                item.style.color = "";
+            }
+        }
+    }
+}
+//把预设码里的勾选应用到素材面板
+//skipRender=true 时由调用方自己刷新；skipMouth=true 时保留嘴部勾选不变（对口型模式导入用）
+function applyPresetPicks(picks, skipRender, skipMouth){
+    //先清空要覆盖的列表勾选和隐藏缓存（嘴部是否清空由 skipMouth 决定）
+    for(var li = 0; li < allRowLists.length; li++){
+        var list = allRowLists[li];
+        if(!list || !list.items){ continue; }
+        if(skipMouth && presetIsMouthList(list)){ continue; }
+        list._tempState = []; //丢弃隐藏列表里的旧勾选，避免重新显示时覆盖导入结果
+        for(var ii = 0; ii < list.items.length; ii++){
+            list.items[ii].isSelected = false;
+            list.items[ii].style.backgroundColor = "";
+            list.items[ii].style.color = "";
+        }
+    }
+    //再按预设勾选；隐藏中的列表把勾选存进 _tempState，等联动逻辑显示时恢复
+    var applied = 0;
+    for(var p = 0; p < picks.length; p++){
+        var targetList = allRowLists[picks[p].list - 1];
+        if(!targetList || !targetList.items){ continue; }
+        if(skipMouth && presetIsMouthList(targetList)){ continue; }
+        var targetItem = targetList.items[picks[p].item - 1];
+        if(!targetItem){ continue; }
+        targetItem.isSelected = true;
+        applied++;
+        if(targetList.style.display === "none"){
+            if(!targetList._tempState){ targetList._tempState = []; }
+            targetList._tempState.push(targetItem);
+        }
+    }
+    //跑一次立绘自己的联动逻辑（如姿势决定显示哪套表情），让列表显隐与导入结果一致。
+    //传入一个中性的“点击项”，避免误触发只看点击列表标题的互斥清空。
+    var hook = actorHooks[nowActor];
+    if(typeof hook === "function"){
+        try{
+            hook({ id: "__preset__", addTarget: { theTitle: { innerText: "__preset__" } } });
+        }
+        catch(e){
+            console.error("应用预设时联动逻辑出错", e);
+        }
+    }
+    //联动逻辑只改 isSelected，不会同步颜色，这里统一刷新，导入后立即显示正确选中态
+    syncAllRowListStyles();
+    if(!skipRender){ render(); }
+    return applied;
+}
+//复制当前立绘预设码（导出弹窗底部的按钮）
+function copySpritePresetCode(){
+    var code = buildCurrentPresetCode();
+    if(!code){
+        tip("请先选择立绘", 2000, "#ff6b6b");
+        return;
+    }
+    var ok = copyText(code);
+    tip(ok === false ? "复制失败，请手动选中预设码复制" : "预设码已复制", 2000);
+}
+//导出弹窗：立绘/表情包模式导出命名后的 PNG
+function exportSpritePngNamed(){
+    var input = document.getElementById("input_exportFileName");
+    var name = input ? input.value : "";
+    downloadSprite(name);
+    lipHideExportView();
+}
+//导出弹窗的确定按钮：对口型模式走原来的 GIF/MP4，其它模式导出 PNG
+function exportDialogOk(){
+    if(nowMode === "lip"){
+        lipStartExport();
+    }
+    else{
+        exportSpritePngNamed();
+    }
+}
+//通用「导入预设码」弹窗（目前用于对口型片段）
+var presetImportTarget = "region";
+function showPresetImportView(target){
+    presetImportTarget = target || "region";
+    var box = document.getElementById("dialogView_preset");
+    var bg = document.getElementById("dialogView_preset_backGround");
+    var input = document.getElementById("input_presetCode");
+    if(!box || !bg || !input){ return; }
+    input.value = "";
+    box.style.display = "flex";
+    bg.style.display = "block";
+    box.style.animation = "showDialog 0.3s forwards ease";
+    bg.style.animation = "showDialog_BackGround 0.3s forwards ease";
+    setTimeout(function(){ try{ input.focus(); }catch(e){} }, 50);
+}
+function hidePresetImportView(){
+    var box = document.getElementById("dialogView_preset");
+    var bg = document.getElementById("dialogView_preset_backGround");
+    if(!box || !bg){ return; }
+    box.style.animation = "hideDialog 0.3s forwards ease";
+    bg.style.animation = "hideDialog_BackGround 0.3s forwards ease";
+    setTimeout(function(){
+        box.style.display = "none";
+        bg.style.display = "none";
+    }, 300);
+}
+function presetImportOk(){
+    var input = document.getElementById("input_presetCode");
+    var code = input ? input.value : "";
+    if(presetImportTarget === "region" && typeof lipImportRegionPreset === "function"){
+        if(lipImportRegionPreset(code)){ hidePresetImportView(); }
+    }
+}
+
+
+
 function checkUpdate(){
     tip("检测更新中...");
     checkGitHubVersion(OWNER, REPO, nowBuild).then(result => {
@@ -247,12 +486,23 @@ function hideTheStartView(){
         document.getElementById("theStartView").style.display = "none";
     }, 1000);
 }
-function downloadSprite(){
+//把用户输入的文件名清理成各平台都能保存的名字（去掉非法字符和 .png 后缀）
+function sanitizeExportName(raw){
+    var name = String(raw == null ? "" : raw).trim();
+    name = name.replace(/\.png$/i, ""); //避免用户自己输入 .png 后变成 xxx.png.png
+    name = name.replace(/[\\/:*?"<>|]/g, "_").replace(/\s+$/g, "");
+    if(!name){ name = "zundamon"; }
+    return name.slice(0, 80);
+}
+//保存成品图：fileName 只传名字，不带扩展名
+function downloadSprite(fileName){
     //朗读对口型模式是动态成品，导出入口放在它自己的设置区
     if(nowMode == "lip"){
         tip("朗读模式请在设置区用「透明 GIF / 蓝底 MP4」导出");
         return;
     }
+    //名字没传就用当前立绘名；统一清理一遍，避免出现非法文件名
+    var baseName = sanitizeExportName(fileName || nowActor);
     // 先判断一下环境
     var hasPlus = typeof plus !== "undefined";
     var hasPlusIO = hasPlus && plus.io;
@@ -267,7 +517,7 @@ function downloadSprite(){
     if(!hasPlus){
         var a = document.createElement("a");
         a.href = exportCanvas.toDataURL("image/png");
-        a.download = nowActor + ".png";
+        a.download = baseName + ".png";
         a.click();
         setTimeout(function(){ tip("下载已触发"); }, 500);
         return;
@@ -277,7 +527,6 @@ function downloadSprite(){
     // === HTML5+ 环境 ===
     var dataUrl = exportCanvas.toDataURL("image/png");
     var base64 = dataUrl.replace(/^data:image\/\w+;base64,/, "");
-    var baseName = nowActor;
     var ext = ".png";
 
     function doSave(){
@@ -356,10 +605,14 @@ function switchMode(mode){
         nowMode = "lip";
         tip("朗读对口型模式");
         lipEnterMode();
-        //每次进入朗读对口型模式都用现有提示框提醒当前为测试功能
-        //等模式选择弹框的 0.3s 收起动画结束后再弹，避免共用遮罩被 hideDialogViewMode 的延时关闭收掉
+        //进入朗读对口型模式的提示串行播放：手机端先弹 Capacitor 迁移提示，
+        //关闭后再弹原有的“测试功能”提示；桌面端没有迁移提示，直接弹测试提示。
+        //0.3s 延时是为了等模式选择弹框收起，避免共用遮罩被 hideDialogViewMode 的延时关闭收掉。
         setTimeout(function(){
-            showDialog("提示", "当前功能为测试内容，可能有BUG和其他不稳定因素。欢迎大家来进行反馈的说~\n去github提问也或者电邮:ywang155@outlook.com");
+            lipShowMigrationNotice(function(){
+                //每次进入朗读对口型模式都用现有提示框提醒当前为测试功能
+                showDialog("提示", "当前功能为测试内容，可能有BUG和其他不稳定因素。欢迎大家来进行反馈的说~\n去github提问也或者电邮:ywang155@outlook.com");
+            });
         }, 320);
     }
     //表情包模式/朗读模式显示各自的设置面板，立绘模式隐藏
@@ -374,6 +627,7 @@ function switchMode(mode){
     //拖拽手势层只在表情包模式启用
     dragOverlay.style.display = (mode == "bqb") ? "" : "none";
     dragOverlay.style.cursor = (mode == "bqb") ? "grab" : "";
+    updateZoomControls(); //缩放控件/滚轮只在立绘模式生效
     hideDialogViewMode();
     render();
     //电脑端视图分隔条：模式切换后重建（Android 上该函数不存在，自动跳过）
@@ -777,6 +1031,51 @@ window.addEventListener("touchcancel", dragBqbEnd);
 dragOverlay.addEventListener("mousedown", dragBqbStart);
 window.addEventListener("mousemove", dragBqbMove);
 window.addEventListener("mouseup", dragBqbEnd);
+
+// ---------- 立绘模式：预览缩放（右下角加减按钮 + 电脑端滚轮） ----------
+var spriteZoom = 1;          //当前缩放倍率（1 = 默认显示大小）
+var SPRITE_ZOOM_MIN = 0.5;   //最小倍率
+var SPRITE_ZOOM_MAX = 3;     //最大倍率
+var SPRITE_ZOOM_STEP = 0.2;  //按钮每次缩放的步长
+
+//把倍率写到展示图上，并同步两个按钮的可用状态
+function applySpriteZoom(){
+    img_canvasResult.style.transform = "scale(" + spriteZoom + ")";
+    var zoomIn = document.getElementById("button_zoomIn");
+    var zoomOut = document.getElementById("button_zoomOut");
+    if(zoomIn){ zoomIn.disabled = spriteZoom >= SPRITE_ZOOM_MAX - 0.001; }
+    if(zoomOut){ zoomOut.disabled = spriteZoom <= SPRITE_ZOOM_MIN + 0.001; }
+}
+//设置缩放倍率（自动夹在最小/最大之间）
+function setSpriteZoom(value){
+    spriteZoom = Math.min(SPRITE_ZOOM_MAX, Math.max(SPRITE_ZOOM_MIN, value));
+    applySpriteZoom();
+}
+//加减按钮：direction 传 1 放大，-1 缩小
+function zoomSprite(direction){
+    setSpriteZoom(spriteZoom + direction * SPRITE_ZOOM_STEP);
+}
+//缩放控件只在立绘模式显示；离开立绘模式时清掉缩放，避免影响表情包/朗读模式的预览图
+function updateZoomControls(){
+    var box = document.getElementById("zoomControls");
+    if(!box){ return; }
+    if(nowMode == "sprite"){
+        box.style.display = "flex";
+        applySpriteZoom();
+    }
+    else{
+        box.style.display = "none";
+        spriteZoom = 1;
+        img_canvasResult.style.transform = "";
+    }
+}
+//电脑端滚轮缩放：只在立绘模式下拦截，其它模式保持原有行为
+document.getElementById("canvasView").addEventListener("wheel", function(e){
+    if(nowMode != "sprite"){ return; }
+    e.preventDefault();
+    setSpriteZoom(spriteZoom * (e.deltaY < 0 ? 1.1 : 1 / 1.1));
+}, {passive: false});
+updateZoomControls(); //初始为完整立绘模式，显示右下角缩放按钮
 
 //拦截原生图片拖拽和长按菜单
 window.addEventListener("dragstart", function(e){ e.preventDefault(); });

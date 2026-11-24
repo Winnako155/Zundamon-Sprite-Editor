@@ -1,0 +1,5 @@
+// 只用来单独编译 screenrecorder 这个 Android Library（AAR）。
+plugins {
+    id 'com.android.application' version '8.5.2' apply false
+    id 'com.android.library' version '8.5.2' apply false
+}

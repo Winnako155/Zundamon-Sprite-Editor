@@ -125,3 +125,63 @@
         font-size: 10px;
     }
 }
+/* 选立绘界面的预设码导入区：粘贴预设码后直接还原人物和图层 */
+#decideView_preset{
+    width: 90%;
+    max-width: 720px;
+    box-sizing: border-box;
+    margin: 10px 0 12px;
+    padding: 10px;
+    background-color: #f3faf4;
+    border: 1px solid #cfe6d4;
+    border-radius: 8px;
+}
+.decideView_presetTitle{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+.decideView_presetTitle p{
+    font-size: 15px;
+    font-weight: bold;
+    color: #2e6b3c;
+    margin: 0;
+}
+.decideView_presetRow{
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 6px;
+}
+#input_decidePreset{
+    flex: 1;
+    min-width: 0;
+    min-height: 38px;
+    box-sizing: border-box;
+    padding: 6px 8px;
+    font-size: 13px;
+    line-height: 1.4;
+    font-family: inherit;
+    border: 1px solid #cfe6d4;
+    border-radius: 5px;
+    background-color: #ffffff;
+    color: #222222;
+    resize: vertical;
+    user-select: text;
+    -webkit-user-select: text;
+}
+#button_importPreset{
+    flex: 0 0 auto;
+    padding: 0 16px;
+    border: 0;
+    border-radius: 5px;
+    background-color: var(--color-primary);
+    color: #ffffff;
+    font-size: 14px;
+    cursor: pointer;
+}
+#button_importPreset:active{
+    transform: scale(0.95);
+}

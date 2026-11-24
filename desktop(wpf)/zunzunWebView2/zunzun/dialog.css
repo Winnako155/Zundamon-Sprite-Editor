@@ -41,7 +41,7 @@
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 9999;
+    z-index: 10009;
 }
 #dialogView{
     position: absolute;
@@ -53,7 +53,7 @@
     background-color: #fff;
     border-radius: 10px;
     padding: 20px;
-    z-index: 10000;
+    z-index: 10010;
 
     display: flex;
     flex-direction: column;
@@ -277,6 +277,29 @@
 #dialogView_export h2{
     margin-bottom: 12px;
 }
+/* 标题 + 右侧问号：沿用朗读面板的问号按钮与说明弹窗 */
+.dialogTitleWithHelp{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    margin-bottom: 12px;
+}
+#dialogView_export .dialogTitleWithHelp h2,
+#dialogView_preset .dialogTitleWithHelp h2{
+    margin-bottom: 0;
+}
+#dialogView_preset .dialogTitleWithHelp{
+    margin-bottom: 10px;
+}
+#dialogView_export .exportPresetLabel{
+    font-size: 14px;
+    line-height: 1.4;
+    color: #333333;
+    margin: 0;
+}
 #dialogView_export button{
     box-sizing: border-box;
     padding: 10px 20px;
@@ -318,6 +341,15 @@
 }
 #dialogView_export .lipExportTab{
     flex: 1;
+}
+/* 选项下方的小字标注（如「不推荐」），不额外占一行设置项 */
+#dialogView_export .lipExportTabNote{
+    display: block;
+    margin-top: 2px;
+    font-size: 11px;
+    font-weight: normal;
+    line-height: 1.2;
+    opacity: 0.8;
 }
 #dialogView_export .lipExportTabActive,
 #dialogView_export .lipExportTabActive:hover{
@@ -379,6 +411,44 @@
     word-break: break-all;
     margin: 0;
 }
+/* 保存进度：与导出面板的绿色按钮风格一致 */
+#dialogView_export .lipSaveProgress{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #C8E6C9;
+    background-color: #F1F8E9;
+    box-sizing: border-box;
+}
+#dialogView_export .lipSaveProgressHead{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 13px;
+    color: #2E7D32;
+}
+#dialogView_export #text_lipSaveProgressPct{
+    flex: none;
+    font-variant-numeric: tabular-nums;
+}
+#dialogView_export .lipSaveProgressTrack{
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background-color: #E0E0E0;
+    overflow: hidden;
+}
+#dialogView_export .lipSaveProgressBar{
+    width: 0%;
+    height: 100%;
+    border-radius: 4px;
+    background-color: var(--color-primary);
+    transition: width 0.2s ease;
+}
 #dialogView_export .dialogView_export_buttons{
     display: flex;
     gap: 10px;
@@ -403,4 +473,157 @@
 #dialogView_export .dialogView_export_ok:hover{
     background-color: var(--color-primary);
     color: #ffffff;
+}
+/* 立绘 / 表情包模式的导出内容：文件名 + 预设码 */
+#dialogView_export #exportSpriteOptions,
+#dialogView_export #exportPresetBox{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+#dialogView_export textarea{
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 3.2em;
+    padding: 6px 8px;
+    font-size: 13px;
+    line-height: 1.4;
+    font-family: inherit;
+    border: 1px solid #c8c8c8;
+    border-radius: 5px;
+    background-color: #ffffff;
+    color: #333333;
+    resize: vertical;
+    user-select: text;
+    -webkit-user-select: text;
+}
+#dialogView_export #text_exportPresetCode{
+    background-color: #f7faf7;
+    word-break: break-all;
+}
+/* 预设码文本框与复制图标同一行 */
+#dialogView_export .exportPresetCodeRow{
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 8px;
+    width: 100%;
+}
+#dialogView_export .exportPresetCodeRow textarea{
+    flex: 1;
+    width: auto;
+    min-width: 0;
+}
+#dialogView_export .exportPresetCopyButton{
+    flex: 0 0 42px;
+    width: 42px;
+    min-height: 42px;
+    padding: 0;
+    border: 0;
+    border-radius: 5px;
+    background-color: var(--color-primary);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+}
+/* 缩放只作用在图标上：按钮本身不放大，避免撑出导出弹窗的滚动条 */
+#dialogView_export .exportPresetCopyButton svg{
+    display: block;
+    pointer-events: none;
+    transition: transform 0.1s ease;
+}
+#dialogView_export .exportPresetCopyButton:hover svg{
+    transform: scale(1.12);
+}
+#dialogView_export .exportPresetCopyButton:active svg{
+    transform: scale(0.92);
+}
+/* 导入预设码对话框（对口型片段） */
+#dialogView_preset_backGround{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 10007;
+    display: none;
+}
+#dialogView_preset{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-width: 420px;
+    box-sizing: border-box;
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    z-index: 10008;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+}
+#dialogView_preset h2{
+    margin-bottom: 10px;
+}
+#dialogView_preset p{
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333333;
+    margin-bottom: 10px;
+    width: 100%;
+    text-align: left;
+}
+#dialogView_preset textarea{
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 4.5em;
+    padding: 8px;
+    font-size: 14px;
+    line-height: 1.5;
+    font-family: inherit;
+    border: 1px solid #c8c8c8;
+    border-radius: 5px;
+    background-color: #ffffff;
+    color: #333333;
+    resize: vertical;
+    user-select: text;
+    -webkit-user-select: text;
+}
+#dialogView_preset .dialogView_preset_buttons{
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    justify-content: center;
+    margin-top: 14px;
+}
+#dialogView_preset button{
+    flex: 1;
+    box-sizing: border-box;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: 0;
+    cursor: pointer;
+    transition: all 0.1s ease;
+}
+#dialogView_preset .dialogView_preset_cancel{
+    background-color: #eeeeee;
+    color: #666666;
+}
+#dialogView_preset .dialogView_preset_cancel:hover{
+    background-color: #999999;
+    color: #ffffff;
+}
+#dialogView_preset .dialogView_preset_ok{
+    background-color: var(--color-primary);
+    color: #ffffff;
+}
+#dialogView_preset button:active{
+    transform: scale(0.95);
 }
