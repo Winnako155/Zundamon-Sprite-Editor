@@ -1,4 +1,4 @@
-const nowBuild = "v1.6.2"; //当前版本
+const nowBuild = "v1.7"; //当前版本
 const OWNER = 'Winnako155'; //仓库所有者
 const REPO = 'Zundamon-Sprite-Editor'; //仓库名称
 
@@ -9,10 +9,17 @@ var nowMode = "sprite"; //当前模式：sprite/actor
 document.getElementById("nowBuildText").innerHTML = nowBuild;
 console.log(nowBuild);
 document.getElementById("bqbView").style.display ="none";
+document.getElementById("lipView").style.display ="none"; //朗读对口型设置区默认隐藏
 let canvas = document.getElementById("canvas");
 let bqbCanvas = document.getElementById("bqbCanvas");
 let img_canvasResult = document.getElementById("img_canvasResult");
 let dragOverlay = document.getElementById("dragOverlay");
+//电脑端 WebView2 套壳才有“拖出 PNG / 复制到剪贴板”，手机端（HBuilderX）保持原样
+var isWebView2Desktop = !!(window.chrome && window.chrome.webview);
+if(isWebView2Desktop){
+    document.body.classList.add("webview2");
+    img_canvasResult.setAttribute("draggable", "true");
+}
 let button_nowActor = document.getElementById("button_nowActor");
 var subtitleText = "";
 var subtitleColor = "#FFFFFF";
@@ -73,6 +80,10 @@ async function render(){
         //如果是人物模式，绘制到 bqb 画板
         refreshActorLayerThumb(); //主画布变了，顺手刷新人物图层的缩略图
         drawBqbResult();
+    }
+    else if(nowMode == "lip"){
+        //朗读对口型模式用独立画布预览，这里只通知它立绘/选中项变了
+        lipOnSpriteChanged();
     }
 }
 //把主画布内容合成到 bqb 画板并刷新预览（这里，我用、了同步执行，拖拽时、直接调，用这样就能。，避免延迟、）
@@ -243,6 +254,11 @@ function hideTheStartView(){
     }, 1000);
 }
 function downloadSprite(){
+    //朗读对口型模式是动态成品，导出入口放在它自己的设置区
+    if(nowMode == "lip"){
+        tip("朗读模式请在设置区用「透明 GIF / 蓝底 MP4」导出");
+        return;
+    }
     // 先判断一下环境
     var hasPlus = typeof plus !== "undefined";
     var hasPlusIO = hasPlus && plus.io;
@@ -342,13 +358,34 @@ function switchMode(mode){
         tip("表情包模式");
         initBqbLayers();
     }
-    //表情包模式显示设置面板，立绘模式隐藏
+    else if(mode == "lip"){
+        nowMode = "lip";
+        tip("朗读对口型模式");
+        lipEnterMode();
+        //每次进入朗读对口型模式都用现有提示框提醒当前为测试功能
+        //等模式选择弹框的 0.3s 收起动画结束后再弹，避免共用遮罩被 hideDialogViewMode 的延时关闭收掉
+        setTimeout(function(){
+            showDialog("提示", "当前功能为测试内容，可能有BUG和其他不稳定因素。欢迎大家来进行反馈的说~\n去github提问也或者电邮:ywang155@outlook.com");
+        }, 320);
+    }
+    //表情包模式/朗读模式显示各自的设置面板，立绘模式隐藏
     document.getElementById("bqbView").style.display = (mode == "bqb") ? "" : "none";
+    document.getElementById("lipView").style.display = (mode == "lip") ? "" : "none";
+    //朗读模式用独立预览画布，避免逐帧刷新 1082x1650 的大图上 img 卡顿
+    document.getElementById("lipPreviewCanvas").style.display = (mode == "lip") ? "" : "none";
+    img_canvasResult.style.display = (mode == "lip") ? "none" : "";
+    if(mode != "lip"){
+        lipLeaveMode(); //离开朗读模式时停掉播放/录制
+    }
     //拖拽手势层只在表情包模式启用
     dragOverlay.style.display = (mode == "bqb") ? "" : "none";
     dragOverlay.style.cursor = (mode == "bqb") ? "grab" : "";
+    dragOverlay.style.pointerEvents = ""; //切模式时恢复手势层，避免 Alt 拖出状态残留
+    updateCopyResultButton();
     hideDialogViewMode();
     render();
+    //电脑端视图分隔条：模式切换后重建
+    if(window.refreshPaneSplitters){ window.refreshPaneSplitters(); }
 }
 
 //↓一堆、表情包模式的设置项（多图层）
@@ -649,6 +686,7 @@ document.getElementById("backgroundColorWell").oninput = function(){
 };
 initBqbLayers();
 dragOverlay.style.display = "none"; //默认是 sprite 模式，手势层隐藏（切到 bqb 时由 switchMode 打开）
+updateCopyResultButton(); //电脑端初始为完整立绘模式，显示左下角复制按钮
 //↑一堆、表情包模式的设置项（多图层）
 document.getElementById("input_subtitleText").oninput = function(){
     subtitleText = this.value;
@@ -706,6 +744,8 @@ function getDragClient(e){
 }
 function dragBqbStart(e){
     if(nowMode != "bqb") return;
+    //电脑端按住 Alt 时手势层让路，改为拖出成品图（见下方 WebView2 拖拽逻辑）
+    if(isWebView2Desktop && e.altKey) return;
     const layer = getSelectedLayer();
     if(!layer){ return; }
     e.preventDefault(); //阻止触摸默认行为
@@ -749,16 +789,121 @@ dragOverlay.addEventListener("mousedown", dragBqbStart);
 window.addEventListener("mousemove", dragBqbMove);
 window.addEventListener("mouseup", dragBqbEnd);
 
-//拦截原生图片拖拽和长按菜单
-window.addEventListener("dragstart", function(e){ e.preventDefault(); });
+// ---------- 电脑端 WebView2：成品图拖出 PNG / 复制到剪贴板 ----------
+// 只有在 WebView2 套壳里才启用；手机端不满足 isWebView2Desktop，行为与以前完全一致
+function getResultPngDataUrl(){
+    //表情包模式导出 bqb 画板，完整立绘模式导出主画布
+    var exportCanvas = (nowMode == "bqb") ? bqbCanvas : canvas;
+    return exportCanvas.toDataURL("image/png");
+}
+function getResultFileName(){
+    var name = String(nowActor || "zunzun");
+    name = name.replace(/[\\/:*?"<>|]/g, "_"); //去掉 Windows 文件名非法字符
+    return name + ".png";
+}
+function getZunzunBridge(){
+    try{
+        if(window.chrome && window.chrome.webview && window.chrome.webview.hostObjects){
+            return window.chrome.webview.hostObjects.zunzunBridge || null;
+        }
+    }catch(e){}
+    return null;
+}
+function updateCopyResultButton(){
+    var btn = document.getElementById("button_copyResult");
+    if(!btn){ return; }
+    //只有电脑端、且当前模式有静态成品图（表情包 / 完整立绘）才显示
+    btn.style.display = (isWebView2Desktop && nowMode != "lip") ? "block" : "none";
+}
+function copyResultByWebApi(dataUrl){
+    if(!navigator.clipboard || typeof ClipboardItem === "undefined"){
+        tip("当前环境不支持复制图片");
+        return;
+    }
+    fetch(dataUrl).then(function(res){ return res.blob(); }).then(function(blob){
+        return navigator.clipboard.write([new ClipboardItem({"image/png": blob})]);
+    }).then(function(){
+        tip("已复制成品图到剪贴板");
+    }).catch(function(err){
+        console.error(err);
+        tip("复制失败，可以先用「导出」保存图片");
+    });
+}
+function copyResultImage(){
+    if(!isWebView2Desktop){ return; }
+    if(nowMode == "lip"){ return; }
+    var dataUrl = getResultPngDataUrl();
+    var base64 = dataUrl.substring(dataUrl.indexOf(",") + 1);
+    var bridge = getZunzunBridge();
+    if(bridge && typeof bridge.CopyPng === "function"){
+        try{
+            var ret = bridge.CopyPng(base64); //原生剪贴板，最稳
+            if(ret && typeof ret.then === "function"){
+                ret.then(function(){
+                    tip("已复制成品图到剪贴板");
+                }, function(err){
+                    console.error(err);
+                    copyResultByWebApi(dataUrl); //桥调用失败时退回网页剪贴板
+                });
+            }else{
+                tip("已复制成品图到剪贴板");
+            }
+            return;
+        }catch(err){
+            console.error(err);
+        }
+    }
+    copyResultByWebApi(dataUrl);
+}
+//把当前成品图以 PNG 文件的形式拖出：Edge/WebView2 支持 Chromium 的 DownloadURL
+img_canvasResult.addEventListener("dragstart", function(e){
+    if(!isWebView2Desktop || nowMode == "lip"){
+        e.preventDefault();
+        return;
+    }
+    var dataUrl = getResultPngDataUrl();
+    var fileName = getResultFileName();
+    try{
+        e.dataTransfer.effectAllowed = "copy";
+        e.dataTransfer.setData("DownloadURL", "image/png:" + fileName + ":" + dataUrl);
+        e.dataTransfer.setData("text/plain", fileName);
+    }catch(err){
+        console.error(err);
+        e.preventDefault();
+        tip("当前环境不支持拖出图片");
+    }
+});
+//拦截原生图片拖拽和长按菜单；电脑端只放行成品图的拖出
+window.addEventListener("dragstart", function(e){
+    if(isWebView2Desktop && e.target === img_canvasResult && nowMode != "lip"){
+        return;
+    }
+    e.preventDefault();
+});
 dragOverlay.addEventListener("contextmenu", function(e){ e.preventDefault(); });
 img_canvasResult.addEventListener("contextmenu", function(e){ e.preventDefault(); });
+
+//表情包模式下成品图被手势层盖住：按住 Alt 时让手势层暂时不接收鼠标，才能从图片开始拖出
+function setBqbDragOutMode(on){
+    if(!isWebView2Desktop || nowMode != "bqb"){ return; }
+    dragOverlay.style.pointerEvents = on ? "none" : "";
+}
+window.addEventListener("keydown", function(e){
+    if(e.key === "Alt"){ setBqbDragOutMode(true); }
+});
+window.addEventListener("keyup", function(e){
+    if(e.key === "Alt"){ setBqbDragOutMode(false); }
+});
+window.addEventListener("blur", function(){ setBqbDragOutMode(false); });
 
 
 
 function toggleBqbView(){ //是否折叠表情包模式的设置项
     var bqbView = document.getElementById("bqbView");
-    var isCollapsed = bqbView.style.flex.charAt(0) === "0";
+    var isCollapsed = bqbView.dataset.paneCollapsed === "1";
+    bqbView.dataset.paneCollapsed = isCollapsed ? "0" : "1";
     bqbView.style.flex = isCollapsed ? "1" : "0";
     bqbView.style.minHeight = isCollapsed ? "auto" : "60px";
+    //电脑端视图分隔条：折叠状态变化后重建
+    if(window.refreshPaneSplitters){ window.refreshPaneSplitters(); }
 }

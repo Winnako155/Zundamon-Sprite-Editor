@@ -6,11 +6,137 @@
         xmlns:local="clr-namespace:zunzunWebView2"
         xmlns:Wpf="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf" x:Class="zunzunWebView2.MainWindow"
         mc:Ignorable="d"
-        Title="俊达萌立绘编辑器" Height="600" Width="800" MinWidth="380" MinHeight="500" WindowStartupLocation="CenterScreen" Icon="ico.png">
+        Title="俊达萌立绘编辑器" Height="600" Width="800" MinWidth="380" MinHeight="500" WindowStartupLocation="CenterScreen" Icon="ico.png"
+        WindowStyle="None" ResizeMode="CanResize" Background="#E8F5E9" UseLayoutRounding="True" SnapsToDevicePixels="True"
+        Opacity="0" ShowActivated="False" ShowInTaskbar="False"
+        StateChanged="Window_StateChanged">
+    <!-- 自绘标题栏：保留拖动/双击最大化，并在右侧提供置顶、最小化、最大化、关闭 -->
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="36" ResizeBorderThickness="6" GlassFrameThickness="0" UseAeroCaptionButtons="False" CornerRadius="0"/>
+    </WindowChrome.WindowChrome>
+    <Window.Resources>
+        <Style x:Key="TitleBarButton" TargetType="Button">
+            <Setter Property="Width" Value="46"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#3B5C3E"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bg" Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              TextElement.Foreground="{TemplateBinding Foreground}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bg" Property="Background" Value="#CDE9CF"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="bg" Property="Background" Value="#B7DFBA"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="TitleBarCloseButton" TargetType="Button" BasedOn="{StaticResource TitleBarButton}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bg" Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              TextElement.Foreground="{TemplateBinding Foreground}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bg" Property="Background" Value="#E81123"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="bg" Property="Background" Value="#C50F1F"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!-- 钉子按钮：按下（置顶）时用主题绿高亮，和普通标题栏按钮区分 -->
+        <Style x:Key="TitleBarPinButton" TargetType="ToggleButton">
+            <Setter Property="Width" Value="40"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#3B5C3E"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="ToolTip" Value="总在最前"/>
+            <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="bg" Margin="3,5" Background="{TemplateBinding Background}"
+                                BorderBrush="Transparent" BorderThickness="1" CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              TextElement.Foreground="{TemplateBinding Foreground}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bg" Property="Background" Value="#CDE9CF"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="bg" Property="Background" Value="#C8E6C9"/>
+                                <Setter TargetName="bg" Property="BorderBrush" Value="#43A047"/>
+                                <Setter Property="Foreground" Value="#0E5A11"/>
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsChecked" Value="True"/>
+                                    <Condition Property="IsMouseOver" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="bg" Property="Background" Value="#B7DFBA"/>
+                            </MultiTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <Grid>
-        <Grid>
-            <Wpf:WebView2 x:Name="webView" Margin="0"/>
-        </Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="36"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
+        <Border Grid.Row="0" Background="#E8F5E9" BorderBrush="#0E5A111C" BorderThickness="0,0,0,1">
+            <Grid>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0" IsHitTestVisible="False">
+                    <Image Source="ico.png" Width="16" Height="16"/>
+                    <TextBlock Text="俊达萌立绘编辑器" Margin="8,0,0,0" FontSize="12"
+                               Foreground="#0E5A11" VerticalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+                    <ToggleButton x:Name="button_pin" Style="{StaticResource TitleBarPinButton}"
+                                  Content="&#xE718;" Checked="button_pin_Checked" Unchecked="button_pin_Unchecked"/>
+                    <Button x:Name="button_min" Style="{StaticResource TitleBarButton}"
+                            Content="&#xE921;" Click="button_min_Click" ToolTip="最小化"/>
+                    <Button x:Name="button_max" Style="{StaticResource TitleBarButton}"
+                            Content="&#xE922;" Click="button_max_Click" ToolTip="最大化"/>
+                    <Button x:Name="button_close" Style="{StaticResource TitleBarCloseButton}"
+                            Content="&#xE8BB;" Click="button_close_Click" ToolTip="关闭"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1">
+            <!-- 四周留 3px 让 WindowChrome 的缩放边框不被 WebView2 子窗口盖住 -->
+            <Wpf:WebView2 x:Name="webView" Margin="3,0,3,3"/>
+        </Grid>
     </Grid>
 </Window>

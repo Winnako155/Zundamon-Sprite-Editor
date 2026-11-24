@@ -19,3 +19,6 @@ document.getElementById("dialogView_mode_sprite").onclick = function(){
 document.getElementById("dialogView_mode_bqb").onclick = function(){
     switchMode("bqb");
 }
+document.getElementById("dialogView_mode_lip").onclick = function(){
+    switchMode("lip");
+}

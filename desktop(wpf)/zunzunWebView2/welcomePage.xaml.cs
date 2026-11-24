@@ -19,20 +19,9 @@ namespace zunzunWebView2
     /// </summary>
     public partial class welcomePage : Window
     {
-        public MainWindow mw;
         public welcomePage()
         {
             InitializeComponent();
-            openTheMainWindow();
-            mw = new MainWindow();
-
-        }
-        async private void openTheMainWindow()
-        {
-            await Task.Delay(2000);
-            mw.Show();
-            this.Close();
-            
         }
     }
 }

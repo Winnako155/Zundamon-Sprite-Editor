@@ -29,7 +29,7 @@
         <div>
             <button id="button_nowActor" onclick="showDecideView()">当前立绘:???</button>
             <button id="button_Mode" onclick="showDialogMode('编辑器模式')">模式</button>
-            <button id="button_Download" onclick="downloadSprite()">导出</button>
+            <button id="button_Download" onclick="handleExportButton()">导出</button>
         </div>
     </div>
     <div id="mainView"><!-- 主视图 -->
@@ -38,6 +38,7 @@
             <canvas id="canvas" style="display: none;"></canvas> <!--隐藏起来，后期用img显示，这样不用调整大小(-->
             <canvas id="bqbCanvas" style="display: none;"></canvas>
             <img id="img_canvasResult" alt="展示区"  src="res/no-image.png" style="border-radius: 10px;">
+            <canvas id="lipPreviewCanvas" style="display: none;"></canvas> <!--朗读对口型模式的预览画布-->
             <div id="dragOverlay"></div> <!--透明手势层：接管触摸，避免 webview 长按图片触发原生拖拽-->
         </div>
 
@@ -124,9 +125,184 @@
         </div>
 
         <div id="setView"><!-- 设置视图 -->
-            <p style="font-size: 30px; font-weight: bold;">设置</p>
+            <!-- 标题行：右侧折叠按钮只在朗读模式的竖屏/窄屏出现，用来收起下方的素材/图层选择区 -->
+            <div class="setViewHeader">
+                <p style="font-size: 30px; font-weight: bold;">设置</p>
+                <button id="button_toggleSetView" onclick="toggleSetView()">隐藏</button>
+            </div>
         </div>
 
+        <div id="lipView"><!--朗读对口型设置视图（与表情包设置区同风格）-->
+            <div style="display: flex; flex-direction: row; align-items: center; gap: 5px;">
+                <p style="font-size: 30px; font-weight: bold;">朗读对口型</p>
+                <button class="lipHelpButton" type="button" onclick="lipShowHelp('main')" aria-label="朗读对口型说明">?</button>
+                <button id="button_toggleLipView" onclick="toggleLipView()">折叠</button>
+            </div>
+
+            <div class="lipSectionTitle">
+                <p>音频</p>
+                <button class="lipHelpButton" type="button" onclick="lipShowHelp('audio')" aria-label="音频说明">?</button>
+            </div>
+            <div style="display: flex; flex-direction: row; align-items: center; gap: 5px;">
+                <button onclick="lipPickAudio()">选择音频</button>
+                <p id="text_lipAudioName" style="font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">未选择</p>
+                <input type="file" accept="audio/*" id="input_lipAudio" style="display: none;" />
+            </div>
+
+            <p id="text_lipStatus" style="margin-top: 5px; font-size: 13px; color: var(--color-primary-dark);">未选择音频</p>
+
+            <div class="lipSectionTitle">
+                <p>预览</p>
+                <button class="lipHelpButton" type="button" onclick="lipShowHelp('preview')" aria-label="预览说明">?</button>
+            </div>
+            <div style="display: flex; flex-direction: row; align-items: center; gap: 5px;">
+                <button id="button_lipPlay" onclick="lipTogglePlay()">播放</button>
+                <button onclick="lipStopPlayback()">停止</button>
+                <!-- 播放时间：点一下变成输入框，回车跳到该时刻；未编辑时实时显示当前位置 -->
+                <span id="lipTimeBox">
+                    <span id="text_lipTime" title="点击输入时间跳转">0.0 / 0.0s</span>
+                    <input type="text" id="input_lipTimeJump" inputmode="text" enterkeyhint="go"
+                           autocomplete="off" spellcheck="false" placeholder="12.5 或 0:12.5" />
+                </span>
+            </div>
+            <audio id="lipAudio" style="display: none;"></audio>
+
+            <!-- 播放进度条同时是片段时间轴：片段色块直接画在这条拖动条上 -->
+            <div id="lipTimelineBar">
+                <div id="lipRegionTimeline">
+                    <div id="lipTimelineFill"></div>
+                    <div id="lipRegionPlayhead"></div>
+                </div>
+                <input type="range" min="0" max="1000" step="1" value="0" id="input_lipProgress" />
+            </div>
+
+            <div class="lipSectionTitle">
+                <p>立绘样式关键帧</p>
+                <button class="lipHelpButton" type="button" onclick="lipShowHelp('regions')" aria-label="立绘样式关键帧说明">?</button>
+            </div>
+            <div style="display: flex; flex-direction: row; align-items: center; gap: 5px; margin-top: 5px; flex-wrap: wrap;">
+                <button onclick="lipAddRegion()">创建片段</button>
+                <p id="text_lipRegionHint" style="font-size: 13px; color: var(--color-primary-dark);">请先选择音频</p>
+            </div>
+            <!-- 选中片段后显示起止时间，可手动改；删除入口放在输入框旁边 -->
+            <div id="lipRegionEditor">
+                <p class="lipRegionEditorTitle">片段 <span id="text_lipRegionIndex">1</span></p>
+                <div class="lipRegionEditorRow">
+                    <span>开始</span>
+                    <input type="text" id="input_lipRegionStart" inputmode="text" enterkeyhint="done"
+                           autocomplete="off" spellcheck="false" />
+                    <span>结束</span>
+                    <input type="text" id="input_lipRegionEnd" inputmode="text" enterkeyhint="done"
+                           autocomplete="off" spellcheck="false" />
+                    <button class="lipRegionEditorDelete" onclick="lipDeleteSelectedRegion()">删除片段</button>
+                </div>
+            </div>
+
+            <div class="lipSectionTitle">
+                <p>口型</p>
+                <button class="lipHelpButton" type="button" onclick="lipShowHelp('mouth')" aria-label="口型说明">?</button>
+            </div>
+            <div style="display: flex; flex-direction: row; align-items: center; gap: 5px;">
+                <p>灵敏度:</p>
+                <input type="range" min="20" max="200" step="1" value="100" style="flex: 1;" id="input_lipSensitivity" />
+                <p id="text_lipSensitivity">100%</p>
+            </div>
+            <div style="display: flex; flex-direction: row; align-items: center; gap: 5px; margin-top: 5px;">
+                <p>平滑:</p>
+                <input type="range" min="0" max="100" step="1" value="40" style="flex: 1;" id="input_lipSmooth" />
+                <p id="text_lipSmooth">40%</p>
+            </div>
+            <p id="text_lipMouthHint" style="margin-top: 5px; font-size: 13px; color: var(--color-primary-dark);"></p>
+
+            <div class="lipSectionTitle">
+                <p>动画</p>
+                <button class="lipHelpButton" type="button" onclick="lipShowHelp('bob')" aria-label="动画说明">?</button>
+            </div>
+            <div style="display: flex; flex-direction: row; align-items: center; gap: 5px;">
+                <label style="display: flex; align-items: center; gap: 4px; font-size: 14px;">
+                    <input type="checkbox" id="input_lipBob" checked /> 说话时上下浮动
+                </label>
+            </div>
+            <div style="display: flex; flex-direction: row; align-items: center; gap: 5px; margin-top: 5px;">
+                <p>幅度:</p>
+                <input type="range" min="0" max="100" step="1" value="50" style="flex: 1;" id="input_lipBobAmp" />
+                <p id="text_lipBobAmp" style="min-width: 3.5em; text-align: right; font-size: 13px;">50%</p>
+            </div>
+            <div style="display: flex; flex-direction: row; align-items: center; gap: 5px; margin-top: 5px;">
+                <p>频率:</p>
+                <input type="range" min="10" max="60" step="1" value="30" style="flex: 1;" id="input_lipBobFreq" />
+                <p id="text_lipBobFreq" style="min-width: 3.5em; text-align: right; font-size: 13px;">3.0Hz</p>
+            </div>
+
+            <div class="lipSectionTitle">
+                <p>片段衔接</p>
+                <button class="lipHelpButton" type="button" onclick="lipShowHelp('transition')" aria-label="片段衔接说明">?</button>
+            </div>
+            <div style="display: flex; flex-direction: row; align-items: center; gap: 5px;">
+                <label style="display: flex; align-items: center; gap: 4px; font-size: 14px;">
+                    <input type="checkbox" id="input_lipTransition" /> 交接处挤压回弹
+                </label>
+            </div>
+            <div style="display: flex; flex-direction: row; align-items: center; gap: 5px; margin-top: 5px;">
+                <p style="white-space: nowrap;">挤压时长:</p>
+                <input type="range" min="10" max="100" step="5" value="15" style="flex: 1;" id="input_lipTransitionSqueezeDur" />
+                <p id="text_lipTransitionSqueezeDur" style="min-width: 3.5em; text-align: right; font-size: 13px;">0.15s</p>
+            </div>
+            <div style="display: flex; flex-direction: row; align-items: center; gap: 5px; margin-top: 5px;">
+                <p style="white-space: nowrap;">回弹时长:</p>
+                <input type="range" min="10" max="100" step="5" value="40" style="flex: 1;" id="input_lipTransitionReboundDur" />
+                <p id="text_lipTransitionReboundDur" style="min-width: 3.5em; text-align: right; font-size: 13px;">0.40s</p>
+            </div>
+            <div style="display: flex; flex-direction: row; align-items: center; gap: 5px; margin-top: 5px;">
+                <p>挤压:</p>
+                <input type="range" min="0" max="100" step="1" value="50" style="flex: 1;" id="input_lipTransitionSquash" />
+                <p id="text_lipTransitionSquash" style="min-width: 3.5em; text-align: right; font-size: 13px;">50%</p>
+            </div>
+            <div style="display: flex; flex-direction: row; align-items: center; gap: 5px; margin-top: 5px;">
+                <p>回弹:</p>
+                <input type="range" min="0" max="100" step="1" value="50" style="flex: 1;" id="input_lipTransitionRebound" />
+                <p id="text_lipTransitionRebound" style="min-width: 3.5em; text-align: right; font-size: 13px;">50%</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 导出对话框：复用确认框的遮罩、标题、按钮与弹出/关闭动画 -->
+    <div id="dialogView_export_backGround" onclick="lipHideExportView()"></div>
+    <div id="dialogView_export">
+        <h2>导出</h2>
+        <div class="lipExportContent">
+            <!-- 导出格式：GIF 与 MP4 二选一 -->
+            <div class="lipExportTabs">
+                <button id="button_lipExportTabGif" class="lipExportTab lipExportTabActive" onclick="lipSelectExportKind('gif')">透明 GIF</button>
+                <button id="button_lipExportTabMp4" class="lipExportTab" onclick="lipSelectExportKind('mp4')">蓝底 MP4</button>
+            </div>
+            <div class="lipExportRow">
+                <p>尺寸:</p>
+                <select id="input_lipExportSize">
+                    <option value="480">大(480)</option>
+                    <option value="360" selected>中(360)</option>
+                    <option value="240">小(240)</option>
+                </select>
+            </div>
+            <div class="lipExportRow" id="lipExportBgRow">
+                <p>蓝底色:</p>
+                <input type="color" id="input_lipMp4Bg" value="#0000FF" />
+                <p class="lipExportHint">仅 MP4 使用</p>
+            </div>
+            <!-- 帧数：GIF 与 MP4 共用，1~60，输入非法时回到上次的有效值 -->
+            <div class="lipExportRow">
+                <p>帧数:</p>
+                <input type="text" id="input_lipExportFps" inputmode="decimal" enterkeyhint="done"
+                       autocomplete="off" spellcheck="false" value="30" />
+                <p class="lipExportHint">fps（1–60）</p>
+            </div>
+            <p id="text_lipExportStatus" class="lipExportStatus"></p>
+        </div>
+        <div class="dialogView_export_buttons">
+            <button class="dialogView_export_close" onclick="lipHideExportView()">关闭</button>
+            <button class="dialogView_export_ok" onclick="lipStartExport()">开始导出</button>
+        </div>
     </div>
 
     <!-- 选择框背景 -->
@@ -176,7 +352,18 @@
         <p id="dialogView_content"></p>
         <button onclick="hideDialogView()">确定</button>
     </div>
-    
+
+    <!-- 对话框_确认（切换立绘这类会丢失数据的操作用） -->
+    <div id="dialogView_confirm_backGround"></div>
+    <div id="dialogView_confirm">
+        <h2 id="dialogView_confirm_title"></h2>
+        <p id="dialogView_confirm_content"></p>
+        <div class="dialogView_confirm_buttons">
+            <button id="dialogView_confirm_cancel" onclick="hideConfirmView()">取消</button>
+            <button id="dialogView_confirm_ok" onclick="confirmViewOk()">确定</button>
+        </div>
+    </div>
+
     <!-- 对话框_更新下载 -->
     <div id="dialogView_update_backGround"></div>
     <div id="dialogView_update">
@@ -196,6 +383,7 @@
         <h1 style="margin-bottom: 20px;" id="dialogView_mode_title">编辑器模式</h1>
         <img src="res/img/mode_sprite.png" alt="完整立绘模式" id="dialogView_mode_sprite">
         <img src="res/img/mode_bqb.png" alt="表情包模式" id="dialogView_mode_bqb">
+        <img src="res/img/mode_lip.png" alt="朗读对口型模式" id="dialogView_mode_lip">
     </div>
 
     <!--开场视图-->
@@ -211,6 +399,8 @@
 <script src="decideView.js"></script>
 <script src="checkUpdate.js"></script>
 <script src="dialog_mode.js"></script>
+<script src="lipSync.js"></script>
+<script src="splitter.js"></script>
 <script>
     checkUpdate();
     hideDialogViewMode();

@@ -157,3 +157,377 @@
 2026-11-23 13:03:48.688: [INFO] BookmarksLoadDropped droppedNodes=0
 2026-11-23 13:03:48.688: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
 2026-11-23 13:13:19.105: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 00:55:40.206: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 00:55:40.206: [INFO] Profiles total count: 1
+2026-11-24 00:55:40.206: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-23T13:13:19.065Z
+2026-11-24 00:55:40.206: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 00:55:40.206: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-23T13:13:19.065Z
+2026-11-24 00:55:40.206: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 00:55:40.206: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 00:55:40.206: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 00:55:40.206: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 00:55:45.470: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 00:57:07.851: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 00:57:07.851: [INFO] Profiles total count: 1
+2026-11-24 00:57:07.851: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-23T13:13:19.065Z
+2026-11-24 00:57:07.851: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 00:57:07.851: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-23T13:13:19.065Z
+2026-11-24 00:57:07.851: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 00:57:07.851: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 00:57:07.851: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 00:57:07.851: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 00:57:15.150: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 00:57:21.318: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 00:57:21.318: [INFO] Profiles total count: 1
+2026-11-24 00:57:21.318: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-23T13:13:19.065Z
+2026-11-24 00:57:21.318: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 00:57:21.318: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-23T13:13:19.065Z
+2026-11-24 00:57:21.318: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 00:57:21.318: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 00:57:21.318: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 00:57:21.318: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 00:57:28.786: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 00:57:38.075: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 00:57:38.075: [INFO] Profiles total count: 1
+2026-11-24 00:57:38.075: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-23T13:13:19.065Z
+2026-11-24 00:57:38.075: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 00:57:38.075: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-23T13:13:19.065Z
+2026-11-24 00:57:38.075: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 00:57:38.075: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 00:57:38.075: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 00:57:38.075: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 00:57:47.548: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 00:58:08.343: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 00:58:08.343: [INFO] Profiles total count: 1
+2026-11-24 00:58:08.343: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-23T13:13:19.065Z
+2026-11-24 00:58:08.343: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 00:58:08.343: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-23T13:13:19.065Z
+2026-11-24 00:58:08.343: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 00:58:08.343: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 00:58:08.343: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 00:58:08.343: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 00:58:18.694: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 00:58:46.292: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 00:58:46.292: [INFO] Profiles total count: 1
+2026-11-24 00:58:46.292: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T00:58:18.659Z
+2026-11-24 00:58:46.292: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 00:58:46.292: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T00:58:18.659Z
+2026-11-24 00:58:46.292: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 00:58:46.292: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 00:58:46.292: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 00:58:46.292: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 00:58:56.011: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 00:59:44.074: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 00:59:44.074: [INFO] Profiles total count: 1
+2026-11-24 00:59:44.074: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T00:58:18.659Z
+2026-11-24 00:59:44.074: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 00:59:44.074: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T00:58:18.659Z
+2026-11-24 00:59:44.074: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 00:59:44.074: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 00:59:44.074: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 00:59:44.074: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:00:09.871: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:00:17.529: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:00:17.529: [INFO] Profiles total count: 1
+2026-11-24 01:00:17.529: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T00:58:18.659Z
+2026-11-24 01:00:17.529: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:00:17.529: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T00:58:18.659Z
+2026-11-24 01:00:17.529: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 01:00:17.529: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 01:00:17.529: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 01:00:17.529: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:00:43.554: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:01:07.521: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:01:07.522: [INFO] Profiles total count: 1
+2026-11-24 01:01:07.522: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T00:58:18.659Z
+2026-11-24 01:01:07.522: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:01:07.522: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T00:58:18.659Z
+2026-11-24 01:01:07.522: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 01:01:07.522: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 01:01:07.522: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 01:01:07.522: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:01:17.076: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:01:54.214: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:01:54.214: [INFO] Profiles total count: 1
+2026-11-24 01:01:54.214: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T00:58:18.659Z
+2026-11-24 01:01:54.214: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:01:54.214: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T00:58:18.659Z
+2026-11-24 01:01:54.214: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 01:01:54.214: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 01:01:54.214: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 01:01:54.214: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:02:20.015: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:02:28.954: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:02:28.954: [INFO] Profiles total count: 1
+2026-11-24 01:02:28.954: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:02:19.981Z
+2026-11-24 01:02:28.954: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:02:28.954: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:02:19.981Z
+2026-11-24 01:02:28.954: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 01:02:28.954: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 01:02:28.954: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 01:02:28.954: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:02:55.216: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:03:26.465: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:03:26.465: [INFO] Profiles total count: 1
+2026-11-24 01:03:26.465: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:02:55.180Z
+2026-11-24 01:03:26.465: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:03:26.465: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:02:55.180Z
+2026-11-24 01:03:26.465: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 01:03:26.465: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 01:03:26.465: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 01:03:26.465: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:03:57.018: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:04:11.912: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:04:11.912: [INFO] Profiles total count: 1
+2026-11-24 01:04:11.912: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:02:55.180Z
+2026-11-24 01:04:11.912: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:04:11.912: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:02:55.180Z
+2026-11-24 01:04:11.912: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 01:04:11.912: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 01:04:11.912: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 01:04:11.912: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:04:32.394: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:04:57.231: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:04:57.231: [INFO] Profiles total count: 1
+2026-11-24 01:04:57.231: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:02:55.180Z
+2026-11-24 01:04:57.231: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:04:57.231: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:02:55.180Z
+2026-11-24 01:04:57.231: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 01:04:57.231: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 01:04:57.231: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 01:04:57.231: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:05:15.091: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:05:40.412: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:05:40.412: [INFO] Profiles total count: 1
+2026-11-24 01:05:40.412: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:02:55.180Z
+2026-11-24 01:05:40.412: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:05:40.412: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:02:55.180Z
+2026-11-24 01:05:40.412: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 01:05:40.412: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 01:05:40.412: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 01:05:40.412: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:05:50.243: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:06:09.386: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:06:09.386: [INFO] Profiles total count: 1
+2026-11-24 01:06:09.386: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:02:55.180Z
+2026-11-24 01:06:09.386: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:06:09.387: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:02:55.180Z
+2026-11-24 01:06:09.387: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 01:06:09.387: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 01:06:09.387: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 01:06:09.387: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:06:21.358: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:07:19.689: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:07:19.689: [INFO] Profiles total count: 1
+2026-11-24 01:07:19.689: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:02:55.180Z
+2026-11-24 01:07:19.689: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:07:19.689: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:02:55.180Z
+2026-11-24 01:07:19.689: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 01:07:19.689: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 01:07:19.689: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 01:07:19.689: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:07:28.699: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:08:32.320: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:08:32.320: [INFO] Profiles total count: 1
+2026-11-24 01:08:32.320: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:02:55.180Z
+2026-11-24 01:08:32.320: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:08:32.320: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:02:55.180Z
+2026-11-24 01:08:32.320: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 01:08:32.320: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 01:08:32.320: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 01:08:32.320: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:15:42.553: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:19:30.339: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:19:30.339: [INFO] Profiles total count: 1
+2026-11-24 01:19:30.339: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:15:42.517Z
+2026-11-24 01:19:30.339: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:19:30.339: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:15:42.517Z
+2026-11-24 01:19:30.339: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 01:19:30.339: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 01:19:30.339: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 01:19:30.339: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:19:38.939: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:22:19.834: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:22:19.834: [INFO] Profiles total count: 1
+2026-11-24 01:22:19.834: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:15:42.517Z
+2026-11-24 01:22:19.834: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:22:19.834: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:15:42.517Z
+2026-11-24 01:22:19.834: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 01:22:19.834: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 01:22:19.834: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 01:22:19.834: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:22:40.973: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:23:40.977: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:23:40.977: [INFO] Profiles total count: 1
+2026-11-24 01:23:40.977: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:15:42.517Z
+2026-11-24 01:23:40.977: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:23:40.977: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:15:42.517Z
+2026-11-24 01:23:40.977: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 01:23:40.977: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 01:23:40.977: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 01:23:40.977: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:26:17.126: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:28:15.642: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:28:15.642: [INFO] Profiles total count: 1
+2026-11-24 01:28:15.642: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:26:17.084Z
+2026-11-24 01:28:15.642: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:28:15.642: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:26:17.084Z
+2026-11-24 01:28:15.642: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 01:28:15.642: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 01:28:15.642: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 01:28:15.642: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:28:31.553: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:28:44.874: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:28:44.874: [INFO] Profiles total count: 1
+2026-11-24 01:28:44.874: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:26:17.084Z
+2026-11-24 01:28:44.874: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:28:44.874: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:26:17.084Z
+2026-11-24 01:28:44.874: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 01:28:44.874: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 01:28:44.874: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 01:28:44.874: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:28:50.647: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:29:11.063: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:29:11.063: [INFO] Profiles total count: 1
+2026-11-24 01:29:11.063: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:26:17.084Z
+2026-11-24 01:29:11.063: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:29:11.063: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:26:17.084Z
+2026-11-24 01:29:11.063: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 01:29:11.063: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 01:29:11.063: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 01:29:11.063: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:29:27.092: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:30:10.435: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:30:10.435: [INFO] Profiles total count: 1
+2026-11-24 01:30:10.435: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:26:17.084Z
+2026-11-24 01:30:10.435: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:30:10.435: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:26:17.084Z
+2026-11-24 01:30:10.435: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 01:30:10.435: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 01:30:10.435: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 01:30:10.435: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:30:30.290: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:30:59.291: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:30:59.291: [INFO] Profiles total count: 1
+2026-11-24 01:30:59.291: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:30:16.010Z
+2026-11-24 01:30:59.291: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:30:59.291: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:30:16.010Z
+2026-11-24 01:30:59.291: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 01:30:59.291: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 01:30:59.291: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 01:30:59.291: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:31:22.013: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:32:12.410: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:32:12.410: [INFO] Profiles total count: 1
+2026-11-24 01:32:12.410: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:30:16.010Z
+2026-11-24 01:32:12.410: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:32:12.410: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:30:16.010Z
+2026-11-24 01:32:12.410: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 01:32:12.410: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 01:32:12.410: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 01:32:12.410: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:36:10.723: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:36:27.405: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:36:27.405: [INFO] Profiles total count: 1
+2026-11-24 01:36:27.405: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:32:43.501Z
+2026-11-24 01:36:27.405: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:36:27.405: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:32:43.501Z
+2026-11-24 01:36:27.405: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 01:36:27.405: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 01:36:27.405: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 01:36:27.405: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:36:35.444: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:37:20.766: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:37:20.766: [INFO] Profiles total count: 1
+2026-11-24 01:37:20.766: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:36:32.281Z
+2026-11-24 01:37:20.766: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:37:20.766: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:36:32.281Z
+2026-11-24 01:37:20.766: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 01:37:20.766: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 01:37:20.766: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 01:37:20.766: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:38:06.502: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:38:06.502: [INFO] Profiles total count: 1
+2026-11-24 01:38:06.502: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:36:32.281Z
+2026-11-24 01:38:06.502: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:38:06.503: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:36:32.281Z
+2026-11-24 01:38:06.503: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 01:38:06.503: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 01:38:06.503: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 01:38:06.503: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:42:38.786: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:43:09.164: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:43:09.164: [INFO] Profiles total count: 1
+2026-11-24 01:43:09.164: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:38:45.472Z
+2026-11-24 01:43:09.164: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:43:09.164: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:38:45.472Z
+2026-11-24 01:43:09.164: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 01:43:09.164: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 01:43:09.164: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 01:43:09.164: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:45:14.531: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:45:14.531: [INFO] Profiles total count: 1
+2026-11-24 01:45:14.531: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:38:45.472Z
+2026-11-24 01:45:14.531: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:45:14.531: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:38:45.472Z
+2026-11-24 01:45:14.531: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 01:45:14.531: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 01:45:14.531: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 01:45:14.531: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:47:09.540: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:47:09.540: [INFO] Profiles total count: 1
+2026-11-24 01:47:09.540: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:38:45.472Z
+2026-11-24 01:47:09.540: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:47:09.540: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:38:45.472Z
+2026-11-24 01:47:09.540: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 01:47:09.540: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 01:47:09.540: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 01:47:09.540: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:48:45.083: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:48:45.083: [INFO] Profiles total count: 1
+2026-11-24 01:48:45.083: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:38:45.472Z
+2026-11-24 01:48:45.083: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:48:45.083: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:38:45.472Z
+2026-11-24 01:48:45.083: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 01:48:45.083: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 01:48:45.083: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 01:48:45.083: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:51:40.771: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:51:40.771: [INFO] Profiles total count: 1
+2026-11-24 01:51:40.771: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:38:45.472Z
+2026-11-24 01:51:40.771: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:51:40.771: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:38:45.472Z
+2026-11-24 01:51:40.771: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 01:51:40.771: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 01:51:40.771: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 01:51:40.771: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:51:59.432: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:51:59.432: [INFO] Profiles total count: 1
+2026-11-24 01:51:59.432: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:38:45.472Z
+2026-11-24 01:51:59.432: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:51:59.432: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:38:45.472Z
+2026-11-24 01:51:59.432: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 01:51:59.432: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 01:51:59.432: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 01:51:59.432: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:52:17.147: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:52:47.762: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:52:47.762: [INFO] Profiles total count: 1
+2026-11-24 01:52:47.762: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:38:45.472Z
+2026-11-24 01:52:47.762: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:52:47.762: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:38:45.472Z
+2026-11-24 01:52:47.762: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 01:52:47.762: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 01:52:47.762: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 01:52:47.762: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:53:08.499: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:53:59.323: [INFO] CurrentProfilePath: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:53:59.323: [INFO] Profiles total count: 1
+2026-11-24 01:53:59.323: [INFO] Profile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:38:45.472Z
+2026-11-24 01:53:59.323: [INFO] LastUsedProfileDir: C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default
+2026-11-24 01:53:59.323: [INFO] MostRecentlyActiveProfile: name=用户配置 1 path=C:\Users\wang\Documents\github\Zundamon-Sprite-Editor\desktop(wpf)\zunzunWebView2\bin\Debug\zunzunWebView2.exe.WebView2\EBWebView\Default lastActive=2026-11-24T01:38:45.472Z
+2026-11-24 01:53:59.323: [INFO] OnDoneLoading sync enabled: 0
+2026-11-24 01:53:59.323: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-24 01:53:59.323: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-24 01:53:59.323: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-24 01:55:14.458: [INFO] BookmarksSnapshot Shutdown total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1

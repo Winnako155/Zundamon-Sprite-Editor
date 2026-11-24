@@ -15,6 +15,38 @@ function hideDialogView() {
     }, 300);
 }
 
+//确认对话框：点“确定”执行回调，点“取消”只关闭
+//用于切换立绘这类会丢失已有数据（片段）的操作
+var confirmViewCallback = null;
+function showConfirmView(title, content, onOk) {
+    confirmViewCallback = onOk || null;
+    document.getElementById("dialogView_confirm_title").innerHTML = title;
+    document.getElementById("dialogView_confirm_content").innerHTML = content.replace(/\n/g, "<br>");
+    var box = document.getElementById("dialogView_confirm");
+    var bg = document.getElementById("dialogView_confirm_backGround");
+    box.style.display = "flex";
+    bg.style.display = "block";
+    box.style.animation = "showDialog 0.3s forwards ease";
+    bg.style.animation = "showDialog_BackGround 0.3s forwards ease";
+}
+function hideConfirmView() {
+    confirmViewCallback = null;
+    var box = document.getElementById("dialogView_confirm");
+    var bg = document.getElementById("dialogView_confirm_backGround");
+    box.style.animation = "hideDialog 0.3s forwards ease";
+    bg.style.animation = "hideDialog_BackGround 0.3s forwards ease";
+    setTimeout(() => {
+        box.style.display = "none";
+        bg.style.display = "none";
+    }, 300);
+}
+function confirmViewOk() {
+    var cb = confirmViewCallback;
+    confirmViewCallback = null; //先清掉，避免重复触发
+    hideConfirmView();
+    if (cb) { cb(); }
+}
+
 //更新下载对话框：三个下载渠道
 var updateDownloadUrls = {
     "123pan": "https://1814681618.share.123pan.cn/123pan/MO1cVv-Cbqav",

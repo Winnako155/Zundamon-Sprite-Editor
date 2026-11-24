@@ -49,22 +49,36 @@ function addItem(img,name,jsPath){
     item.classList.add("decideView_item");
     item.innerHTML = '<div class="item"><img id="' + name + '" src="' + img + '" alt=""><p>' + name + '</p></div>';
     item.querySelector("#" + name).addEventListener("click",function(){
-        tip("切换中...");
-        hideDecideView();
-        clearAllLists();
-        setTimeout(() => {
-            tip(name + "切换成功");
-            resetActorLayerTransform();
-            console.log("重置人物位置");
-        }, 500);
-        // 创建script元素并设置js路径
-        let script = document.createElement("script");
-        script.src = jsPath;
-        // 将script元素添加到body中以加载js文件
-        document.body.appendChild(script);
-        button_nowActor.innerHTML = "当前立绘:" + name;
-        
+        // 片段快照绑定的是旧立绘的图层，切换立绘后没法继续用，
+        // 已有片段时先确认，用户确认后才切换并清空片段
+        if (typeof lipState !== "undefined" && lipState.regions && lipState.regions.length > 0) {
+            showConfirmView("切换立绘",
+                "切换立绘会丢失已有片段（当前 " + lipState.regions.length + " 个），切换后需要重新创建。\n确定要切换到「" + name + "」吗？",
+                function () { switchActor(name, jsPath); });
+            return;
+        }
+        switchActor(name, jsPath);
     });
     decideView_itemList.appendChild(item);
     
+}
+
+//真正执行切换：加载新立绘的 js，并清掉旧片段的绘制状态
+function switchActor(name,jsPath){
+    tip("切换中...");
+    hideDecideView();
+    clearAllLists();
+    // 清空片段列表/时间轴色块/选中状态，避免新立绘上残留旧片段的图层和嘴部
+    if (typeof lipResetRegions === "function") { lipResetRegions(); }
+    setTimeout(() => {
+        tip(name + "切换成功");
+        resetActorLayerTransform();
+        console.log("重置人物位置");
+    }, 500);
+    // 创建script元素并设置js路径
+    let script = document.createElement("script");
+    script.src = jsPath;
+    // 将script元素添加到body中以加载js文件
+    document.body.appendChild(script);
+    button_nowActor.innerHTML = "当前立绘:" + name;
 }

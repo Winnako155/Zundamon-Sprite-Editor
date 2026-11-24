@@ -1,4 +1,4 @@
-const nowBuild = "v1.6.2"; //当前版本
+const nowBuild = "v1.7"; //当前版本
 const OWNER = 'Winnako155'; //仓库所有者
 const REPO = 'Zundamon-Sprite-Editor'; //仓库名称
 
@@ -9,6 +9,7 @@ var nowMode = "sprite"; //当前模式：sprite/actor
 document.getElementById("nowBuildText").innerHTML = nowBuild;
 console.log(nowBuild);
 document.getElementById("bqbView").style.display ="none";
+document.getElementById("lipView").style.display ="none"; //朗读对口型设置区默认隐藏
 let canvas = document.getElementById("canvas");
 let bqbCanvas = document.getElementById("bqbCanvas");
 let img_canvasResult = document.getElementById("img_canvasResult");
@@ -73,6 +74,10 @@ async function render(){
         //如果是人物模式，绘制到 bqb 画板
         refreshActorLayerThumb(); //主画布变了，顺手刷新人物图层的缩略图
         drawBqbResult();
+    }
+    else if(nowMode == "lip"){
+        //朗读对口型模式用独立画布预览，这里只通知它立绘/选中项变了
+        lipOnSpriteChanged();
     }
 }
 //把主画布内容合成到 bqb 画板并刷新预览（这里，我用、了同步执行，拖拽时、直接调，用这样就能。，避免延迟、）
@@ -243,6 +248,11 @@ function hideTheStartView(){
     }, 1000);
 }
 function downloadSprite(){
+    //朗读对口型模式是动态成品，导出入口放在它自己的设置区
+    if(nowMode == "lip"){
+        tip("朗读模式请在设置区用「透明 GIF / 蓝底 MP4」导出");
+        return;
+    }
     // 先判断一下环境
     var hasPlus = typeof plus !== "undefined";
     var hasPlusIO = hasPlus && plus.io;
@@ -342,13 +352,32 @@ function switchMode(mode){
         tip("表情包模式");
         initBqbLayers();
     }
-    //表情包模式显示设置面板，立绘模式隐藏
+    else if(mode == "lip"){
+        nowMode = "lip";
+        tip("朗读对口型模式");
+        lipEnterMode();
+        //每次进入朗读对口型模式都用现有提示框提醒当前为测试功能
+        //等模式选择弹框的 0.3s 收起动画结束后再弹，避免共用遮罩被 hideDialogViewMode 的延时关闭收掉
+        setTimeout(function(){
+            showDialog("提示", "当前功能为测试内容，可能有BUG和其他不稳定因素。欢迎大家来进行反馈的说~\n去github提问也或者电邮:ywang155@outlook.com");
+        }, 320);
+    }
+    //表情包模式/朗读模式显示各自的设置面板，立绘模式隐藏
     document.getElementById("bqbView").style.display = (mode == "bqb") ? "" : "none";
+    document.getElementById("lipView").style.display = (mode == "lip") ? "" : "none";
+    //朗读模式用独立预览画布，避免逐帧刷新 1082x1650 的大图上 img 卡顿
+    document.getElementById("lipPreviewCanvas").style.display = (mode == "lip") ? "" : "none";
+    img_canvasResult.style.display = (mode == "lip") ? "none" : "";
+    if(mode != "lip"){
+        lipLeaveMode(); //离开朗读模式时停掉播放/录制
+    }
     //拖拽手势层只在表情包模式启用
     dragOverlay.style.display = (mode == "bqb") ? "" : "none";
     dragOverlay.style.cursor = (mode == "bqb") ? "grab" : "";
     hideDialogViewMode();
     render();
+    //电脑端视图分隔条：模式切换后重建（Android 上该函数不存在，自动跳过）
+    if(window.refreshPaneSplitters){ window.refreshPaneSplitters(); }
 }
 
 //↓一堆、表情包模式的设置项（多图层）
@@ -758,7 +787,10 @@ img_canvasResult.addEventListener("contextmenu", function(e){ e.preventDefault()
 
 function toggleBqbView(){ //是否折叠表情包模式的设置项
     var bqbView = document.getElementById("bqbView");
-    var isCollapsed = bqbView.style.flex.charAt(0) === "0";
+    var isCollapsed = bqbView.dataset.paneCollapsed === "1";
+    bqbView.dataset.paneCollapsed = isCollapsed ? "0" : "1";
     bqbView.style.flex = isCollapsed ? "1" : "0";
     bqbView.style.minHeight = isCollapsed ? "auto" : "60px";
+    //电脑端视图分隔条：折叠状态变化后重建（Android 上该函数不存在，自动跳过）
+    if(window.refreshPaneSplitters){ window.refreshPaneSplitters(); }
 }
